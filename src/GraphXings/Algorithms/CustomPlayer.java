@@ -185,8 +185,10 @@ public class CustomPlayer implements Player {
             // In this case we have to place more or less random coordinates
             // because it's not possible to calculate crossings at this point.
 
-            var lastVertex = gameMoves.getLast().getVertex();
-            var lastCoordinate = gameMoves.getLast().getCoordinate();
+            GameMove lastGameMove = gameMoves.get(gameMoves.size()-1);
+
+            var lastVertex = lastGameMove.getVertex();
+            var lastCoordinate = lastGameMove.getCoordinate();
 
             // Get a neighbour vertex by iterating through the edges
             Vertex neighbourVertex = null;
