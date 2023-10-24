@@ -54,10 +54,20 @@ public class GraphXings
         g.addEdge(e8);
         g.addEdge(e9);
         g.addEdge(e10);
-        // Run the game with two players.
-        Game game = new Game(g,5,4,new RandomPlayer("Player 1"), new CustomPlayer("Player 2"));
-        GameResult res = game.play();
-        // Display the result!
-        System.out.println(res.announceResult());
+
+        int player1 = 0, player2 = 0;
+        for (int i = 0; i < 1000; i++) {
+            // Run the game with two players.
+            Game game = new Game(g, 5, 4, new RandomPlayer("Player 1"), new CustomPlayer("Player 2"));
+            GameResult res = game.play();
+            // Display the result!
+            System.out.println(res.announceResult());
+            if (res.getWinner() == 1) {
+                player1++;
+            } else {
+                player2++;
+            }
+        }
+        System.out.println("Total games: 1000, Player 1 wins: " + player1 + ", Player 2 wins: " + player2);
     }
 }

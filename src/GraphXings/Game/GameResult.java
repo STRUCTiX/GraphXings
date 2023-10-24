@@ -89,4 +89,8 @@ public class GameResult
         }
         return (winner + " beats " + looser + " with " + crossingsGame1 + ":" + crossingsGame2 + " crossings!");
     }
+
+    public int getWinner() {
+        return (crossingsGame1 > crossingsGame2) ? 1 : 2;
+    }
 }

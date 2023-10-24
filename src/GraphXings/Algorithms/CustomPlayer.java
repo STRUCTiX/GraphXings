@@ -33,7 +33,7 @@ public class CustomPlayer implements Player {
     @Override
     public GameMove minimizeCrossings(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, int[][] usedCoordinates, HashSet<Vertex> placedVertices, int width, int height)
     {
-        return randomMove(g,usedCoordinates,placedVertices,width,height);
+        return minimizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
     }
 
     @Override
@@ -105,13 +105,11 @@ public class CustomPlayer implements Player {
         // Check if one of the coordinate candidates are possible game moves
         for (var vertex : coordinateCandidate.keySet()) {
             if (isCoordinateFree(usedCoordinates, coordinateCandidate.get(vertex))) {
-                System.out.println("Success :)");
                 return new GameMove(vertex, coordinateCandidate.get(vertex));
             }
         }
 
 
-        System.out.println("Fallback :(");
         // If we haven't found anything yet use fallback strategy
         // -> use the first free coordinate
         var coordinate = new Coordinate(0, 0);
@@ -177,6 +175,94 @@ public class CustomPlayer implements Player {
 
     private boolean isCoordinateFree(int[][] usedCoordinates, Coordinate coordinate) {
         return usedCoordinates[coordinate.getX()][coordinate.getY()] == 0;
+    }
+
+
+    private GameMove minimizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
+        if (placedVertices.size() < 3) {
+            // In this case we have to place more or less random coordinates
+            // because it's not possible to calculate crossings at this point.
+
+            var lastVertex = gameMoves.getLast().getVertex();
+            var lastCoordinate = gameMoves.getLast().getCoordinate();
+
+            // Get a neighbour vertex by iterating through the edges
+            Vertex neighbourVertex = null;
+            for (var e : g.getEdges()) {
+                if (e.getS().equals(lastVertex)) {
+                    neighbourVertex = e.getT();
+                    break;
+                }
+            }
+
+            // Place the vertex in a corner of the canvas with
+            // maximum distance to the placed vertex.
+            int maxDistance = 0;
+            Coordinate maxCoordinate = new Coordinate(0, 0);
+            for (int i = 0; i < width; i += width - 1) {
+                for (int k = 0; k < height; k += height - 1) {
+                    var tempCoord = new Coordinate(i, k);
+                    var distance = euclidianDistance(lastCoordinate, tempCoord);
+                    if (distance > maxDistance) {
+                        maxDistance = distance;
+                        maxCoordinate = tempCoord;
+                    }
+                }
+            }
+
+            return new GameMove(neighbourVertex, maxCoordinate);
+        }
+
+        // In this case we can compute the minimal crossings
+
+        // First create duplicates of the existing graph and vertex coordintes structures
+        var graphDuplicate = g.copy();
+        var vertexCoordDuplicate = new HashMap<>(vertexCoordinates);
+
+
+        // Check the minimal crossings for an unplaced vertex
+        var minCross = Integer.MAX_VALUE;
+        Coordinate minCoord = null;
+        Vertex unplacedVertex = null;
+        for (var v : g.getVertices()) {
+            if (!placedVertices.contains(v)) {
+
+                // Test the minimal crossings for each coordinate
+                for (int i = 0; i < width; i++) {
+                    for (int k = 0; k < height; k++) {
+                        // Create a test coordinate
+                        var tempCoord = new Coordinate(i, k);
+                        if (!isCoordinateFree(usedCoordinates, tempCoord)) {
+                            continue;
+                        }
+
+                        // Put it into the hashmap
+                        vertexCoordDuplicate.put(v, tempCoord);
+
+                        // Test crossings
+                        var crossCalc = new CrossingCalculator(graphDuplicate, vertexCoordDuplicate);
+                        var crossNum = crossCalc.computePartialCrossingNumber();
+                        if (crossNum < minCross) {
+                            minCross = crossNum;
+                            minCoord = tempCoord;
+                        }
+
+                        // Remove coordinate from hashmap for the next iteration
+                        vertexCoordDuplicate.remove(v);
+                    }
+                }
+
+                // Currently we check for the first unplaced vertex. Might be optimized by checking all
+                unplacedVertex = v;
+                break;
+            }
+        }
+
+        return new GameMove(unplacedVertex, minCoord);
+    }
+
+    private int euclidianDistance(Coordinate p, Coordinate q) {
+        return (int)Math.sqrt(Math.pow(q.getX() - p.getX(), 2) + Math.pow(q.getY() - p.getY(), 2));
     }
 
     @Override
