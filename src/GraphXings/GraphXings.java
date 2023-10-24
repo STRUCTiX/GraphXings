@@ -55,6 +55,7 @@ public class GraphXings
         g.addEdge(e9);
         g.addEdge(e10);
 
+        // Play 1000 games so we can see if the new player wins consistently
         int player1 = 0, player2 = 0;
         for (int i = 0; i < 1000; i++) {
             // Run the game with two players.

@@ -27,7 +27,7 @@ public class CustomPlayer implements Player {
     @Override
     public GameMove maximizeCrossings(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, int[][] usedCoordinates, HashSet<Vertex> placedVertices, int width, int height)
     {
-        return maximizeMove(g, usedCoordinates, vertexCoordinates, placedVertices, width, height);
+        return maximizeMove2(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
     }
 
     @Override
@@ -42,45 +42,19 @@ public class CustomPlayer implements Player {
 
     }
 
+
     /**
-     * Computes a random valid move.
-     * @param g The graph.
-     * @param usedCoordinates The used coordinates.
+     * Tries to maximize the amount of crossings in a graph g by moving the vertices near each other.
+     * This is currently experimental and therefore we use maximizeMove2.
+     *
+     * @param g The graph object.
+     * @param usedCoordinates This contains an array of the canvas with already used coordinates.
+     * @param vertexCoordinates This is a map which outputs the coordinates for a given vertex.
      * @param placedVertices The already placed vertices.
-     * @param width The width of the game board.
-     * @param height The height of the game board.
-     * @return A random valid move.
+     * @param width Width of the canvas.
+     * @param height Height of the canvas.
+     * @return A game move of the final decision.
      */
-    private GameMove randomMove(Graph g, int[][] usedCoordinates, HashSet<Vertex> placedVertices, int width, int height)
-    {
-        Random r = new Random();
-        int stillToBePlaced = g.getN()- placedVertices.size();
-        int next = r.nextInt(stillToBePlaced);
-        int skipped = 0;
-        Vertex v=null;
-        for (Vertex u : g.getVertices())
-        {
-            if (!placedVertices.contains(u))
-            {
-                if (skipped < next)
-                {
-                    skipped++;
-                    continue;
-                }
-                v=u;
-                break;
-            }
-        }
-        Coordinate c = new Coordinate(0,0);
-        do
-        {
-            c = new Coordinate(r.nextInt(width),r.nextInt(height));
-        }
-        while (usedCoordinates[c.getX()][c.getY()]!=0);
-        return new GameMove(v,c);
-    }
-
-
     private GameMove maximizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, HashSet<Vertex> placedVertices, int width, int height) {
         // This list contains the possible coordinates for the next move.
         // We have to check if these coordinates are actually unused,
@@ -134,6 +108,13 @@ public class CustomPlayer implements Player {
         return new GameMove(vertex, coordinate);
     }
 
+    /**
+     * Calculate the middle point for a selected vertex and its neighbours.
+     * @param g
+     * @param vertexCoordinates
+     * @param selectedVertex
+     * @return
+     */
     private Optional<Coordinate> getMidpoint(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, Vertex selectedVertex) {
         HashMap<Vertex, Coordinate> neighbours = new HashMap<>();
         // Get the adjacent edges of the selected vertex
@@ -166,6 +147,8 @@ public class CustomPlayer implements Player {
         return Optional.of(new Coordinate(x / 2, y / 2));
     }
 
+
+    // Currently not in use. This should be used in the middle point maximizing strategy
     private Coordinate moveVertexCloser(Coordinate vertexPosition, Coordinate targetPosition) {
         // Move the vertex closer to the target position
         int x = vertexPosition.getX() + targetPosition.getX();
@@ -173,11 +156,30 @@ public class CustomPlayer implements Player {
         return new Coordinate(x / 2, y / 2);
     }
 
+    /**
+     * Helper function to check whether a coordinate is free or in use.
+     * @param usedCoordinates The usedCoordinates array.
+     * @param coordinate A coordinate object to test for.
+     * @return Returns true if free, false otherwise.
+     */
     private boolean isCoordinateFree(int[][] usedCoordinates, Coordinate coordinate) {
         return usedCoordinates[coordinate.getX()][coordinate.getY()] == 0;
     }
 
 
+    /**
+     * Tries to minimize the amount of crossings in a graph g by testing for the min. amount of crossings.
+     * In the first move we can't find any crossings because we don't have enough coordinates.
+     * Therefore, we place the vertex in a corner of the canvas with the max. distance to the already placed vertex.
+     *
+     * @param g The graph object.
+     * @param usedCoordinates This contains an array of the canvas with already used coordinates.
+     * @param vertexCoordinates This is a map which outputs the coordinates for a given vertex.
+     * @param placedVertices The already placed vertices.
+     * @param width Width of the canvas.
+     * @param height Height of the canvas.
+     * @return A game move of the final decision.
+     */
     private GameMove minimizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
         if (placedVertices.size() < 3) {
             // In this case we have to place more or less random coordinates
@@ -261,6 +263,85 @@ public class CustomPlayer implements Player {
         return new GameMove(unplacedVertex, minCoord);
     }
 
+
+    /**
+     * Tries to maximize the amount of crossings in a graph g by testing for the max. amount of crossings.
+     * In the first move we can't find any crossings because we don't have enough coordinates.
+     * Therefore, we place the vertex in the middle of the canvas with the min. distance to the already placed vertex.
+     *
+     * @param g The graph object.
+     * @param usedCoordinates This contains an array of the canvas with already used coordinates.
+     * @param vertexCoordinates This is a map which outputs the coordinates for a given vertex.
+     * @param placedVertices The already placed vertices.
+     * @param width Width of the canvas.
+     * @param height Height of the canvas.
+     * @return A game move of the final decision.
+     */
+    private GameMove maximizeMove2(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
+        if (placedVertices.size() == 0) {
+            // Maximize is the first move of the game.
+            // Therefore, we place the vertex in the middle of the canvas
+            var firstVertex = g.getVertices().iterator().next();
+            var middleCoordinate = new Coordinate(width / 2, height / 2);
+            return new GameMove(firstVertex, middleCoordinate);
+        }
+
+        // In this case we can compute the max. crossings
+
+        // First create duplicates of the existing graph and vertex coordintes structures
+        var graphDuplicate = g.copy();
+        var vertexCoordDuplicate = new HashMap<>(vertexCoordinates);
+
+
+        // Check the minimal crossings for an unplaced vertex
+        var maxCross = Integer.MIN_VALUE;
+        Coordinate maxCoord = null;
+        Vertex unplacedVertex = null;
+        for (var v : g.getVertices()) {
+            if (!placedVertices.contains(v)) {
+
+                // Test the max. crossings for each coordinate
+                for (int i = 0; i < width; i++) {
+                    for (int k = 0; k < height; k++) {
+                        // Create a test coordinate
+                        var tempCoord = new Coordinate(i, k);
+
+                        // Coordinate already in use -> skip
+                        if (!isCoordinateFree(usedCoordinates, tempCoord)) {
+                            continue;
+                        }
+
+                        // Put it into the hashmap
+                        vertexCoordDuplicate.put(v, tempCoord);
+
+                        // Test crossings
+                        var crossCalc = new CrossingCalculator(graphDuplicate, vertexCoordDuplicate);
+                        var crossNum = crossCalc.computePartialCrossingNumber();
+                        if (crossNum > maxCross) {
+                            maxCross = crossNum;
+                            maxCoord = tempCoord;
+                        }
+
+                        // Remove coordinate from hashmap for the next iteration
+                        vertexCoordDuplicate.remove(v);
+                    }
+                }
+
+                // Currently we check for the first unplaced vertex. Might be optimized by checking all
+                unplacedVertex = v;
+                break;
+            }
+        }
+
+        return new GameMove(unplacedVertex, maxCoord);
+    }
+
+    /**
+     * Calculate the euclidian distance between two coordinates as integer value.
+     * @param p A coordinate object.
+     * @param q A coordinate object.
+     * @return The distance as integer.
+     */
     private int euclidianDistance(Coordinate p, Coordinate q) {
         return (int)Math.sqrt(Math.pow(q.getX() - p.getX(), 2) + Math.pow(q.getY() - p.getY(), 2));
     }
