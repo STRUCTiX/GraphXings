@@ -110,10 +110,10 @@ public class CustomPlayer implements Player {
 
     /**
      * Calculate the middle point for a selected vertex and its neighbours.
-     * @param g
-     * @param vertexCoordinates
-     * @param selectedVertex
-     * @return
+     * @param g The graph object
+     * @param vertexCoordinates This is a map which outputs the coordinates for a given vertex.
+     * @param selectedVertex The selected vertex
+     * @return Middle point coordinates or none
      */
     private Optional<Coordinate> getMidpoint(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, Vertex selectedVertex) {
         HashMap<Vertex, Coordinate> neighbours = new HashMap<>();
