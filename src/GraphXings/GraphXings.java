@@ -1,6 +1,6 @@
 package GraphXings;
 
-import GraphXings.Algorithms.CustomPlayer;
+import GraphXings.Gruppe4.CustomPlayer;
 import GraphXings.Algorithms.RandomPlayer;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
