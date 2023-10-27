@@ -57,13 +57,18 @@ public class GraphXings
 
         // Play 1000 games so we can see if the new player wins consistently
         int player1 = 0, player2 = 0;
+        var randPlayer = new RandomPlayer("Player 1");
         for (int i = 0; i < 1000; i++) {
             // Run the game with two players.
-            Game game = new Game(g, 5, 4, new RandomPlayer("Player 1"), new CustomPlayer("Player 2"));
+            Game game = new Game(g, 5, 4, randPlayer, new CustomPlayer("Player 2"));
             GameResult res = game.play();
             // Display the result!
             System.out.println(res.announceResult());
-            if (res.getWinner() == 1) {
+            if (res.getWinner() == null) {
+                // Draw
+                player1++;
+                player2++;
+            } else if (res.getWinner().equals(randPlayer)) {
                 player1++;
             } else {
                 player2++;
