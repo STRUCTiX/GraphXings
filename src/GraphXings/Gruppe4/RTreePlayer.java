@@ -7,10 +7,12 @@ import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import com.github.davidmoten.rtree.RTree;
+import com.github.davidmoten.rtree.geometry.Line;
 
 import java.util.*;
 
-public class CustomPlayer implements Player {
+public class RTreePlayer implements Player {
 
     /**
      * The name of the random player.
@@ -18,10 +20,15 @@ public class CustomPlayer implements Player {
     private String name;
 
     /**
+     * The immutable R-Tree structure.
+     */
+    private RTree<Vertex, Line> tree;
+
+    /**
      * Creates a random player with the assigned name.
      * @param name
      */
-    public CustomPlayer(String name)
+    public RTreePlayer(String name)
     {
         this.name = name;
     }
@@ -41,7 +48,14 @@ public class CustomPlayer implements Player {
     @Override
     public void initializeNextRound(Graph g, int width, int height, Role role)
     {
-
+        var vertices = (HashSet<Vertex>) g.getVertices();
+        // If we have <10k Vertices use the normal R-Tree.
+        // Otherwise, use the R*-Tree heuristic.
+        if (vertices.size() < 10000) {
+            tree = RTree.maxChildren(4).create();
+        } else {
+            tree = RTree.star().maxChildren(6).create();
+        }
     }
 
 
@@ -355,4 +369,5 @@ public class CustomPlayer implements Player {
     {
         return name;
     }
+
 }

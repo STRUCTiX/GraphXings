@@ -1,6 +1,6 @@
 package GraphXings;
 
-import GraphXings.Gruppe4.CustomPlayer;
+import GraphXings.Gruppe4.BruteforcePlayer;
 import GraphXings.Algorithms.RandomPlayer;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
@@ -58,9 +58,10 @@ public class GraphXings
         // Play 1000 games so we can see if the new player wins consistently
         int player1 = 0, player2 = 0;
         var randPlayer = new RandomPlayer("Player 1");
-        for (int i = 0; i < 1000; i++) {
+        var gamesNum = 10;
+        for (int i = 0; i < gamesNum; i++) {
             // Run the game with two players.
-            Game game = new Game(g, 5, 4, randPlayer, new CustomPlayer("Player 2"));
+            Game game = new Game(g, 100, 100, randPlayer, new BruteforcePlayer("Player 2"));
             GameResult res = game.play();
             // Display the result!
             System.out.println(res.announceResult());
@@ -74,6 +75,6 @@ public class GraphXings
                 player2++;
             }
         }
-        System.out.println("Total games: 1000, Player 1 wins: " + player1 + ", Player 2 wins: " + player2);
+        System.out.println("Total games: " + gamesNum + ", Player 1 wins: " + player1 + ", Player 2 wins: " + player2);
     }
 }
