@@ -10,6 +10,9 @@ import GraphXings.Game.GameMove;
 
 import java.util.*;
 
+/**
+ * This is the bruteforce player of week 1.
+ */
 public class BruteforcePlayer implements Player {
 
     /**

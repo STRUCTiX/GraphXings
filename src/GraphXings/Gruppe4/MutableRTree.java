@@ -1,7 +1,11 @@
 package GraphXings.Gruppe4;
 
-import com.github.davidmoten.rtree.RTree;
-import com.github.davidmoten.rtree.geometry.Geometry;
+import com.github.davidmoten.rtree2.Entry;
+import com.github.davidmoten.rtree2.RTree;
+import com.github.davidmoten.rtree2.geometry.Geometry;
+
+import java.util.Vector;
+import java.util.stream.StreamSupport;
 
 public class MutableRTree<T, S extends Geometry> {
 
@@ -34,6 +38,17 @@ public class MutableRTree<T, S extends Geometry> {
 
     public RTree<T, S> get() {
         return tree;
+    }
+
+    public long getIntersections(S geometry) {
+        // retrieve the minimal bounding box from the geometry
+        var rectBB = geometry.mbr();
+
+        // Get all potential intersections with the given bounding box
+        Iterable<Entry<T, S>> potentialIntersections = tree.search(rectBB);
+
+        // Count all elements
+        return StreamSupport.stream(potentialIntersections.spliterator(), false).count();
     }
 
 }
