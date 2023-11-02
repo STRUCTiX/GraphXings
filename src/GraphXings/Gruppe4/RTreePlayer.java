@@ -22,7 +22,7 @@ public class RTreePlayer implements Player {
     /**
      * The immutable R-Tree structure.
      */
-    private RTree<Vertex, Line> tree;
+    private MutableRTree<Vertex, Line> tree;
 
     /**
      * Creates a random player with the assigned name.
@@ -52,9 +52,9 @@ public class RTreePlayer implements Player {
         // If we have <10k Vertices use the normal R-Tree.
         // Otherwise, use the R*-Tree heuristic.
         if (vertices.size() < 10000) {
-            tree = RTree.maxChildren(4).create();
+            tree = new MutableRTree<>(MutableRTree.TreeSetup.SMALL);
         } else {
-            tree = RTree.star().maxChildren(6).create();
+            tree = new MutableRTree<>(MutableRTree.TreeSetup.BIG);
         }
     }
 
