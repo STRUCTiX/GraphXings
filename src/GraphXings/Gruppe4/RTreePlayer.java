@@ -7,8 +7,10 @@ import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import GraphXings.Gruppe4.Common.TreeHelper;
 import com.github.davidmoten.rtree2.RTree;
 import com.github.davidmoten.rtree2.geometry.Line;
+import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.*;
 
@@ -25,7 +27,7 @@ public class RTreePlayer implements Player {
     /**
      * The immutable R-Tree structure.
      */
-    private MutableRTree<Vertex, Line> tree;
+    private MutableRTree<Edge, LineFloat> tree;
 
     /**
      * Creates a random player with the assigned name.
@@ -39,12 +41,16 @@ public class RTreePlayer implements Player {
     @Override
     public GameMove maximizeCrossings(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, int[][] usedCoordinates, HashSet<Vertex> placedVertices, int width, int height)
     {
+        tree.reset();
+        tree.addAll(TreeHelper.createLinesFromPlacedEdges(g, vertexCoordinates, placedVertices));
         return maximizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
     }
 
     @Override
     public GameMove minimizeCrossings(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, int[][] usedCoordinates, HashSet<Vertex> placedVertices, int width, int height)
     {
+        tree.reset();
+        tree.addAll(TreeHelper.createLinesFromPlacedEdges(g, vertexCoordinates, placedVertices));
         return minimizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
     }
 

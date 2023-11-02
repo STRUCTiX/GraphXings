@@ -1,15 +1,21 @@
 package GraphXings.Gruppe4;
 
+import GraphXings.Data.Coordinate;
+import GraphXings.Data.Graph;
+import GraphXings.Data.Vertex;
 import com.github.davidmoten.rtree2.Entry;
 import com.github.davidmoten.rtree2.RTree;
 import com.github.davidmoten.rtree2.geometry.Geometry;
+import com.github.davidmoten.rtree2.geometry.Line;
+import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 public class MutableRTree<T, S extends Geometry> {
 
     private RTree<T, S> tree;
+    private TreeSetup setup;
 
     public enum TreeSetup {
         // Less than 10k entries
@@ -20,7 +26,12 @@ public class MutableRTree<T, S extends Geometry> {
     }
 
     public MutableRTree(TreeSetup size) {
-        if (size == TreeSetup.SMALL) {
+        setup = size;
+        initRTree();
+    }
+
+    private void initRTree() {
+        if (setup == TreeSetup.SMALL) {
             tree = RTree.maxChildren(4).create();
         } else {
             tree = RTree.star().maxChildren(6).create();
@@ -36,8 +47,16 @@ public class MutableRTree<T, S extends Geometry> {
         tree = tree.add(value, geometry);
     }
 
+    public void addAll(List<Entry<T, S>> entries) {
+        entries.forEach((e) -> add(e.value(), e.geometry()));
+    }
+
     public RTree<T, S> get() {
         return tree;
+    }
+
+    public void reset() {
+        initRTree();
     }
 
     public long getIntersections(S geometry) {
