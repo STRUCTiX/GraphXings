@@ -67,7 +67,7 @@ public class Heuristics {
 
 
     public static Optional<GameMove> maximizeHeuristic(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
-        if (placedVertices.size() == 0) {
+        if (placedVertices.isEmpty()) {
             // Maximize is the first move of the game.
             // Therefore, we place the vertex in the middle of the canvas
             var firstVertex = g.getVertices().iterator().next();
