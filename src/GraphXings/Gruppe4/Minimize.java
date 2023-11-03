@@ -2,9 +2,11 @@ package GraphXings.Gruppe4;
 
 import GraphXings.Algorithms.CrossingCalculator;
 import GraphXings.Data.Coordinate;
+import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +28,8 @@ public class Minimize {
      * @param height Height of the canvas.
      * @return A game move of the final decision.
      */
-    public static GameMove minimizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
+    public static GameMove minimizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
+        // At the start of the game we can't check for intersections
         var heuristicsResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
         if (heuristicsResult.isPresent()) {
             return heuristicsResult.get();
@@ -34,10 +37,9 @@ public class Minimize {
 
         // In this case we can compute the minimal crossings
 
-        // First create duplicates of the existing graph and vertex coordintes structures
+        // First create duplicates of the existing graph and vertex coordinates structures
         var graphDuplicate = g.copy();
         var vertexCoordDuplicate = new HashMap<>(vertexCoordinates);
-
 
         // Check the minimal crossings for an unplaced vertex
         var minCross = Integer.MAX_VALUE;

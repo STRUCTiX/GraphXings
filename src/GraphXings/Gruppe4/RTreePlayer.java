@@ -41,16 +41,22 @@ public class RTreePlayer implements Player {
     @Override
     public GameMove maximizeCrossings(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, int[][] usedCoordinates, HashSet<Vertex> placedVertices, int width, int height)
     {
+        // Use an empty tree
         tree.reset();
+        // Insert the placed edges into the R-Tree
         tree.addAll(TreeHelper.createLinesFromPlacedEdges(g, vertexCoordinates, placedVertices));
+
         return maximizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
     }
 
     @Override
     public GameMove minimizeCrossings(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, int[][] usedCoordinates, HashSet<Vertex> placedVertices, int width, int height)
     {
+        // Use an empty tree
         tree.reset();
+        // Insert the placed edges into the R-Tree
         tree.addAll(TreeHelper.createLinesFromPlacedEdges(g, vertexCoordinates, placedVertices));
+
         return minimizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
     }
 
