@@ -52,6 +52,10 @@ public class Maximize {
         int coordY = 0;
         for (int i = 0; i < width; i++) {
             for (int k = 0; k < height; k++) {
+                if (isCoordinateFree(usedCoordinates, i, k)) {
+                    continue;
+                }
+
                 // Create a line
                 var line = LineFloat.create(pCoord.getX(), pCoord.getY(), i, k);
 
@@ -66,7 +70,7 @@ public class Maximize {
         }
         var coord = new Coordinate(coordX, coordY);
         // Return the game move with the unused vertex and the coordinate with max. intersections
-        return new GameMove((usedEdge.getS() != null) ? usedEdge.getS() : usedEdge.getT(), coord);
+        return new GameMove((usedEdge.getS() == null) ? usedEdge.getS() : usedEdge.getT(), coord);
     }
 
 }
