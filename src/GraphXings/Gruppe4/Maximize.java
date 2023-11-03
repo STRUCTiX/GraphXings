@@ -2,9 +2,11 @@ package GraphXings.Gruppe4;
 
 import GraphXings.Algorithms.CrossingCalculator;
 import GraphXings.Data.Coordinate;
+import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +28,7 @@ public class Maximize {
      * @param height Height of the canvas.
      * @return A game move of the final decision.
      */
-    public static GameMove maximizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
+    public static GameMove maximizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
         var heuristicResult = Heuristics.maximizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
         if (heuristicResult.isPresent()) {
             return heuristicResult.get();

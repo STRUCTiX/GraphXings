@@ -46,7 +46,7 @@ public class RTreePlayer implements Player {
         // Insert the placed edges into the R-Tree
         tree.addAll(TreeHelper.createLinesFromPlacedEdges(g, vertexCoordinates, placedVertices));
 
-        return maximizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        return maximizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height, tree);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class RTreePlayer implements Player {
         // Insert the placed edges into the R-Tree
         tree.addAll(TreeHelper.createLinesFromPlacedEdges(g, vertexCoordinates, placedVertices));
 
-        return minimizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        return minimizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height, tree);
     }
 
     @Override
