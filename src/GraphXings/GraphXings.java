@@ -7,6 +7,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.Game;
 import GraphXings.Game.GameResult;
+import GraphXings.Gruppe4.RTreePlayer;
 
 public class GraphXings
 {
@@ -61,7 +62,7 @@ public class GraphXings
         var gamesNum = 10;
         for (int i = 0; i < gamesNum; i++) {
             // Run the game with two players.
-            Game game = new Game(g, 100, 100, randPlayer, new BruteforcePlayer("Player 2"));
+            Game game = new Game(g, 100, 100, randPlayer, new RTreePlayer("Player 2"));
             GameResult res = game.play();
             // Display the result!
             System.out.println(res.announceResult());

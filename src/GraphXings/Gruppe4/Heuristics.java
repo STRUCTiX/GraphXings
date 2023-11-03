@@ -26,8 +26,25 @@ public class Heuristics {
      * @param height Height of the canvas.
      * @return A game move of the final decision.
      */
-    public static Optional<GameMove> minimizeHeuristic(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
-        if (placedVertices.size() < 3) {
+    public static Optional<GameMove> minimizeHeuristic(Graph g, int[][] usedCoordinates, int width, int height, Vertex v) {
+        for(int i = 0; i < width; i++){
+            if(usedCoordinates[0][i] == 0) {
+                return Optional.of(new GameMove(v, new Coordinate(0, i)));
+            } else if (usedCoordinates[height-1][i] == 0) {
+                return Optional.of(new GameMove(v, new Coordinate(height-1, i)));
+            }
+        }
+
+        for(int i = 0; i < height; i++){
+            if(usedCoordinates[i][0] == 0) {
+                return Optional.of(new GameMove(v, new Coordinate(i, 0)));
+            } else if (usedCoordinates[i][width-1] == 0) {
+                return Optional.of(new GameMove(v, new Coordinate(i,width-1)));
+            }
+        }
+
+
+        /*if (placedVertices.size() < 3) {
             // In this case we have to place more or less random coordinates
             // because it's not possible to calculate crossings at this point.
 
@@ -61,7 +78,7 @@ public class Heuristics {
             }
 
             return Optional.of(new GameMove(neighbourVertex, maxCoordinate));
-        }
+        }*/
         return Optional.empty();
     }
 

@@ -30,19 +30,16 @@ public class Minimize {
      */
     public static GameMove minimizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
         // At the start of the game we can't check for intersections
-        var heuristicsResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
-        if (heuristicsResult.isPresent()) {
-            return heuristicsResult.get();
-        }
+        //var heuristicsResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        //if (heuristicsResult.isPresent()) {
+          //  return heuristicsResult.get();
+        //}
 
         // In this case we can compute the minimal crossings
 
-        // First create duplicates of the existing graph and vertex coordinates structures
-        var graphDuplicate = g.copy();
-        var vertexCoordDuplicate = new HashMap<>(vertexCoordinates);
 
         // Check the minimal crossings for an unplaced vertex
-        var minCross = Integer.MAX_VALUE;
+        var minCross = Long.MAX_VALUE;
         Coordinate minCoord = null;
         Vertex unplacedVertex = null;
         for (var v : g.getVertices()) {
@@ -57,19 +54,39 @@ public class Minimize {
                             continue;
                         }
 
-                        // Put it into the hashmap
-                        vertexCoordDuplicate.put(v, tempCoord);
+                        // Get tagret vertex and coordinates of the edge
+                        Vertex targetVertex = null;
+                        Coordinate t = null;
+                        for(var e: g.getEdges()){
+                            if(e.getS().equals(v)){
+                                targetVertex = e.getT();
+                                t = vertexCoordinates.get(targetVertex);
+                                if (t == null){
+                                    continue;
+                                }
+                                break;
+                            }
+                        }
+
+                        //Create Line for the rtree
+                        //LineFloat line = null;
+                        if (t == null){
+                            t = Heuristics.minimizeHeuristic(g, usedCoordinates, width, height, targetVertex).get().getCoordinate();
+                        }
+
+                        var line = LineFloat.create(tempCoord.getX(), tempCoord.getY(), t.getX(), t.getY());
+
+
+
+                        //compute number of intersections
+                        long crossNum = tree.getIntersections(line);
 
                         // Test crossings
-                        var crossCalc = new CrossingCalculator(graphDuplicate, vertexCoordDuplicate);
-                        var crossNum = crossCalc.computePartialCrossingNumber();
                         if (crossNum < minCross) {
                             minCross = crossNum;
                             minCoord = tempCoord;
                         }
 
-                        // Remove coordinate from hashmap for the next iteration
-                        vertexCoordDuplicate.remove(v);
                     }
                 }
 
