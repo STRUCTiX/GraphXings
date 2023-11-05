@@ -36,23 +36,33 @@ public class Maximize {
         }
         // In this case we can compute the max. crossings
 
-        // Find a unplaced vertex with a corresponding edge
+        // Find a placed vertex (and a unplaced vertex) with a corresponding edge
         var placed = EdgeHelper.getUsedVertex(g.getEdges(), vertexCoordinates);
         if (placed.isEmpty()) {
             // This case should never happen because we're not able to place anything
             return null;
         }
+
+        // Get the used edge with one placed and one unplaced vertex
         var usedEdge = placed.get().getKey();
         var placedVertex = placed.get().getValue();
         var pCoord = vertexCoordinates.get(placedVertex);
 
-        // Check the minimal crossings for an unplaced vertex
+
+        // Check if we use a heuristic or the actual maximizer
+        if (tree.get().isEmpty()) {
+            // Use heuristic
+            return Heuristics.maximizeHeuristicLateGame(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        }
+
+        // Check the max. crossings for an unplaced vertex
         var maxCross = Long.MIN_VALUE;
         int coordX = 0;
         int coordY = 0;
         for (int i = 0; i < width; i++) {
             for (int k = 0; k < height; k++) {
-                if (isCoordinateFree(usedCoordinates, i, k)) {
+                // Coordinate isn't free -> try the next one
+                if (!isCoordinateFree(usedCoordinates, i, k)) {
                     continue;
                 }
 
@@ -68,9 +78,17 @@ public class Maximize {
                 }
             }
         }
-        var coord = new Coordinate(coordX, coordY);
-        // Return the game move with the unused vertex and the coordinate with max. intersections
-        return new GameMove((usedEdge.getS() == null) ? usedEdge.getS() : usedEdge.getT(), coord);
+        Coordinate coord;
+        if (maxCross > 0) {
+            // We found crossings so we take the maximized coordinates
+            coord = new Coordinate(coordX, coordY);
+
+            // Return the game move with the unused vertex and the coordinate with max. intersections
+            return new GameMove((usedEdge.getS() == null) ? usedEdge.getS() : usedEdge.getT(), coord);
+        } else {
+            // No intersections found -> use heuristic
+            return Heuristics.maximizeHeuristicLateGame(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        }
     }
 
 }

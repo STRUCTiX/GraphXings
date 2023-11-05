@@ -4,6 +4,8 @@ import GraphXings.Data.Coordinate;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import GraphXings.Gruppe4.Common.EdgeHelper;
+import GraphXings.Gruppe4.Common.Helper;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,6 +68,18 @@ public class Heuristics {
     }
 
 
+    /**
+     * This heuristic is used if it's our first game move.
+     * In this case we just place the vertex in the middle of the canvas.
+     * @param g
+     * @param usedCoordinates
+     * @param vertexCoordinates
+     * @param gameMoves
+     * @param placedVertices
+     * @param width
+     * @param height
+     * @return
+     */
     public static Optional<GameMove> maximizeHeuristic(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
         if (placedVertices.isEmpty()) {
             // Maximize is the first move of the game.
@@ -75,6 +89,61 @@ public class Heuristics {
             return Optional.of(new GameMove(firstVertex, middleCoordinate));
         }
         return Optional.empty();
+    }
+
+    /**
+     * Sometimes there's no existing edge (two placed vertices connected by the predefined edge)
+     * on the canvas. In this case we have to use another heuristic to place an adjacent vertex
+     * and therefore have a usable edge in the next game move.
+     * The strategy remains the same: try to place the vertex near the middle point of the canvas.
+     * @param g
+     * @param usedCoordinates
+     * @param vertexCoordinates
+     * @param gameMoves
+     * @param placedVertices
+     * @param width
+     * @param height
+     * @return
+     */
+    public static GameMove maximizeHeuristicLateGame(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
+        var unusedEdgeVertex = EdgeHelper.getUnusedVertex(g.getEdges(), vertexCoordinates);
+
+        Vertex placeableVertex = null;
+        if (unusedEdgeVertex.isEmpty()) {
+            // We're in a weird state. No placed and unplaced vertex-pair inside an edge.
+            // This shouldn't happen except for the start and end of the game but we better handle
+            // this edge case.
+            // Just get any unplaced vertex
+            for (var v : g.getVertices()) {
+                if (!placedVertices.contains(v)) {
+                    placeableVertex = v;
+                    break;
+                }
+            }
+        } else {
+            // In this case we've retrieved a unused vertex
+            placeableVertex = unusedEdgeVertex.get().getValue();
+        }
+
+        int midX = width / 2;
+        int midY = height / 2;
+
+        int unusedX = 0;
+        int unusedY = 0;
+        for (int i = 0; i < midX; i++) {
+            for (int k = 0; k < midY; k++) {
+                unusedX = midX + i;
+                unusedY = midY + k;
+                if (Helper.isCoordinateFree(usedCoordinates, unusedX, unusedY)) {
+                    // We've found a free coordinate, return game move
+                    var coord = new Coordinate(unusedX, unusedY);
+                    return new GameMove(placeableVertex, coord);
+                }
+            }
+        }
+
+        // This case should never happen
+        return new GameMove(placeableVertex, new Coordinate(0, 0));
     }
 
 
