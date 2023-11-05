@@ -121,7 +121,7 @@ public class Heuristics {
                 }
             }
         } else {
-            // In this case we've retrieved a unused vertex
+            // In this case we've retrieved an unused vertex
             placeableVertex = unusedEdgeVertex.get().getValue();
         }
 

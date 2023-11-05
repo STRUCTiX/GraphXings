@@ -78,13 +78,13 @@ public class Maximize {
                 }
             }
         }
-        Coordinate coord;
+
         if (maxCross > 0) {
             // We found crossings so we take the maximized coordinates
-            coord = new Coordinate(coordX, coordY);
+            var coord = new Coordinate(coordX, coordY);
 
             // Return the game move with the unused vertex and the coordinate with max. intersections
-            return new GameMove((usedEdge.getS() == null) ? usedEdge.getS() : usedEdge.getT(), coord);
+            return new GameMove((vertexCoordinates.get(usedEdge.getS()) == null) ? usedEdge.getS() : usedEdge.getT(), coord);
         } else {
             // No intersections found -> use heuristic
             return Heuristics.maximizeHeuristicLateGame(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
