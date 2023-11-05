@@ -6,6 +6,7 @@ import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import GraphXings.Gruppe4.Common.EdgeHelper;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.HashMap;
@@ -33,55 +34,61 @@ public class Maximize {
         if (heuristicResult.isPresent()) {
             return heuristicResult.get();
         }
-
         // In this case we can compute the max. crossings
 
-        // First create duplicates of the existing graph and vertex coordintes structures
-        var graphDuplicate = g.copy();
-        var vertexCoordDuplicate = new HashMap<>(vertexCoordinates);
+        // Find a placed vertex (and a unplaced vertex) with a corresponding edge
+        var placed = EdgeHelper.getUsedVertex(g.getEdges(), vertexCoordinates);
+        if (placed.isEmpty()) {
+            // This case should never happen because we're not able to place anything
+            return null;
+        }
+
+        // Get the used edge with one placed and one unplaced vertex
+        var usedEdge = placed.get().getKey();
+        var placedVertex = placed.get().getValue();
+        var pCoord = vertexCoordinates.get(placedVertex);
 
 
-        // Check the minimal crossings for an unplaced vertex
-        var maxCross = Integer.MIN_VALUE;
-        Coordinate maxCoord = null;
-        Vertex unplacedVertex = null;
-        for (var v : g.getVertices()) {
-            if (!placedVertices.contains(v)) {
+        // Check if we use a heuristic or the actual maximizer
+        if (tree.get().isEmpty()) {
+            // Use heuristic
+            return Heuristics.maximizeHeuristicLateGame(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        }
 
-                // Test the max. crossings for each coordinate
-                for (int i = 0; i < width; i++) {
-                    for (int k = 0; k < height; k++) {
-                        // Create a test coordinate
-                        var tempCoord = new Coordinate(i, k);
-
-                        // Coordinate already in use -> skip
-                        if (!isCoordinateFree(usedCoordinates, tempCoord)) {
-                            continue;
-                        }
-
-                        // Put it into the hashmap
-                        vertexCoordDuplicate.put(v, tempCoord);
-
-                        // Test crossings
-                        var crossCalc = new CrossingCalculator(graphDuplicate, vertexCoordDuplicate);
-                        var crossNum = crossCalc.computePartialCrossingNumber();
-                        if (crossNum > maxCross) {
-                            maxCross = crossNum;
-                            maxCoord = tempCoord;
-                        }
-
-                        // Remove coordinate from hashmap for the next iteration
-                        vertexCoordDuplicate.remove(v);
-                    }
+        // Check the max. crossings for an unplaced vertex
+        var maxCross = Long.MIN_VALUE;
+        int coordX = 0;
+        int coordY = 0;
+        for (int i = 0; i < width; i++) {
+            for (int k = 0; k < height; k++) {
+                // Coordinate isn't free -> try the next one
+                if (!isCoordinateFree(usedCoordinates, i, k)) {
+                    continue;
                 }
 
-                // Currently we check for the first unplaced vertex. Might be optimized by checking all
-                unplacedVertex = v;
-                break;
+                // Create a line
+                var line = LineFloat.create(pCoord.getX(), pCoord.getY(), i, k);
+
+                // Test for intersections
+                var intersections = tree.getIntersections(line);
+                if (intersections > maxCross) {
+                    maxCross = intersections;
+                    coordX = i;
+                    coordY = k;
+                }
             }
         }
 
-        return new GameMove(unplacedVertex, maxCoord);
+        if (maxCross > 0) {
+            // We found crossings so we take the maximized coordinates
+            var coord = new Coordinate(coordX, coordY);
+
+            // Return the game move with the unused vertex and the coordinate with max. intersections
+            return new GameMove((vertexCoordinates.get(usedEdge.getS()) == null) ? usedEdge.getS() : usedEdge.getT(), coord);
+        } else {
+            // No intersections found -> use heuristic
+            return Heuristics.maximizeHeuristicLateGame(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        }
     }
 
 }

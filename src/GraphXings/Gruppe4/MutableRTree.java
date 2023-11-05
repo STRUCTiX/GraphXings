@@ -48,7 +48,7 @@ public class MutableRTree<T, S extends Geometry> {
     }
 
     public void addAll(List<Entry<T, S>> entries) {
-        entries.forEach((e) -> add(e.value(), e.geometry()));
+        tree = tree.add(entries);
     }
 
     public RTree<T, S> get() {
