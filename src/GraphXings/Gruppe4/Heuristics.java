@@ -22,8 +22,6 @@ public class Heuristics {
      *
      * @param g The graph object.
      * @param usedCoordinates This contains an array of the canvas with already used coordinates.
-     * @param vertexCoordinates This is a map which outputs the coordinates for a given vertex.
-     * @param placedVertices The already placed vertices.
      * @param width Width of the canvas.
      * @param height Height of the canvas.
      * @return A game move of the final decision.
@@ -45,42 +43,6 @@ public class Heuristics {
             }
         }
 
-
-        /*if (placedVertices.size() < 3) {
-            // In this case we have to place more or less random coordinates
-            // because it's not possible to calculate crossings at this point.
-
-            GameMove lastGameMove = gameMoves.get(gameMoves.size() - 1);
-
-            var lastVertex = lastGameMove.getVertex();
-            var lastCoordinate = lastGameMove.getCoordinate();
-
-            // Get a neighbour vertex by iterating through the edges
-            Vertex neighbourVertex = null;
-            for (var e : g.getEdges()) {
-                if (e.getS().equals(lastVertex)) {
-                    neighbourVertex = e.getT();
-                    break;
-                }
-            }
-
-            // Place the vertex in a corner of the canvas with
-            // maximum distance to the placed vertex.
-            int maxDistance = 0;
-            Coordinate maxCoordinate = new Coordinate(0, 0);
-            for (int i = 0; i < width; i += width - 1) {
-                for (int k = 0; k < height; k += height - 1) {
-                    var tempCoord = new Coordinate(i, k);
-                    var distance = euclideanDistance(lastCoordinate, tempCoord);
-                    if (distance > maxDistance) {
-                        maxDistance = distance;
-                        maxCoordinate = tempCoord;
-                    }
-                }
-            }
-
-            return Optional.of(new GameMove(neighbourVertex, maxCoordinate));
-        }*/
         return Optional.empty();
     }
 

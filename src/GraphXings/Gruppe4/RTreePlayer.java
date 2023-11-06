@@ -16,6 +16,7 @@ import java.util.*;
 
 import static GraphXings.Gruppe4.Maximize.maximizeMove;
 import static GraphXings.Gruppe4.Minimize.minimizeMove;
+import static GraphXings.Gruppe4.Minimize.minimizeMove2;
 
 public class RTreePlayer implements Player {
 
@@ -57,7 +58,7 @@ public class RTreePlayer implements Player {
         // Insert the placed edges into the R-Tree
         tree.addAll(TreeHelper.createLinesFromPlacedEdges(g, vertexCoordinates, placedVertices));
 
-        return minimizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height, tree);
+        return minimizeMove2(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height, tree);
     }
 
     @Override

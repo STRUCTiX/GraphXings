@@ -67,7 +67,11 @@ public class MutableRTree<T, S extends Geometry> {
         Iterable<Entry<T, S>> potentialIntersections = tree.search(rectBB);
 
         // Count all elements
-        return StreamSupport.stream(potentialIntersections.spliterator(), false).count();
+        long count = 0;
+        for (var e : potentialIntersections) {
+            count++;
+        }
+        return count;
     }
 
 }
