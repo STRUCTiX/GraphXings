@@ -4,6 +4,7 @@ import GraphXings.Data.Coordinate;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import com.github.davidmoten.rtree2.Entry;
+import com.github.davidmoten.rtree2.Iterables;
 import com.github.davidmoten.rtree2.RTree;
 import com.github.davidmoten.rtree2.geometry.Geometry;
 import com.github.davidmoten.rtree2.geometry.Line;
@@ -67,11 +68,7 @@ public class MutableRTree<T, S extends Geometry> {
         Iterable<Entry<T, S>> potentialIntersections = tree.search(rectBB);
 
         // Count all elements
-        long count = 0;
-        for (var e : potentialIntersections) {
-            count++;
-        }
-        return count;
+        return Iterables.size(potentialIntersections);
     }
 
 }

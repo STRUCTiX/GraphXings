@@ -78,7 +78,7 @@ public class Minimize {
                         //Create Line for the rtree
                         //LineFloat line = null;
                         if (t == null){
-                            t = Heuristics.minimizeHeuristic(g, usedCoordinates, width, height, targetVertex).get().getCoordinate();
+                            t = Heuristics.minimizeHeuristicLateGame(g, usedCoordinates, width, height, targetVertex).get().getCoordinate();
                         }
 
                         var line = LineFloat.create(i, k, t.getX(), t.getY());
@@ -108,7 +108,7 @@ public class Minimize {
 
 
     public static GameMove minimizeMove2(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
-        var heuristicResult = Heuristics.maximizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        var heuristicResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
         if (heuristicResult.isPresent()) {
             return heuristicResult.get();
         }
@@ -131,7 +131,7 @@ public class Minimize {
         if (tree.get().isEmpty()) {
             // Use heuristic
             var unplacedVertex = (vertexCoordinates.get(usedEdge.getS()) == null) ? usedEdge.getS() : usedEdge.getT();
-            var heuristic = Heuristics.minimizeHeuristic(g, usedCoordinates, width, height, unplacedVertex);
+            var heuristic = Heuristics.minimizeHeuristicLateGame(g, usedCoordinates, width, height, unplacedVertex);
 
             // If we're in the null case we'd probably lose anyway
             return heuristic.orElse(null);
