@@ -1,23 +1,24 @@
 package GraphXings.Game.Match;
-import GraphXings.Algorithms.Player;
-import GraphXings.Game.Game;
+
+import GraphXings.Algorithms.NewPlayer;
+import GraphXings.Game.NewGame;
 import GraphXings.Game.GameInstance.GameInstance;
 import GraphXings.Game.GameInstance.GameInstanceFactory;
-import GraphXings.Game.GameResult;
+import GraphXings.Game.NewGameResult;
 
 /**
  * A class managing a Best of X type match of GraphXings.
  */
-public class Match
+public class NewMatch
 {
 	/**
 	 * The first player.
 	 */
-	private Player player1;
+	private NewPlayer player1;
 	/**
 	 * The second player.
 	 */
-	private Player player2;
+	private NewPlayer player2;
 	/**
 	 * The game instance factory.
 	 */
@@ -38,7 +39,7 @@ public class Match
 	 * @param factory The game instance factory to be used for created the games!
 	 * @param bestOutOf The number of games to be played.
 	 */
-	public Match(Player player1, Player player2, GameInstanceFactory factory, int bestOutOf)
+	public NewMatch(NewPlayer player1, NewPlayer player2, GameInstanceFactory factory, int bestOutOf)
 	{
 		this.player1 = player1;
 		this.player2 = player2;
@@ -55,7 +56,7 @@ public class Match
 	 * @param bestOutOf The number of games to be played.
 	 * @param gameTimeLimit The time limit for each game in the match.
 	 */
-	public Match(Player player1, Player player2, GameInstanceFactory factory, int bestOutOf, long gameTimeLimit)
+	public NewMatch(NewPlayer player1, NewPlayer player2, GameInstanceFactory factory, int bestOutOf, long gameTimeLimit)
 	{
 		this.player1 = player1;
 		this.player2 = player2;
@@ -68,7 +69,7 @@ public class Match
 	 * Plays the match.
 	 * @return A MatchResult object containing the results of the match.
 	 */
-	public MatchResult play()
+	public NewMatchResult play()
 	{
 		boolean end = false;
 		int gamesWon1 = 0;
@@ -77,8 +78,8 @@ public class Match
 		while(!end)
 		{
 			GameInstance gi = factory.getGameInstance();
-			Game game = new Game(gi.getG(),gi.getWidth(),gi.getHeight(),player1,player2,gameTimeLimit);
-			GameResult gr = game.play();
+			NewGame game = new NewGame(gi.getG(),gi.getWidth(),gi.getHeight(),player1,player2,gameTimeLimit);
+			NewGameResult gr = game.play();
 			gamesPlayed++;
 			System.out.println("Game " + gamesPlayed + ": " + gr.announceResult());
 			if (gamesPlayed > 2*bestOutOf)
@@ -108,6 +109,6 @@ public class Match
 				}
 			}
 		}
-		return new MatchResult(player1,player2,gamesWon1,gamesWon2);
+		return new NewMatchResult(player1,player2,gamesWon1,gamesWon2);
 	}
 }
