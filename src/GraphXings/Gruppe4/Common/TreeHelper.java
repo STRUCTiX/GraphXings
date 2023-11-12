@@ -4,13 +4,12 @@ import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
+import GraphXings.Game.GameMove;
 import com.github.davidmoten.rtree2.Entry;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.internal.EntryDefault;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -36,5 +35,59 @@ public class TreeHelper {
                     return EntryDefault.entry(e, LineFloat.create(s.getX(), s.getY(), t.getX(), t.getY()));
                 })
                 .collect(Collectors.toList());
+    }
+
+
+    public static Optional<List<Entry<Edge, LineFloat>>> additionalLines(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves) {
+        var edgeEntries = new ArrayList<Edge>();
+        var lineEntries = new ArrayList<LineFloat>();
+
+        if (gameMoves.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // Get last game move
+        List<GameMove> lastMoves;
+        try {
+            // We have to add to moves because we didn't add our own move at the
+            // end of last round
+            lastMoves = gameMoves.subList(gameMoves.size() - 2, gameMoves.size());
+        } catch (IndexOutOfBoundsException e) {
+
+            // First iteration consists of only one element
+            lastMoves = new ArrayList<>();
+            lastMoves.add(gameMoves.getLast());
+        }
+
+        // Iterate over the last moves
+        for (var lastMove : lastMoves) {
+            // Get adjacent vertices
+            var adjacent = g.getIncidentEdges(lastMove.getVertex());
+
+            // Create lines for all placed edges
+            for (var a : adjacent) {
+                var sourceCoord = vertexCoordinates.get(a.getS());
+                var targetCoord = vertexCoordinates.get(a.getT());
+                if (sourceCoord != null && targetCoord != null) {
+                    if (!edgeEntries.contains(a)) {
+                        // Prevent creation of duplicate lines
+                        var line = LineFloat.create(sourceCoord.getX(), sourceCoord.getY(), targetCoord.getX(), targetCoord.getY());
+                        lineEntries.add(line);
+                        edgeEntries.add(a);
+                    }
+                }
+            }
+        }
+
+        if (edgeEntries.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // Create edge/line entry list
+        List<Entry<Edge, LineFloat>> list = new ArrayList<>();
+        for (int i = 0; i < edgeEntries.size(); i++) {
+            list.add(new EntryDefault<>(edgeEntries.get(i), lineEntries.get(i)));
+        }
+        return Optional.of(list);
     }
 }
