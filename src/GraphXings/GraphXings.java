@@ -1,5 +1,6 @@
 package GraphXings;
 
+import GraphXings.Game.GameInstance.RandomCycleFactory;
 import GraphXings.Gruppe4.BruteforcePlayer;
 import GraphXings.Algorithms.RandomPlayer;
 import GraphXings.Data.Edge;
@@ -11,8 +12,7 @@ import GraphXings.Gruppe4.RTreePlayer;
 
 public class GraphXings
 {
-    public static void main (String[] args)
-    {
+    public static void main (String[] args) {
         // Create a graph g. This time it is a 10-cycle!
         Graph g = new Graph();
         Vertex v1 = new Vertex("1");
@@ -62,7 +62,7 @@ public class GraphXings
         var gamesNum = 10;
         for (int i = 0; i < gamesNum; i++) {
             // Run the game with two players.
-            Game game = new Game(g, 100, 100, randPlayer, new RTreePlayer("Player 2"));
+            Game game = new Game(g, 1000, 1000, randPlayer, new RTreePlayer("Player 2"));
             GameResult res = game.play();
             // Display the result!
             System.out.println(res.announceResult());
@@ -77,5 +77,12 @@ public class GraphXings
             }
         }
         System.out.println("Total games: " + gamesNum + ", Player 1 wins: " + player1 + ", Player 2 wins: " + player2);
+
+        //var rcf = new RandomCycleFactory(19111991);
+        //var instance = rcf.getGameInstance();
+
+        //var game = new Game(instance.getG(), instance.getWidth(), instance.getHeight(), new RandomPlayer("Player 1"), new RTreePlayer("Player 2"));
+        //var result = game.play();
+        //System.out.println(result.announceResult());
     }
 }
