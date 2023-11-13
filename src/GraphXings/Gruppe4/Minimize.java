@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static GraphXings.Gruppe4.Common.Helper.isCoordinateFree;
+import static GraphXings.Gruppe4.Common.Helper.minimizeBounds;
 
 public class Minimize {
     /**
@@ -22,19 +23,19 @@ public class Minimize {
      * In the first move we can't find any crossings because we don't have enough coordinates.
      * Therefore, we place the vertex in a corner of the canvas with the max. distance to the already placed vertex.
      *
-     * @param g The graph object.
-     * @param usedCoordinates This contains an array of the canvas with already used coordinates.
+     * @param g                 The graph object.
+     * @param usedCoordinates   This contains an array of the canvas with already used coordinates.
      * @param vertexCoordinates This is a map which outputs the coordinates for a given vertex.
-     * @param placedVertices The already placed vertices.
-     * @param width Width of the canvas.
-     * @param height Height of the canvas.
+     * @param placedVertices    The already placed vertices.
+     * @param width             Width of the canvas.
+     * @param height            Height of the canvas.
      * @return A game move of the final decision.
      */
     public static GameMove minimizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
         // At the start of the game we can't check for intersections
         //var heuristicsResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
         //if (heuristicsResult.isPresent()) {
-          //  return heuristicsResult.get();
+        //  return heuristicsResult.get();
         //}
 
         // In this case we can compute the minimal crossings
@@ -64,11 +65,11 @@ public class Minimize {
                         // TODO: Use UnplacedHelper
                         Vertex targetVertex = null;
                         Coordinate t = null;
-                        for(var e: g.getEdges()){
-                            if(e.getS().equals(v)){
+                        for (var e : g.getEdges()) {
+                            if (e.getS().equals(v)) {
                                 targetVertex = e.getT();
                                 t = vertexCoordinates.get(targetVertex);
-                                if (t == null){
+                                if (t == null) {
                                     continue;
                                 }
                                 break;
@@ -77,12 +78,11 @@ public class Minimize {
 
                         //Create Line for the rtree
                         //LineFloat line = null;
-                        if (t == null){
+                        if (t == null) {
                             t = Heuristics.minimizeHeuristicLateGame(g, usedCoordinates, width, height, targetVertex).get().getCoordinate();
                         }
 
                         var line = LineFloat.create(i, k, t.getX(), t.getY());
-
 
 
                         //compute number of intersections
@@ -162,11 +162,69 @@ public class Minimize {
             }
         }
 
-            // We found crossings so we take the minimized coordinates
-            var coord = new Coordinate(coordX, coordY);
+        // We found crossings so we take the minimized coordinates
+        var coord = new Coordinate(coordX, coordY);
 
-            // Return the game move with the unused vertex and the coordinate with max. intersections
-            return new GameMove((vertexCoordinates.get(usedEdge.getS()) == null) ? usedEdge.getS() : usedEdge.getT(), coord);
+        // Return the game move with the unused vertex and the coordinate with max. intersections
+        return new GameMove((vertexCoordinates.get(usedEdge.getS()) == null) ? usedEdge.getS() : usedEdge.getT(), coord);
+    }
+
+
+    public static GameMove minimizeMoveClose(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
+        var heuristicResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        if (heuristicResult.isPresent()) {
+            return heuristicResult.get();
+        }
+
+        // Try to place the new vertex next to the last placed vertex.
+        // This is only possible if one of the adjacent vertices is unplaced.
+        var lastMove = gameMoves.getLast();
+        var lastEdges = g.getIncidentEdges(lastMove.getVertex());
+        Vertex unplacedVertex = null;
+        for (var e : lastEdges) {
+            var sourceCoord = vertexCoordinates.get(e.getS());
+            var targetCoord = vertexCoordinates.get(e.getT());
+            // Check if vertex is unplaced
+            if (sourceCoord == null) {
+                unplacedVertex = e.getS();
+                break;
+            } else if (targetCoord == null) {
+                unplacedVertex = e.getT();
+                break;
+            }
+        }
+
+        // If we've found an unplaced vertex -> try to place it next to the last game move vertex
+        if (unplacedVertex != null) {
+            var lastCoord = lastMove.getCoordinate();
+
+            var gameMove = minimizeBounds(usedCoordinates, tree, unplacedVertex, lastCoord, 1, 1);
+            if (gameMove.isPresent()) {
+                return gameMove.get();
+            }
+        }
+
+        // In this case we either don't have an unplaced vertex or the checked perimeter was too small
+        // TODO: Currently we just use the heuristic from last week which doesn't really fit to our new strategy
+        // TODO: A better strategy would be to increase the perimeter to width x height and go from the usedCoordinate towards width/height
+        if (unplacedVertex != null) {
+            var result = Heuristics.minimizeHeuristicLateGame(g, usedCoordinates, width, height, unplacedVertex);
+            if (result.isPresent()) {
+                return result.get();
+            }
+        }
+
+        // Find the first unplaced vertex
+        for (var v : g.getVertices()) {
+            if (!placedVertices.contains(v)) {
+                var result = Heuristics.minimizeHeuristicLateGame(g, usedCoordinates, width, height, v);
+                // In this case we return a result or we're screwed and just surrender
+                return result.orElse(null);
+            }
+        }
+
+        // This would be the case if we don't find any free vertex -> should not happen
+        return null;
     }
 
 }
