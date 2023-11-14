@@ -38,6 +38,14 @@ public class TreeHelper {
     }
 
 
+    /**
+     * Incrementally build up the R-Tree. This is used to add the difference between the opponent move and create
+     * a list to add the missing lines to the tree.
+     * @param g
+     * @param vertexCoordinates
+     * @param gameMoves
+     * @return
+     */
     public static Optional<List<Entry<Edge, LineFloat>>> additionalLines(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves) {
         var edgeEntries = new ArrayList<Edge>();
         var lineEntries = new ArrayList<LineFloat>();

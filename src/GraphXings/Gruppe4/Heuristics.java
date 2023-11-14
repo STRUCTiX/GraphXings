@@ -189,4 +189,16 @@ public class Heuristics {
     public static int euclideanDistance(Coordinate p, Coordinate q) {
         return (int)Math.sqrt(Math.pow(q.getX() - p.getX(), 2) + Math.pow(q.getY() - p.getY(), 2));
     }
+
+
+    /**
+     * Calculate the euclidean distance between two coordinates as integer value.
+     * @param p A coordinate object.
+     * @param x x coordinate as integer
+     * @param y y coordinate as integer
+     * @return The distance as integer.
+     */
+    public static int euclideanDistance(Coordinate p, int x, int y) {
+        return (int)Math.sqrt(Math.pow(x - p.getX(), 2) + Math.pow(y - p.getY(), 2));
+    }
 }
