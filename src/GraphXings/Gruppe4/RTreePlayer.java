@@ -15,6 +15,7 @@ import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import java.util.*;
 
 import static GraphXings.Gruppe4.Maximize.maximizeMove;
+import static GraphXings.Gruppe4.Maximize.maximizeMoveOptimize;
 import static GraphXings.Gruppe4.Minimize.*;
 
 public class RTreePlayer implements Player {
@@ -45,7 +46,7 @@ public class RTreePlayer implements Player {
         var additionalLines = TreeHelper.additionalLines(g, vertexCoordinates, gameMoves);
         additionalLines.ifPresent(entries -> tree.addAll(entries));
 
-        return maximizeMove(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height, tree);
+        return maximizeMoveOptimize(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height, tree);
     }
 
     @Override

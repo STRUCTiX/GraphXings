@@ -80,18 +80,18 @@ public class Heuristics {
      */
     public static Optional<GameMove> minimizeHeuristicLateGame(Graph g, int[][] usedCoordinates, int width, int height, Vertex v) {
         for(int i = 0; i < width; i++){
-            if(usedCoordinates[0][i] == 0) {
-                return Optional.of(new GameMove(v, new Coordinate(0, i)));
-            } else if (usedCoordinates[height-1][i] == 0) {
-                return Optional.of(new GameMove(v, new Coordinate(height-1, i)));
+            if(usedCoordinates[i][0] == 0) {
+                return Optional.of(new GameMove(v, new Coordinate(i, 0)));
+            } else if (usedCoordinates[i][height-1] == 0) {
+                return Optional.of(new GameMove(v, new Coordinate(i, height-1)));
             }
         }
 
         for(int i = 0; i < height; i++){
-            if(usedCoordinates[i][0] == 0) {
-                return Optional.of(new GameMove(v, new Coordinate(i, 0)));
-            } else if (usedCoordinates[i][width-1] == 0) {
-                return Optional.of(new GameMove(v, new Coordinate(i,width-1)));
+            if(usedCoordinates[0][i] == 0) {
+                return Optional.of(new GameMove(v, new Coordinate(0, i)));
+            } else if (usedCoordinates[width-1][i] == 0) {
+                return Optional.of(new GameMove(v, new Coordinate(width-1, i)));
             }
         }
 

@@ -10,6 +10,9 @@ import GraphXings.Game.Game;
 import GraphXings.Game.GameResult;
 import GraphXings.Gruppe4.RTreePlayer;
 
+import java.util.Spliterators;
+import java.util.stream.StreamSupport;
+
 public class GraphXings
 {
     public static void main (String[] args) {
@@ -78,11 +81,14 @@ public class GraphXings
         }
         System.out.println("Total games: " + gamesNum + ", Player 1 wins: " + player1 + ", Player 2 wins: " + player2);
 
-        //var rcf = new RandomCycleFactory(19111991);
-        //var instance = rcf.getGameInstance();
+        var rcf = new RandomCycleFactory(19111991);
+        var instance = rcf.getGameInstance();
+        System.out.println("Width: " + instance.getWidth() + ", Height: " + instance.getHeight());
+        var vertices = StreamSupport.stream(instance.getG().getVertices().spliterator(), false).count();
+        System.out.println("Vertices: " + vertices);
 
-        //var game = new Game(instance.getG(), instance.getWidth(), instance.getHeight(), new RandomPlayer("Player 1"), new RTreePlayer("Player 2"));
-        //var result = game.play();
-        //System.out.println(result.announceResult());
+        var game = new Game(instance.getG(), instance.getWidth(), instance.getHeight(), new RandomPlayer("Player 1"), new RTreePlayer("Player 2"));
+        var result = game.play();
+        System.out.println(result.announceResult());
     }
 }
