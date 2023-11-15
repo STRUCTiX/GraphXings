@@ -250,7 +250,7 @@ public class BruteforcePlayer implements Player {
 
                         // Test crossings
                         var crossCalc = new CrossingCalculator(graphDuplicate, vertexCoordDuplicate);
-                        var crossNum = crossCalc.computePartialCrossingNumber();
+                        var crossNum = crossCalc.computeCrossingNumber();
                         if (crossNum < minCross) {
                             minCross = crossNum;
                             minCoord = tempCoord;
@@ -323,7 +323,7 @@ public class BruteforcePlayer implements Player {
 
                         // Test crossings
                         var crossCalc = new CrossingCalculator(graphDuplicate, vertexCoordDuplicate);
-                        var crossNum = crossCalc.computePartialCrossingNumber();
+                        var crossNum = crossCalc.computeCrossingNumber();
                         if (crossNum > maxCross) {
                             maxCross = crossNum;
                             maxCoord = tempCoord;
