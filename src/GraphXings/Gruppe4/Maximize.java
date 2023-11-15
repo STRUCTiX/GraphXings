@@ -150,7 +150,7 @@ public class Maximize {
                 var line = LineFloat.create(maxDistCoordinates.getX(), maxDistCoordinates.getY(), sampleCoord.getX(), sampleCoord.getY());
                 var numCrossings = tree.getIntersections(line);
                 if (numCrossings > maxCrossings) {
-                    numCrossings = maxCrossings;
+                    maxCrossings = numCrossings;
                     bestCoord = sampleCoord;
                 }
             }
