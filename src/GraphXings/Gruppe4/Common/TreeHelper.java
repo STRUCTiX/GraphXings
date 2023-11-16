@@ -37,6 +37,43 @@ public class TreeHelper {
                 .collect(Collectors.toList());
     }
 
+    public static Optional<List<Entry<Edge, LineFloat>>> additionalLines(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove) {
+        if (lastMove == null) {
+            return Optional.empty();
+        }
+        var edgeEntries = new ArrayList<Edge>();
+        var lineEntries = new ArrayList<LineFloat>();
+
+        // Get adjacent vertices
+        var adjacent = g.getIncidentEdges(lastMove.getVertex());
+
+        // Create lines for all placed edges
+        for (var a : adjacent) {
+            var sourceCoord = vertexCoordinates.get(a.getS());
+            var targetCoord = vertexCoordinates.get(a.getT());
+            if (sourceCoord != null && targetCoord != null) {
+                if (!edgeEntries.contains(a)) {
+                    // Prevent creation of duplicate lines
+                    var line = LineFloat.create(sourceCoord.getX(), sourceCoord.getY(), targetCoord.getX(), targetCoord.getY());
+                    lineEntries.add(line);
+                    edgeEntries.add(a);
+                }
+            }
+        }
+
+        if (edgeEntries.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // Create edge/line entry list
+        List<Entry<Edge, LineFloat>> list = new ArrayList<>();
+        for (int i = 0; i < edgeEntries.size(); i++) {
+            list.add(new EntryDefault<>(edgeEntries.get(i), lineEntries.get(i)));
+        }
+        return Optional.of(list);
+    }
+
+
 
     /**
      * Incrementally build up the R-Tree. This is used to add the difference between the opponent move and create

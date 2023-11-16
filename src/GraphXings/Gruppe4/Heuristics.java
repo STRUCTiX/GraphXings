@@ -28,15 +28,14 @@ public class Heuristics {
      * @param height Height of the canvas.
      * @return A game move of the final decision.
      */
-    public static Optional<GameMove> minimizeHeuristic(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
+    public static Optional<GameMove> minimizeHeuristic(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height) {
         if (placedVertices.size() < 3) {
             // In this case we have to place more or less random coordinates
             // because it's not possible to calculate crossings at this point.
 
-            GameMove lastGameMove = gameMoves.get(gameMoves.size() - 1);
 
-            var lastVertex = lastGameMove.getVertex();
-            var lastCoordinate = lastGameMove.getCoordinate();
+            var lastVertex = lastMove.getVertex();
+            var lastCoordinate = lastMove.getCoordinate();
 
             // Get a neighbour vertex by iterating through the edges
             Vertex neighbourVertex = null;
@@ -105,13 +104,13 @@ public class Heuristics {
      * @param g
      * @param usedCoordinates
      * @param vertexCoordinates
-     * @param gameMoves
+     * @param lastMove
      * @param placedVertices
      * @param width
      * @param height
      * @return
      */
-    public static Optional<GameMove> maximizeHeuristic(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height) {
+    public static Optional<GameMove> maximizeHeuristic(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height) {
         if (placedVertices.isEmpty()) {
             // Maximize is the first move of the game.
             // Therefore, we place the vertex in the middle of the canvas

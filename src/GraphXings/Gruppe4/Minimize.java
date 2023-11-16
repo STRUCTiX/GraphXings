@@ -108,7 +108,7 @@ public class Minimize {
 
 
     public static GameMove minimizeMove2(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
-        var heuristicResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        var heuristicResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves.getLast(), placedVertices, width, height);
         if (heuristicResult.isPresent()) {
             return heuristicResult.get();
         }
@@ -170,15 +170,14 @@ public class Minimize {
     }
 
 
-    public static GameMove minimizeMoveClose(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
-        var heuristicResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+    public static GameMove minimizeMoveClose(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
+        var heuristicResult = Heuristics.minimizeHeuristic(g, usedCoordinates, vertexCoordinates, lastMove, placedVertices, width, height);
         if (heuristicResult.isPresent()) {
             return heuristicResult.get();
         }
 
         // Try to place the new vertex next to the last placed vertex.
         // This is only possible if one of the adjacent vertices is unplaced.
-        var lastMove = gameMoves.getLast();
         var lastEdges = g.getIncidentEdges(lastMove.getVertex());
         Vertex unplacedVertex = null;
         for (var e : lastEdges) {

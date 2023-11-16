@@ -31,7 +31,7 @@ public class Maximize {
      * @return A game move of the final decision.
      */
     public static GameMove maximizeMove(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
-        var heuristicResult = Heuristics.maximizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+        var heuristicResult = Heuristics.maximizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves.getLast(), placedVertices, width, height);
         if (heuristicResult.isPresent()) {
             return heuristicResult.get();
         }
@@ -93,13 +93,12 @@ public class Maximize {
     }
 
 
-    public static GameMove maximizeMoveOptimize(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
-        var heuristicResult = Heuristics.maximizeHeuristic(g, usedCoordinates, vertexCoordinates, gameMoves, placedVertices, width, height);
+    public static GameMove maximizeMoveOptimize(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
+        var heuristicResult = Heuristics.maximizeHeuristic(g, usedCoordinates, vertexCoordinates, lastMove, placedVertices, width, height);
         if (heuristicResult.isPresent()) {
             return heuristicResult.get();
         }
 
-        var lastMove = gameMoves.getLast();
 
         // Test for max. distance between last vertex and the corners of the canvas
         var testCoords = new Coordinate[]{
