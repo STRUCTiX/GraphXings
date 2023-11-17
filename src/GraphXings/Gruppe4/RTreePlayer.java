@@ -70,11 +70,17 @@ public class RTreePlayer implements NewPlayer {
     @Override
     public GameMove minimizeCrossings(GameMove lastMove)
     {
+        if (lastMove != null) {
+            gs.applyMove(lastMove);
+        }
+        
         // Add lines to tree by observing last game move
         var additionalLines = TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove);
         additionalLines.ifPresent(entries -> tree.addAll(entries));
 
-        return minimizeMoveClose(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), lastMove, gs.getPlacedVertices(), width, height, tree);
+        var move = minimizeMoveClose(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), lastMove, gs.getPlacedVertices(), width, height, tree);
+        gs.applyMove(move);
+        return move;
     }
 
     @Override
