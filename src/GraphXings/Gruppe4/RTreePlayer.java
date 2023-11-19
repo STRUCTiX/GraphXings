@@ -90,9 +90,9 @@ public class RTreePlayer implements NewPlayer {
         // If we have <10k Vertices use the normal R-Tree.
         // Otherwise, use the R*-Tree heuristic.
         if (vertices.size() < 10000) {
-            tree = new MutableRTree<>(MutableRTree.TreeSetup.SMALL);
+            tree = new MutableRTree<>(MutableRTree.TreeSetup.SMALL, width, height);
         } else {
-            tree = new MutableRTree<>(MutableRTree.TreeSetup.BIG);
+            tree = new MutableRTree<>(MutableRTree.TreeSetup.BIG, width, height);
         }
         this.g = g;
         this.width = width;
