@@ -5,6 +5,7 @@ import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import GraphXings.Game.GameState;
 import com.github.davidmoten.rtree2.Entry;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.internal.EntryDefault;
@@ -37,6 +38,14 @@ public class TreeHelper {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Incrementally build up the R-Tree. This is used to add the difference between the opponent move and create
+     * a list to add the missing lines to the tree.
+     * @param g
+     * @param vertexCoordinates
+     * @param lastMove
+     * @return A list of Edge to LineFloat mappings
+     */
     public static Optional<List<Entry<Edge, LineFloat>>> additionalLines(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove) {
         if (lastMove == null) {
             return Optional.empty();
@@ -73,66 +82,9 @@ public class TreeHelper {
         return Optional.of(list);
     }
 
+    public static int densityGridSize(GameState gs, int width, int height) {
+        var placedNum = gs.getPlacedVertices().size();
 
-
-    /**
-     * Incrementally build up the R-Tree. This is used to add the difference between the opponent move and create
-     * a list to add the missing lines to the tree.
-     * @param g
-     * @param vertexCoordinates
-     * @param gameMoves
-     * @return
-     */
-    public static Optional<List<Entry<Edge, LineFloat>>> additionalLines(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, List<GameMove> gameMoves) {
-        var edgeEntries = new ArrayList<Edge>();
-        var lineEntries = new ArrayList<LineFloat>();
-
-        if (gameMoves.isEmpty()) {
-            return Optional.empty();
-        }
-
-        // Get last game move
-        List<GameMove> lastMoves;
-        try {
-            // We have to add to moves because we didn't add our own move at the
-            // end of last round
-            lastMoves = gameMoves.subList(gameMoves.size() - 2, gameMoves.size());
-        } catch (IndexOutOfBoundsException e) {
-
-            // First iteration consists of only one element
-            lastMoves = new ArrayList<>();
-            lastMoves.add(gameMoves.getLast());
-        }
-
-        // Iterate over the last moves
-        for (var lastMove : lastMoves) {
-            // Get adjacent vertices
-            var adjacent = g.getIncidentEdges(lastMove.getVertex());
-
-            // Create lines for all placed edges
-            for (var a : adjacent) {
-                var sourceCoord = vertexCoordinates.get(a.getS());
-                var targetCoord = vertexCoordinates.get(a.getT());
-                if (sourceCoord != null && targetCoord != null) {
-                    if (!edgeEntries.contains(a)) {
-                        // Prevent creation of duplicate lines
-                        var line = LineFloat.create(sourceCoord.getX(), sourceCoord.getY(), targetCoord.getX(), targetCoord.getY());
-                        lineEntries.add(line);
-                        edgeEntries.add(a);
-                    }
-                }
-            }
-        }
-
-        if (edgeEntries.isEmpty()) {
-            return Optional.empty();
-        }
-
-        // Create edge/line entry list
-        List<Entry<Edge, LineFloat>> list = new ArrayList<>();
-        for (int i = 0; i < edgeEntries.size(); i++) {
-            list.add(new EntryDefault<>(edgeEntries.get(i), lineEntries.get(i)));
-        }
-        return Optional.of(list);
+        return 1;
     }
 }
