@@ -14,11 +14,8 @@ import java.util.Optional;
 
 public class Heuristics {
 
-
     /**
-     * Tries to minimize the amount of crossings in a graph g by testing for the min. amount of crossings.
-     * In the first move we can't find any crossings because we don't have enough coordinates.
-     * Therefore, we place the vertex in a corner of the canvas with the max. distance to the already placed vertex.
+     * With a GameMove, returns a possible vertex placement for the most distant free coordinate located in the canvas corners.
      *
      * @param g The graph object.
      * @param usedCoordinates This contains an array of the canvas with already used coordinates.
@@ -28,7 +25,7 @@ public class Heuristics {
      * @param height Height of the canvas.
      * @return A game move of the final decision.
      */
-    public static Optional<GameMove> minimizeHeuristic(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height) {
+    public static Optional<GameMove> getMostDistantGameMoveOnCanvasCorners(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height) {
         if (placedVertices.size() < 3) {
             // In this case we have to place more or less random coordinates
             // because it's not possible to calculate crossings at this point.
@@ -67,9 +64,7 @@ public class Heuristics {
     }
 
     /**
-     * Tries to minimize the amount of crossings in a graph g by testing for the min. amount of crossings.
-     * In the first move we can't find any crossings because we don't have enough coordinates.
-     * Therefore, we place the vertex in a corner of the canvas with the max. distance to the already placed vertex.
+     * With a GameMove, returns a possible vertex placement for the first free coordinate at the top, bottom, left and right edge of the canvas.
      *
      * @param g The graph object.
      * @param usedCoordinates This contains an array of the canvas with already used coordinates.
@@ -77,7 +72,8 @@ public class Heuristics {
      * @param height Height of the canvas.
      * @return A game move of the final decision.
      */
-    public static Optional<GameMove> minimizeHeuristicLateGame(Graph g, int[][] usedCoordinates, int width, int height, Vertex v) {
+    public static Optional<GameMove> getFirstFreeGameMoveOnCanvasOutline(Graph g, int[][] usedCoordinates, int width, int height, Vertex v) {
+        // Test top and bottom margin of the canvas for a free coordinate
         for(int i = 0; i < width; i++){
             if(usedCoordinates[i][0] == 0) {
                 return Optional.of(new GameMove(v, new Coordinate(i, 0)));
@@ -86,6 +82,7 @@ public class Heuristics {
             }
         }
 
+        // Test left and right margin of the canvas for a free coordinate
         for(int i = 0; i < height; i++){
             if(usedCoordinates[0][i] == 0) {
                 return Optional.of(new GameMove(v, new Coordinate(0, i)));
@@ -99,8 +96,7 @@ public class Heuristics {
 
 
     /**
-     * This heuristic is used if it's our first game move.
-     * In this case we just place the vertex in the middle of the canvas.
+     * With a GameMove, returns the vertex placement for a free coordinate located in the canvas center.
      * @param g
      * @param usedCoordinates
      * @param vertexCoordinates
@@ -110,10 +106,9 @@ public class Heuristics {
      * @param height
      * @return
      */
-    public static Optional<GameMove> maximizeHeuristic(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height) {
+    public static Optional<GameMove> getFreeGameMoveOnCanvasCenter(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height) {
         if (placedVertices.isEmpty()) {
-            // Maximize is the first move of the game.
-            // Therefore, we place the vertex in the middle of the canvas
+            // Place the vertex in the middle of the canvas
             var firstVertex = g.getVertices().iterator().next();
             var middleCoordinate = new Coordinate(width / 2, height / 2);
             return Optional.of(new GameMove(firstVertex, middleCoordinate));

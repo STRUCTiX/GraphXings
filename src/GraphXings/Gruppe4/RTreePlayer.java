@@ -59,8 +59,9 @@ public class RTreePlayer implements NewPlayer {
         }
 
         // Add lines to tree by observing last game move
-        var additionalLines = TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove);
-        additionalLines.ifPresent(entries -> tree.addAll(entries));
+        var additionalLinesOption = TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove);
+        // If non-empty, add the lines to the tree
+        additionalLinesOption.ifPresent(additionalLines -> tree.addAll(additionalLines));
 
         var move = maximizeMoveOptimize(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), lastMove, gs.getPlacedVertices(), width, height, tree);
         gs.applyMove(move);
@@ -75,8 +76,9 @@ public class RTreePlayer implements NewPlayer {
         }
         
         // Add lines to tree by observing last game move
-        var additionalLines = TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove);
-        additionalLines.ifPresent(entries -> tree.addAll(entries));
+        var additionalLinesOption = TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove);
+        // If non-empty, add the lines to the tree
+        additionalLinesOption.ifPresent(additionalLines -> tree.addAll(additionalLines));
 
         var move = minimizeMoveClose(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), lastMove, gs.getPlacedVertices(), width, height, tree);
         gs.applyMove(move);

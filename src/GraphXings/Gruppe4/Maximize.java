@@ -1,25 +1,22 @@
 package GraphXings.Gruppe4;
 
-import GraphXings.Algorithms.CrossingCalculator;
 import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
-import GraphXings.Gruppe4.Common.EdgeHelper;
 import GraphXings.Gruppe4.Common.Helper;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 import static GraphXings.Gruppe4.Common.Helper.isCoordinateFree;
 
 public class Maximize {
 
     public static GameMove maximizeMoveOptimize(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
-        var heuristicResult = Heuristics.maximizeHeuristic(g, usedCoordinates, vertexCoordinates, lastMove, placedVertices, width, height);
+        var heuristicResult = Heuristics.getFreeGameMoveOnCanvasCenter(g, usedCoordinates, vertexCoordinates, lastMove, placedVertices, width, height);
         if (heuristicResult.isPresent()) {
             return heuristicResult.get();
         }

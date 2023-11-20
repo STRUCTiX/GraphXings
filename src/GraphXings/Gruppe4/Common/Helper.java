@@ -141,12 +141,8 @@ public class Helper {
             }
         }
 
-        // Return the unplaced vertex if we've found one
-        if (unplacedVertex != null) {
-            return Optional.of(unplacedVertex);
-        } else {
-            return Optional.empty();
-        }
+        // Return the unplaced vertex, or else an empty optional
+        return Optional.ofNullable(unplacedVertex);
     }
 
 
