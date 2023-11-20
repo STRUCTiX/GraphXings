@@ -7,6 +7,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Gruppe4.Common.EdgeHelper;
+import GraphXings.Gruppe4.Common.Helper;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.HashMap;
@@ -178,26 +179,13 @@ public class Minimize {
 
         // Try to place the new vertex next to the last placed vertex.
         // This is only possible if one of the adjacent vertices is unplaced.
-        var lastEdges = g.getIncidentEdges(lastMove.getVertex());
-        Vertex unplacedVertex = null;
-        for (var e : lastEdges) {
-            var sourceCoord = vertexCoordinates.get(e.getS());
-            var targetCoord = vertexCoordinates.get(e.getT());
-            // Check if vertex is unplaced
-            if (sourceCoord == null) {
-                unplacedVertex = e.getS();
-                break;
-            } else if (targetCoord == null) {
-                unplacedVertex = e.getT();
-                break;
-            }
-        }
+        var unplacedVertex = Helper.pickIncidentVertex(g, vertexCoordinates, lastMove);
 
         // If we've found an unplaced vertex -> try to place it next to the last game move vertex
-        if (unplacedVertex != null) {
+        if (unplacedVertex.isPresent()) {
             var lastCoord = lastMove.getCoordinate();
 
-            var gameMove = minimizeBounds(usedCoordinates, tree, unplacedVertex, lastCoord, 1, 1);
+            var gameMove = minimizeBounds(usedCoordinates, tree, unplacedVertex.get(), lastCoord, 1, 1);
             if (gameMove.isPresent()) {
                 return gameMove.get();
             }
@@ -206,8 +194,8 @@ public class Minimize {
         // In this case we either don't have an unplaced vertex or the checked perimeter was too small
         // TODO: Currently we just use the heuristic from last week which doesn't really fit to our new strategy
         // TODO: A better strategy would be to increase the perimeter to width x height and go from the usedCoordinate towards width/height
-        if (unplacedVertex != null) {
-            var result = Heuristics.minimizeHeuristicLateGame(g, usedCoordinates, width, height, unplacedVertex);
+        if (unplacedVertex.isPresent()) {
+            var result = Heuristics.minimizeHeuristicLateGame(g, usedCoordinates, width, height, unplacedVertex.get());
             if (result.isPresent()) {
                 return result.get();
             }
