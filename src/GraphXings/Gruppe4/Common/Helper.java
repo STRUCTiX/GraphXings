@@ -63,6 +63,7 @@ public class Helper {
                         }
                     }
                 } catch (IndexOutOfBoundsException e) {
+                    // TODO Switch the exception handling to array boundary checking
                     continue;
                 }
             }
@@ -116,6 +117,7 @@ public class Helper {
                     samples.add(new Coordinate(x, y));
                 }
             } catch (IndexOutOfBoundsException e) {
+                // TODO Switch the exception handling to array boundary checking
                 // In this case we just try again
                 continue;
             }

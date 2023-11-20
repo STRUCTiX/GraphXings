@@ -22,6 +22,7 @@ public class Maximize {
         }
 
 
+        // TODO: Function refactor / Function rewrite
         // Test for max. distance between last vertex and the corners of the canvas
         var testCoords = new Coordinate[]{
                 new Coordinate(0, 0), // left upper corner

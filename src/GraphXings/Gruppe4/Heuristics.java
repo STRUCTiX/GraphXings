@@ -27,6 +27,7 @@ public class Heuristics {
      * @return A game move of the final decision.
      */
     public static Optional<GameMove> getMostDistantGameMoveOnCanvasCorners(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height) {
+        // TODO: Function rewrite
         if (placedVertices.size() < 2) {
             // In this case we have to place more or less random coordinates
             // because it's not possible to calculate crossings at this point.
@@ -65,7 +66,7 @@ public class Heuristics {
     }
 
     /**
-     * With a GameMove, returns a possible vertex placement for the first free coordinate at the top, bottom, left and right edge of the canvas.
+     * With a GameMove, returns a possible vertex placement for the first free coordinate at the top, bottom, left and right edge of the canvas .
      *
      * @param g The graph object.
      * @param usedCoordinates This contains an array of the canvas with already used coordinates.
@@ -83,7 +84,7 @@ public class Heuristics {
             }
         }
 
-        // Test left and right margin of the canvas for a free coordinate
+        // Test left and right outline of the canvas for a free coordinate
         for(int i = 0; i < height; i++){
             if(usedCoordinates[0][i] == 0) {
                 return Optional.of(new GameMove(v, new Coordinate(0, i)));
