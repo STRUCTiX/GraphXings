@@ -14,6 +14,7 @@ import java.util.Optional;
 
 public class Heuristics {
 
+
     /**
      * With a GameMove, returns a possible vertex placement for the most distant free coordinate located in the canvas corners.
      *
@@ -26,7 +27,7 @@ public class Heuristics {
      * @return A game move of the final decision.
      */
     public static Optional<GameMove> getMostDistantGameMoveOnCanvasCorners(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height) {
-        if (placedVertices.size() < 3) {
+        if (placedVertices.size() < 2) {
             // In this case we have to place more or less random coordinates
             // because it's not possible to calculate crossings at this point.
 

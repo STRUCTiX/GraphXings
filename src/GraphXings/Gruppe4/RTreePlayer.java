@@ -88,10 +88,10 @@ public class RTreePlayer implements NewPlayer {
     @Override
     public void initializeNextRound(Graph g, int width, int height, Role role)
     {
-        var vertices = (HashSet<Vertex>) g.getVertices();
-        // If we have <10k Vertices use the normal R-Tree.
+        var edges = (HashSet<Edge>) g.getEdges();
+        // If we have <10k Edges use the normal R-Tree.
         // Otherwise, use the R*-Tree heuristic.
-        if (vertices.size() < 10000) {
+        if (edges.size() < 10000) {
             tree = new MutableRTree<>(MutableRTree.TreeSetup.SMALL, width, height);
         } else {
             tree = new MutableRTree<>(MutableRTree.TreeSetup.BIG, width, height);
