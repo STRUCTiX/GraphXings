@@ -68,8 +68,13 @@ public class Helper {
             }
         }
 
-        // Use the coordinates
-        return Optional.of(new GameMove(unplacedVertex, new Coordinate(x, y)));
+        if (minCrossings == Long.MAX_VALUE) {
+            // Edge case where no minimum was found
+            return Optional.empty();
+        } else {
+            // Use the coordinates found
+            return Optional.of(new GameMove(unplacedVertex, new Coordinate(x, y)));
+        }
     }
 
 
