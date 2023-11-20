@@ -80,9 +80,8 @@ public class Maximize {
             return new GameMove(unplacedVertex, bestCoord);
         }
 
-        // TODO: Edge case if no sample was found.
+        // TODO: Edge case when no informed solution has been found
         // In this case we currently just pick a random vertex but this isn't optimal.
-
         return Helper.randomMove(g, usedCoordinates, placedVertices, width, height);
     }
 

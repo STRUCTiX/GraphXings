@@ -55,8 +55,9 @@ public class Minimize {
             }
         }
 
-        // This would be the case if we don't find any free vertex -> should not happen
-        return null;
+        // TODO: Edge case when no informed solution has been found
+        // In this case we currently just pick a random vertex but this isn't optimal.
+        return Helper.randomMove(g, usedCoordinates, placedVertices, width, height);
     }
 
 }
