@@ -77,8 +77,8 @@ public class GraphXings
         //}
         //System.out.println("Total games: " + gamesNum + ", Player 1 wins: " + player1 + ", Player 2 wins: " + player2);
 
-        var rcf = new RandomCycleFactory(19111991);
-        var match = new NewMatch(new NewRandomPlayer("RandomPlayer"), new RTreePlayer("RTreePlayer"), rcf, 10);
+        var rcf = new RandomCycleFactory(21122012, true);
+        var match = new NewMatch(new RTreePlayer("RtreePlayer1"), new RTreePlayer("RTreePlayer"), rcf, 20);
         var result = match.play();
         System.out.println(result.announceResult());
     }
