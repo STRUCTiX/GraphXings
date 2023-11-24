@@ -8,6 +8,7 @@ import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import com.github.davidmoten.rtree2.Entry;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
+import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.github.davidmoten.rtree2.internal.EntryDefault;
 
 import java.util.*;
@@ -80,6 +81,20 @@ public class TreeHelper {
             list.add(new EntryDefault<>(edgeEntries.get(i), lineEntries.get(i)));
         }
         return Optional.of(list);
+    }
+
+    /**
+     * Incrementally update the R-Tree vertex structure.
+     * @param lastMove Non-null last game move
+     * @return Tuple of vertex with a associated Point object.
+     */
+    public static Optional<Entry<Vertex, PointFloat>> additionalPoint(GameMove lastMove) {
+        if (lastMove == null) {
+            return Optional.empty();
+        }
+        var c = lastMove.getCoordinate();
+        var point = PointFloat.create(c.getX(), c.getY());
+        return Optional.of(EntryDefault.entry(lastMove.getVertex(), point));
     }
 
     public static int densityGridSize(GameState gs, int width, int height) {

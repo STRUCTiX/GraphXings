@@ -54,6 +54,10 @@ public class MutableRTree<T, S extends Geometry> {
         tree = tree.add(value, geometry);
     }
 
+    public void add(Entry<? extends T, ? extends S> entry) {
+        tree = tree.add(entry);
+    }
+
     public void addAll(List<Entry<T, S>> entries) {
         tree = tree.add(entries);
     }

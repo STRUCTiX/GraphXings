@@ -2,7 +2,6 @@ package GraphXings.Gruppe4;
 
 import GraphXings.Algorithms.CrossingCalculator;
 import GraphXings.Algorithms.NewPlayer;
-import GraphXings.Algorithms.Player;
 import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
@@ -13,6 +12,7 @@ import GraphXings.Gruppe4.Common.TreeHelper;
 import com.github.davidmoten.rtree2.RTree;
 import com.github.davidmoten.rtree2.geometry.Line;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
+import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 
 import java.util.*;
 
@@ -27,9 +27,14 @@ public class RTreePlayer implements NewPlayer {
     private String name;
 
     /**
-     * The immutable R-Tree structure.
+     * The mutable R-Tree structure. Filled with edges.
      */
     private MutableRTree<Edge, LineFloat> tree;
+
+    /**
+     * The mutable R-Tree structure filled with the placed vertices.
+     */
+    private MutableRTree<Vertex, PointFloat> vertexTree;
 
     /**
      * The current game state
@@ -58,13 +63,23 @@ public class RTreePlayer implements NewPlayer {
             gs.applyMove(lastMove);
         }
 
-        // Add lines to tree by observing last game move
-        var additionalLinesOption = TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove);
-        // If non-empty, add the lines to the tree
-        additionalLinesOption.ifPresent(additionalLines -> tree.addAll(additionalLines));
+        // Add lines to tree by observing last game move if not empty.
+        TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove).ifPresent(lines -> tree.addAll(lines));
 
+        // Add point to the vertex tree by converting the last game move
+        TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
+
+        // Calculate the game move.
         var move = maximizeMoveOptimize(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), lastMove, gs.getPlacedVertices(), width, height, tree);
         gs.applyMove(move);
+
+        // Add our own move to the trees
+        // Add lines to tree by observing last game move if not empty.
+        TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove).ifPresent(lines -> tree.addAll(lines));
+
+        // Add point to the vertex tree by converting the last game move
+        TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
+
         return move;
     }
 
@@ -74,14 +89,24 @@ public class RTreePlayer implements NewPlayer {
         if (lastMove != null) {
             gs.applyMove(lastMove);
         }
-        
-        // Add lines to tree by observing last game move
-        var additionalLinesOption = TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove);
-        // If non-empty, add the lines to the tree
-        additionalLinesOption.ifPresent(additionalLines -> tree.addAll(additionalLines));
 
+        // Add lines to tree by observing last game move if not empty.
+        TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove).ifPresent(lines -> tree.addAll(lines));
+
+        // Add point to the vertex tree by converting the last game move
+        TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
+
+        // Calculate the game move.
         var move = minimizeMoveClose(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), lastMove, gs.getPlacedVertices(), width, height, tree);
         gs.applyMove(move);
+
+        // Add our own move to the trees
+        // Add lines to tree by observing last game move if not empty.
+        TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove).ifPresent(lines -> tree.addAll(lines));
+
+        // Add point to the vertex tree by converting the last game move
+        TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
+
         return move;
     }
 
@@ -96,6 +121,11 @@ public class RTreePlayer implements NewPlayer {
         } else {
             tree = new MutableRTree<>(MutableRTree.TreeSetup.BIG, width, height);
         }
+
+        // Initialize the vertex tree
+        var vertices = (HashSet<Vertex>) g.getVertices();
+        vertexTree = new MutableRTree<>((vertices.size() < 10000) ? MutableRTree.TreeSetup.SMALL : MutableRTree.TreeSetup.BIG, width, height);
+
         this.g = g;
         this.width = width;
         this.height = height;
