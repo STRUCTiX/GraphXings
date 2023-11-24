@@ -50,8 +50,8 @@ public class Minimize {
         for (var v : g.getVertices()) {
             if (!placedVertices.contains(v)) {
                 var result = Heuristics.getFirstFreeGameMoveOnCanvasOutline(g, usedCoordinates, width, height, v);
-                // In this case we return a result or we're screwed and just surrender
-                return result.orElse(null);
+                // In this case we return a result, or we do a random move.
+                return result.orElse(Helper.randomMove(g, usedCoordinates, placedVertices, width, height));
             }
         }
 
