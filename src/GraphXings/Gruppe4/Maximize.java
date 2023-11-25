@@ -10,7 +10,11 @@ import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import GraphXings.Data.Edge;
 
 
+import java.util.List;
+import java.util.Optional;
+
 import static GraphXings.Gruppe4.Common.Helper.isCoordinateFree;
+import static GraphXings.Gruppe4.Common.Helper.randPickFreeCoordinatesPerimeter;
 
 public class Maximize {
 
@@ -24,12 +28,13 @@ public class Maximize {
             return heuristicResult.get();
         }
 
-        // Find highest density area for edges and vertices.
+        // Find the highest density area for edges and vertices.
         var vertexDensity = vertexTree.findHighestDensity(TreeHelper.densityGridSize(gs, width, height));
         var edgeDensity = tree.findHighestDensity(TreeHelper.densityGridSize(gs, width, height));
 
+        // Try to get a vertex coordinate in a dense area
         if (vertexDensity.isPresent()) {
-
+            var freeCoordinates = randPickFreeCoordinatesPerimeter(gs.getUsedCoordinates(), vertexDensity.get(), 10);
         }
 
 
@@ -75,26 +80,38 @@ public class Maximize {
 
         // Test for max. crossings
         if (samples.isPresent()) {
-            Coordinate bestCoord = null;
-            var maxCrossings = Long.MIN_VALUE;
-            for (var sampleCoord : samples.get()) {
-
-                // Create a line to test for intersections
-                var line = LineFloat.create(maxDistCoordinates.getX(), maxDistCoordinates.getY(), sampleCoord.getX(), sampleCoord.getY());
-                var numCrossings = tree.getIntersections(line);
-                if (numCrossings > maxCrossings) {
-                    maxCrossings = numCrossings;
-                    bestCoord = sampleCoord;
-                }
+            var highestIntersection = chooseHighestIntersection(tree, unplacedVertex, maxDistCoordinates, samples.get());
+            if (highestIntersection.isPresent()) {
+                return highestIntersection.get();
             }
-
-            // Use the best coordinate
-            return new GameMove(unplacedVertex, bestCoord);
         }
 
         // TODO: Edge case when no informed solution has been found
         // In this case we currently just pick a random vertex but this isn't optimal.
         return Helper.randomMove(g, usedCoordinates, placedVertices, width, height);
+    }
+
+
+    public static Optional<GameMove> chooseHighestIntersection(MutableRTree<Edge, LineFloat> tree, Vertex unplacedVertex, Coordinate maxDistCoordinate, List<Coordinate> samples) {
+        Coordinate bestCoord = null;
+        var maxCrossings = Long.MIN_VALUE;
+        for (var sampleCoord : samples) {
+
+            // Create a line to test for intersections
+            var line = LineFloat.create(maxDistCoordinate.getX(), maxDistCoordinate.getY(), sampleCoord.getX(), sampleCoord.getY());
+            var numCrossings = tree.getIntersections(line);
+            if (numCrossings > maxCrossings) {
+                maxCrossings = numCrossings;
+                bestCoord = sampleCoord;
+            }
+        }
+
+        if (maxCrossings <= 0) {
+            return Optional.empty();
+        }
+
+        // Use the best coordinate
+        return Optional.of(new GameMove(unplacedVertex, bestCoord));
     }
 
 }
