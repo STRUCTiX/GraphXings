@@ -6,6 +6,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Gruppe4.MutableRTree;
+import com.github.davidmoten.rtree2.geometry.Rectangle;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import javax.swing.plaf.metal.MetalBorders;
@@ -128,6 +129,24 @@ public class Helper {
         } else {
             return Optional.of(samples);
         }
+    }
+
+    /**
+     * Randomly pick some free coordinates in a rectangle.
+     * There's a limit how many samples should be collected. In case of a full grid/canvas,
+     * there's a timeout and the list might be shorter or empty.
+     * @param usedCoordinates
+     * @param rect
+     * @param amountSamples
+     * @return
+     */
+    public static Optional<List<Coordinate>> randPickFreeCoordinatesPerimeter(int[][] usedCoordinates, Rectangle rect, int amountSamples) {
+        // Calculate the perimeter by taking the length of x or y and divide it by 2 to get the middle of the rectangle.
+        double perimeterX = (rect.x2() - rect.x1()) / 2;
+        double perimeterY = (rect.y2() - rect.y1()) / 2;
+        var coordinate = new Coordinate((int)(rect.x1() + perimeterX), (int)(rect.y1() + perimeterY));
+
+        return randPickFreeCoordinatesPerimeter(usedCoordinates, coordinate, (int)perimeterX, (int)perimeterY, amountSamples);
     }
 
     public static Optional<Vertex> pickIncidentVertex(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastGameMove) {

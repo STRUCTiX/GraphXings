@@ -1,6 +1,5 @@
 package GraphXings.Gruppe4.Common;
 
-import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
@@ -10,10 +9,11 @@ import com.github.davidmoten.rtree2.Entry;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.github.davidmoten.rtree2.internal.EntryDefault;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import GraphXings.Data.Coordinate;
+
 
 public class TreeHelper {
 
@@ -99,7 +99,17 @@ public class TreeHelper {
 
     public static int densityGridSize(GameState gs, int width, int height) {
         var placedNum = gs.getPlacedVertices().size();
+        var amountCoordinates = width * height;
 
-        return 1;
+        // Split the canvas into 2x2 grid because it is too small
+        if (amountCoordinates <= 10000) {
+            return 2;
+        }
+
+        // Split the canvas into max. 10x10 grid based on placedNum and amountCoordinates. The value should be between 2 and 10.
+        // The more vertices we have the more we can split the canvas.
+        var gridSize = Math.min(10, Math.max(2, (int) Math.ceil(Math.sqrt((double) placedNum / (double) amountCoordinates) * 10)));
+
+        return gridSize;
     }
 }

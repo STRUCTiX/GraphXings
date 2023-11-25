@@ -1,24 +1,35 @@
 package GraphXings.Gruppe4;
 
-import GraphXings.Data.Coordinate;
-import GraphXings.Data.Edge;
-import GraphXings.Data.Graph;
-import GraphXings.Data.Vertex;
+import GraphXings.Data.*;
 import GraphXings.Game.GameMove;
+import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
+import GraphXings.Gruppe4.Common.TreeHelper;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
+import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
+import GraphXings.Data.Edge;
 
-import java.util.HashMap;
-import java.util.HashSet;
 
 import static GraphXings.Gruppe4.Common.Helper.isCoordinateFree;
 
 public class Maximize {
 
-    public static GameMove maximizeMoveOptimize(Graph g, int[][] usedCoordinates, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastMove, HashSet<Vertex> placedVertices, int width, int height, MutableRTree<Edge, LineFloat> tree) {
+    public static GameMove maximizeMoveOptimize(Graph g, GameState gs, GameMove lastMove, int width, int height, MutableRTree<Edge, LineFloat> tree, MutableRTree<Vertex, PointFloat> vertexTree) {
+        var usedCoordinates = gs.getUsedCoordinates();
+        var vertexCoordinates = gs.getVertexCoordinates();
+        var placedVertices = gs.getPlacedVertices();
+
         var heuristicResult = Heuristics.getFreeGameMoveOnCanvasCenter(g, usedCoordinates, vertexCoordinates, lastMove, placedVertices, width, height);
         if (heuristicResult.isPresent()) {
             return heuristicResult.get();
+        }
+
+        // Find highest density area for edges and vertices.
+        var vertexDensity = vertexTree.findHighestDensity(TreeHelper.densityGridSize(gs, width, height));
+        var edgeDensity = tree.findHighestDensity(TreeHelper.densityGridSize(gs, width, height));
+
+        if (vertexDensity.isPresent()) {
+
         }
 
 

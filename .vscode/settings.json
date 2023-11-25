@@ -1,0 +1,7 @@
+{
+    "java.classPath": [
+        "src/GraphXings/Gruppe4/guava-mini-0.1.7.jar",
+        "src/GraphXings/Gruppe4/rtree2-0.9.4-SNAPSHOT.jar",
+
+    ]
+}

@@ -1,20 +1,16 @@
 package GraphXings.Gruppe4;
 
-import GraphXings.Algorithms.CrossingCalculator;
 import GraphXings.Algorithms.NewPlayer;
-import GraphXings.Data.Coordinate;
-import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.TreeHelper;
-import com.github.davidmoten.rtree2.RTree;
-import com.github.davidmoten.rtree2.geometry.Line;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
-
 import java.util.*;
+import GraphXings.Data.Edge;
+
 
 import static GraphXings.Gruppe4.Maximize.maximizeMoveOptimize;
 import static GraphXings.Gruppe4.Minimize.*;
@@ -70,7 +66,7 @@ public class RTreePlayer implements NewPlayer {
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
         // Calculate the game move.
-        var move = maximizeMoveOptimize(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), lastMove, gs.getPlacedVertices(), width, height, tree);
+        var move = maximizeMoveOptimize(g, gs, lastMove, width, height, tree, vertexTree);
         gs.applyMove(move);
 
         // Add our own move to the trees
