@@ -2,12 +2,10 @@ package GraphXings;
 
 import GraphXings.Algorithms.NewRandomPlayer;
 import GraphXings.Game.GameInstance.RandomCycleFactory;
-import GraphXings.Algorithms.RandomPlayer;
-import GraphXings.Game.Game;
 import GraphXings.Game.Match.NewMatch;
 import GraphXings.Gruppe4.RTreePlayer;
+import GraphXings.Game.GameInstance.RandomCycleFactory;
 
-import java.util.stream.StreamSupport;
 
 public class GraphXings
 {
@@ -77,8 +75,8 @@ public class GraphXings
         //}
         //System.out.println("Total games: " + gamesNum + ", Player 1 wins: " + player1 + ", Player 2 wins: " + player2);
 
-        var rcf = new RandomCycleFactory(21122012, true);
-        var match = new NewMatch(new RTreePlayer("RtreePlayer1"), new RTreePlayer("RTreePlayer"), rcf, 20);
+        var rcf = new RandomCycleFactory(3867431, true);
+        var match = new NewMatch(new NewRandomPlayer("RandomPlayer"), new RTreePlayer("RTreePlayer"), rcf, 10);
         var result = match.play();
         System.out.println(result.announceResult());
     }
