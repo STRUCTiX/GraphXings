@@ -158,9 +158,14 @@ public class Helper {
     }
 
     public static Optional<Vertex> pickIncidentVertex(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, GameMove lastGameMove) {
+        return pickIncidentVertex(g, vertexCoordinates, lastGameMove.getVertex());
+
+    }
+
+    public static Optional<Vertex> pickIncidentVertex(Graph g, HashMap<Vertex, Coordinate> vertexCoordinates, Vertex vertex) {
         // Try to place the new vertex next to the last placed vertex.
         // This is only possible if one of the adjacent vertices is unplaced.
-        var lastEdges = g.getIncidentEdges(lastGameMove.getVertex());
+        var lastEdges = g.getIncidentEdges(vertex);
         Vertex unplacedVertex = null;
         for (var e : lastEdges) {
             var sourceCoord = vertexCoordinates.get(e.getS());
