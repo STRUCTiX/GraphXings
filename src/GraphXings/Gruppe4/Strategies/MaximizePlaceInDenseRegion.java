@@ -7,30 +7,36 @@ import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
+import GraphXings.Gruppe4.Common.TreeHelper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
 import GraphXings.Gruppe4.Strategy;
+import com.github.davidmoten.rtree2.geometry.Point;
+import com.github.davidmoten.rtree2.geometry.Rectangle;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
+import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 
 import java.util.List;
 import java.util.Optional;
 
-public class MaximizeDiagonalCrossing implements Strategy {
+public class MaximizePlaceInDenseRegion implements Strategy {
 
     private final Graph g;
     private final MutableRTree<Edge, LineFloat> tree;
+    private final MutableRTree<Vertex, PointFloat> vertexTree;
     private final GameState gs;
     private final int width;
     private final int height;
 
-    private Optional<GameMove> gameMove;
+    private Optional<GameMove> gameMove = Optional.empty();
 
     private long moveQuality = 0;
 
 
-    public MaximizeDiagonalCrossing(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
+    public MaximizePlaceInDenseRegion(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, MutableRTree<Vertex, PointFloat> vertexTree, int width, int height) {
         this.g = g;
         this.tree = tree;
+        this.vertexTree = vertexTree;
         this.gs = gs;
         this.width = width;
         this.height = height;
@@ -62,27 +68,6 @@ public class MaximizeDiagonalCrossing implements Strategy {
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
 
-        // TODO: Function refactor / Function rewrite
-        // Test for max. distance between last vertex and the corners of the canvas
-        var testCoords = new Coordinate[]{
-                new Coordinate(0, 0), // left upper corner
-                new Coordinate(width, 0), // right upper corner
-                new Coordinate(0, height), // left lower corner
-                new Coordinate(width, height) // right lower corner
-        };
-
-        var maxDistance = Integer.MIN_VALUE;
-        Coordinate maxDistCoordinates = testCoords[0];
-        for (var c : testCoords) {
-
-            // Calculate the max. distance between the last move and the corners
-            var tempDistance = Heuristics.euclideanDistance(lastMove.getCoordinate(), c);
-            if (tempDistance > maxDistance) {
-                maxDistCoordinates = c;
-                maxDistance = tempDistance;
-            }
-        }
-
         // Select an unplaced vertex neighbour
         var unplacedVertexOption = Helper.pickIncidentVertex(g, vertexCoordinates, lastMove);
         Vertex unplacedVertex = null;
@@ -98,14 +83,31 @@ public class MaximizeDiagonalCrossing implements Strategy {
             unplacedVertex = unplacedVertexOption.get();
         }
 
-        // Pick 10 random coordinates out of a perimeter and test for the max. crossings
-        // The perimeter is 1/3 of the width/height
-        // TODO: Why should we use maxDistCoordinates? This should be lastMove coordinate instead?
-        var samples = Helper.randPickFreeCoordinatesPerimeter(usedCoordinates, maxDistCoordinates, width / 3, height / 3, 10);
+        // Check for a dense edge region
+        var rectangleOption = tree.findHighestDensity(TreeHelper.densityGridSize(gs, width, height));
 
-        // Test for max. crossings
-        if (samples.isPresent()) {
-            gameMove = chooseHighestIntersection(tree, unplacedVertex, maxDistCoordinates, samples.get());
+        // Suppress warnings from lambda function
+        final Vertex finalUnplacedVertex = unplacedVertex;
+
+        if (rectangleOption.isPresent()) {
+            // We've found a rectangle with a high density
+            // This is not optimal because we should cross completely through the rectangle
+            // to get the max. crossings. But for simplicity we just use this rectangle to search for free coordinates.
+            var samples = Helper.randPickFreeCoordinatesPerimeter(gs.getUsedCoordinates(), rectangleOption.get(), 10);
+            samples.ifPresent(s -> gameMove = chooseHighestIntersection(tree, finalUnplacedVertex, lastMove.getCoordinate(), s));
+        } else {
+            // In this case we have no dense edge region. Fallback to a dense vertex region instead.
+
+            // First: get the highest density region of the vertex tree.
+            var denseOption = vertexTree.findHighestDensity(TreeHelper.densityGridSize(gs, width, height));
+
+            // Second: place the unplaced vertex inside a dense vertex region.
+            // This should cause many intersections in the late game.
+            if (denseOption.isPresent()) {
+                // Create some samples in that region
+                var samples = Helper.randPickFreeCoordinatesPerimeter(gs.getUsedCoordinates(), denseOption.get(), 10);
+                samples.ifPresent(s -> gameMove = Optional.of(new GameMove(finalUnplacedVertex, s.getFirst())));
+            }
         }
 
         return gameMove.isPresent();
