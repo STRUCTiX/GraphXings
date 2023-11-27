@@ -146,6 +146,14 @@ public class Helper {
         double perimeterY = (rect.y2() - rect.y1()) / 2;
         var coordinate = new Coordinate((int)(rect.x1() + perimeterX), (int)(rect.y1() + perimeterY));
 
+        // Avoid an invalid perimeter.
+        // This is caused by the integer cast later.
+        if (perimeterX < 1) {
+            perimeterX = 1;
+        }
+        if (perimeterY < 1) {
+            perimeterY = 1;
+        }
         return randPickFreeCoordinatesPerimeter(usedCoordinates, coordinate, (int)perimeterX, (int)perimeterY, amountSamples);
     }
 

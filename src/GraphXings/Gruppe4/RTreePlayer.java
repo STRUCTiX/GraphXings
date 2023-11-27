@@ -16,8 +16,6 @@ import java.util.*;
 import GraphXings.Data.Edge;
 
 
-import static GraphXings.Gruppe4.Maximize.maximizeMoveOptimize;
-import static GraphXings.Gruppe4.Minimize.*;
 
 public class RTreePlayer implements NewPlayer {
 

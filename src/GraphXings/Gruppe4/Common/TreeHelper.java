@@ -106,9 +106,12 @@ public class TreeHelper {
             return 2;
         }
 
+        // Use a simple formula placedVertices/1000 and restrict it to the range 2-10.
+        var gridSize = Math.min(10, Math.max(2, placedNum / 1000));
+
         // Split the canvas into max. 10x10 grid based on placedNum and amountCoordinates. The value should be between 2 and 10.
         // The more vertices we have the more we can split the canvas.
-        var gridSize = Math.min(10, Math.max(2, (int) Math.ceil(Math.sqrt((double) placedNum / (double) amountCoordinates) * 10)));
+        //var gridSize = Math.min(10, Math.max(2, (int) Math.ceil(Math.sqrt((double) placedNum / (double) amountCoordinates) * 10)));
 
         return gridSize;
     }
