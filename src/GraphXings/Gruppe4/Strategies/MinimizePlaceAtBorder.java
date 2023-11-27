@@ -62,7 +62,8 @@ public class MinimizePlaceAtBorder implements Strategy {
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
 
-        if (isBorderFull(border)){
+        var freeCoordinateAtBorder = isBorderFull();
+        if (isBorderFull().isEmpty()){
             border += 1;
         }
 
@@ -89,39 +90,44 @@ public class MinimizePlaceAtBorder implements Strategy {
         }
 
         //take unused vertex with at least 1 free neighbour
+        for (Vertex vertex : g.getVertices()){
+            if (!placedVertices.contains(vertex) && freeCoordinateAtBorder.isPresent()){
+                gameMove = Optional.of(new GameMove(vertex, freeCoordinateAtBorder.get()));
+            }
+        }
 
 
         return gameMove.isPresent();
     }
 
 
-    private boolean isBorderFull (int border){
+    private Optional<Coordinate> isBorderFull (){
         //check top border
         for (int i = border; i < width-border-1; i++){
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), new Coordinate(i, border))){
-                return false;
+                return Optional.of(new Coordinate(i, border));
             }
         }
         //check bottom border
         for (int i = border; i < width-border-1; i++){
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), new Coordinate(i, height-border-1))){
-                return false;
+                return Optional.of(new Coordinate(i, height-border-1));
             }
         }
         //check left border
         for (int i = border; i < height-border-1; i++){
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), new Coordinate(border, i))){
-                return false;
+                return Optional.of(new Coordinate(border,i));
             }
         }
-        //check ricght border
+        //check right border
         for (int i = border; i < height-border-1; i++){
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), new Coordinate(width-border-1, i))){
-                return false;
+                return Optional.of(new Coordinate(width-border-1, i));
             }
         }
 
-        return true;
+        return Optional.empty();
     }
 
 
