@@ -17,11 +17,11 @@ import java.util.Optional;
 
 public class MaximizeDiagonalCrossing implements Strategy {
 
-    private Graph g;
-    private MutableRTree<Edge, LineFloat> tree;
-    private GameState gs;
-    private int width;
-    private int height;
+    private final Graph g;
+    private final MutableRTree<Edge, LineFloat> tree;
+    private final GameState gs;
+    private final int width;
+    private final int height;
 
     private Optional<GameMove> gameMove;
 
