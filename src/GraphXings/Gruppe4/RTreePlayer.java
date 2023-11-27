@@ -5,7 +5,9 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
+import GraphXings.Gruppe4.Strategies.MaximizeDiagonalCrossing;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import java.util.*;
@@ -66,8 +68,21 @@ public class RTreePlayer implements NewPlayer {
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
         // Calculate the game move.
-        var move = maximizeMoveOptimize(g, gs, lastMove, width, height, tree, vertexTree);
-        gs.applyMove(move);
+        var maximizer = new MaximizeDiagonalCrossing(g, gs, tree, width, height);
+        Optional<GameMove> move = Optional.empty();
+        if (gs.getPlacedVertices().isEmpty()) {
+            maximizer.executeHeuristic(Optional.ofNullable(lastMove));
+            move = maximizer.getGameMove();
+        } else {
+            maximizer.executeStrategy(lastMove);
+            move = maximizer.getGameMove();
+        }
+
+        if (move.isEmpty()) {
+            move = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
+        }
+
+        gs.applyMove(move.get());
 
         // Add our own move to the trees
         // Add lines to tree by observing last game move if not empty.
@@ -76,7 +91,7 @@ public class RTreePlayer implements NewPlayer {
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
-        return move;
+        return move.get();
     }
 
     @Override
