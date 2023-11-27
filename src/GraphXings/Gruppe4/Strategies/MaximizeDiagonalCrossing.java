@@ -29,6 +29,7 @@ public class MaximizeDiagonalCrossing implements Strategy {
 
 
     public MaximizeDiagonalCrossing(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
+        this.g = g;
         this.tree = tree;
         this.gs = gs;
         this.width = width;
