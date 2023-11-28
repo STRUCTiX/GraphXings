@@ -63,7 +63,8 @@ public class MinimizePlaceAtBorder implements Strategy {
         var placedVertices = gs.getPlacedVertices();
 
         var freeCoordinateAtBorder = isBorderFull();
-        if (isBorderFull().isEmpty()){
+        int maxBorder = Math.max(width, height);
+        if (isBorderFull().isEmpty() && border < maxBorder/2){
             border += 1;
         }
 
@@ -93,6 +94,7 @@ public class MinimizePlaceAtBorder implements Strategy {
         for (Vertex vertex : g.getVertices()){
             if (!placedVertices.contains(vertex) && freeCoordinateAtBorder.isPresent()){
                 gameMove = Optional.of(new GameMove(vertex, freeCoordinateAtBorder.get()));
+                return true;
             }
         }
 
@@ -104,25 +106,25 @@ public class MinimizePlaceAtBorder implements Strategy {
     private Optional<Coordinate> isBorderFull (){
         //check top border
         for (int i = border; i < width-border-1; i++){
-            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), new Coordinate(i, border))){
+            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), i,border)){
                 return Optional.of(new Coordinate(i, border));
             }
         }
         //check bottom border
         for (int i = border; i < width-border-1; i++){
-            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), new Coordinate(i, height-border-1))){
+            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), i, height-border-1)){
                 return Optional.of(new Coordinate(i, height-border-1));
             }
         }
         //check left border
         for (int i = border; i < height-border-1; i++){
-            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), new Coordinate(border, i))){
+            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), border, i)){
                 return Optional.of(new Coordinate(border,i));
             }
         }
         //check right border
         for (int i = border; i < height-border-1; i++){
-            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), new Coordinate(width-border-1, i))){
+            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), width-border-1, i)){
                 return Optional.of(new Coordinate(width-border-1, i));
             }
         }
@@ -142,24 +144,20 @@ public class MinimizePlaceAtBorder implements Strategy {
         int xValue_old = coordinate.getX();
         int yValue_old = coordinate.getY();
         int i = 1;
-        Coordinate returnCoordinate = null;
         if(yValue_old == border || yValue_old == height-1){
             //coordinate is at top or bottom border
 
             while (xValue_old + i < width-1 || xValue_old - i > border) {
                 //check field to the right side
                 int xValue_new = xValue_old + i;
-                returnCoordinate = new Coordinate(xValue_new, yValue_old);
-                if (xValue_new < width-1 && Helper.isCoordinateFree(gs.getUsedCoordinates(), returnCoordinate)){
-                    return Optional.of(returnCoordinate);
+                if (xValue_new < width-1 && Helper.isCoordinateFree(gs.getUsedCoordinates(), xValue_new, yValue_old)){
+                    return Optional.of(new Coordinate(xValue_new, yValue_old));
                 }
 
                 //check field to the left side
                 xValue_new = xValue_old - i;
-                returnCoordinate = new Coordinate(xValue_new, yValue_old);
-                if (xValue_new > border && Helper.isCoordinateFree(gs.getUsedCoordinates(), returnCoordinate)){
-                    //returnCoordinate = new Coordinate(xValue_new, yValue_old);
-                    return Optional.of(returnCoordinate);
+                if (xValue_new > border && Helper.isCoordinateFree(gs.getUsedCoordinates(), xValue_new, yValue_old)){
+                    return Optional.of(new Coordinate(xValue_new, yValue_old));
                 }
                 i++;
             }
@@ -169,23 +167,21 @@ public class MinimizePlaceAtBorder implements Strategy {
             while (yValue_old + i < height-1 || yValue_old - i > border){
                 //check field above
                 int yValue_new = yValue_old + i;
-                returnCoordinate = new Coordinate(xValue_old, yValue_new);
-                if (yValue_new < height-1 && Helper.isCoordinateFree(gs.getUsedCoordinates(), returnCoordinate)){
-                    return Optional.of(returnCoordinate);
+                if (yValue_new < height-1 && Helper.isCoordinateFree(gs.getUsedCoordinates(), xValue_old, yValue_new)){
+                    return Optional.of(new Coordinate(xValue_old, yValue_new));
                 }
 
                 //check field under
                 yValue_new = yValue_old - i;
-                returnCoordinate = new Coordinate(xValue_old, yValue_new);
-                if (yValue_new > border && Helper.isCoordinateFree(gs.getUsedCoordinates(), returnCoordinate)){
-                    return Optional.of(returnCoordinate);
+                if (yValue_new > border && Helper.isCoordinateFree(gs.getUsedCoordinates(), xValue_old, yValue_new)){
+                    return Optional.of(new Coordinate(xValue_old, yValue_new));
                 }
 
                 i++;
             }
         }
 
-        return Optional.ofNullable(returnCoordinate);
+        return Optional.empty();
     }
 
     /**
