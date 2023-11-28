@@ -5,6 +5,7 @@ import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.Rectangle;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
@@ -182,6 +183,29 @@ public class Helper {
 
         // Return the unplaced vertex, or else an empty optional
         return Optional.ofNullable(unplacedVertex);
+    }
+
+    /**
+     * Check how many free vertices are placed around a given vertex.
+     * This function returns the amount of unplaced vertices which are connected via an edge to the given vertex.
+     * @param g
+     * @param gs
+     * @param vertex A given placed or unplaced vertex.
+     * @return The amount of free vertices. 0 if no vertex is unplaced.
+     */
+    public static int freeIncidentVertices(Graph g, GameState gs, Vertex vertex) {
+        var incidentEdges = g.getIncidentEdges(vertex);
+        int counter = 0;
+        for (var edge : incidentEdges) {
+            // Check if edge source is not the given vertex and is unplaced
+            if (!edge.getS().equals(vertex) && !gs.getPlacedVertices().contains(edge.getS())) {
+                counter += 1;
+            } else if (!edge.getT().equals(vertex) && !gs.getPlacedVertices().contains(edge.getT())) {
+                // Same check for the target edge vertex
+                counter += 1;
+            }
+        }
+        return counter;
     }
 
 
