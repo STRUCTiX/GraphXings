@@ -160,7 +160,7 @@ public class RTreePlayer implements NewPlayer {
         this.g = g;
         this.width = width;
         this.height = height;
-        gs = new GameState(width, height);
+        gs = new GameState(g, width, height);
     }
 
     @Override
