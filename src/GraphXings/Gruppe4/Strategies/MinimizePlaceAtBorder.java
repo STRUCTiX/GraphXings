@@ -81,9 +81,8 @@ public class MinimizePlaceAtBorder implements Strategy {
             //check for the vertex, if it is at the border and if it has an unplaced neighbour and if there is a free coordinate at the border
             var coordinate_neighbour = findNextFreeCoordinateAtBorder(vertexCoordinate);
             if (isAtBorder(vertexCoordinate) && neighbourVertex.isPresent() && coordinate_neighbour.isPresent()){
-                //compute intersections for the new optinal move to check the quality
-                var edge = LineFloat.create(vertexCoordinate.getX(), vertexCoordinate.getY(), coordinate_neighbour.get().getX(), coordinate_neighbour.get().getY());
-                long current_move_quality = tree.getIntersections(edge);
+                //compute intersections for the new optional move to check the quality
+                long current_move_quality = computeMoveQuality(vertex);
 
                 //only update game move, if the quality of the optional current move is better than the quality of the best move
                 if (this.moveQuality > current_move_quality){
@@ -102,14 +101,18 @@ public class MinimizePlaceAtBorder implements Strategy {
             return true;
         }
 
-        //TODO: maybe it has a better move quality to place a new vertex to the border
+        //TODO: maybe it has a better move quality to place a new vertex to the border????
 
         //take unused vertex with at least 1 free neighbour and put it on the free coordinate on the border
         for (Vertex vertex : g.getVertices()){
             if (!placedVertices.contains(vertex) && freeCoordinateAtBorder.isPresent() && Helper.numIncidentVertices(g, gs, vertex, true) >= 1){
-                //TODO: find vertex with best move quality
-                //TODO: compute crossings for all existing edges
-                gameMove = Optional.of(new GameMove(vertex, freeCoordinateAtBorder.get()));
+                long current_move_quality = computeMoveQuality(vertex);
+                if (moveQuality > current_move_quality){
+                    gameMove = Optional.of(new GameMove(vertex, freeCoordinateAtBorder.get()));
+                    moveQuality = current_move_quality;
+                }
+            }
+            if (moveQuality == 0){
                 return true;
             }
         }
@@ -123,6 +126,7 @@ public class MinimizePlaceAtBorder implements Strategy {
      * picks the first free Coordinate at the border
      * @return the free Coordinate
      */
+    //TODO: find the free coordinate that creates less crossings not only the first one that is found
     private Optional<Coordinate> pickFreeCoordinateAtBorder (){
         //check top border
         for (int i = border; i < width-border-1; i++){
@@ -234,6 +238,30 @@ public class MinimizePlaceAtBorder implements Strategy {
     @Override
     public long getGameMoveQuality() {
         return moveQuality;
+    }
+
+    /**
+     * computes move quality by computing the number of crossings
+     * for all edges that are created by placing the given vertex
+     * @param vertex ton place
+     * @return number of crossings
+     */
+    public long computeMoveQuality (Vertex vertex){
+        var placedVertices = gs.getPlacedVertices();
+        var vertexCoordinates = gs.getVertexCoordinates();
+        var incidentEdges = g.getIncidentEdges(vertex);
+
+        long current_move_quality = 0;
+
+        //check for all edges that the vertex has, if they are already existing
+        for (Edge e : incidentEdges) {
+            if(placedVertices.contains(e.getS()) && placedVertices.contains(e.getT())){
+                var edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), vertexCoordinates.get(e.getT()).getX(), vertexCoordinates.get(e.getT()).getY());
+                 current_move_quality += tree.getIntersections(edge);
+            }
+        }
+
+        return current_move_quality;
     }
 
 

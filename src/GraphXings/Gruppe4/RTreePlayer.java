@@ -7,10 +7,7 @@ import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
-import GraphXings.Gruppe4.Strategies.MaximizeDiagonalCrossing;
-import GraphXings.Gruppe4.Strategies.MaximizePlaceInDenseRegion;
-import GraphXings.Gruppe4.Strategies.MinimizePlaceAtBorder;
-import GraphXings.Gruppe4.Strategies.MinimizePlaceNextToOpponent;
+import GraphXings.Gruppe4.Strategies.*;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import java.util.*;
@@ -69,7 +66,7 @@ public class RTreePlayer implements NewPlayer {
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
         // Calculate the game move.
-        var maximizer = new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height);
+        var maximizer = new MaximizePlaceVertexOnEdge(g, gs, tree, width, height);
         Optional<GameMove> move;
 
         // Check if we've got the first move and must execute the heuristic
@@ -111,7 +108,7 @@ public class RTreePlayer implements NewPlayer {
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
         // Calculate the game move.
-        var minimizer = new MinimizePlaceNextToOpponent(g, gs, tree, width, height);
+        var minimizer = new MinimizePlaceAtBorder(g, gs, tree, width, height);
         Optional<GameMove> move;
 
         // Check if we've got the first move and must execute the heuristic

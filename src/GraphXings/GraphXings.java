@@ -66,7 +66,8 @@ public class GraphXings
         var match = new NewMatch(new NewRandomPlayer("RandomPlayer"), new RTreePlayer("RTreePlayer"), rcf, 10);
         var result = match.play();
         System.out.println(result.announceResult());
-         */
+        */
+
 
         //TODO: add players here
         RandomCycleFactory factory = new RandomCycleFactory(24091869, true);
@@ -74,6 +75,7 @@ public class GraphXings
         NewLeague l = new NewLeague(players,3,timeLimit,factory);
         NewLeagueResult lr = l.runLeague();
         System.out.println(lr.announceResults());
+
 
     }
 }
