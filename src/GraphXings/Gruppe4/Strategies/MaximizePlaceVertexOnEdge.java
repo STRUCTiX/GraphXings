@@ -66,18 +66,15 @@ public class MaximizePlaceVertexOnEdge implements Strategy {
         var placedVertices = gs.getPlacedVertices();
 
         //it is the third game move and the longest edge still has to be created
-
         if (gs.getPlacedVertices().size() < 3){
             createLongestEdge();
             return true;
         }
 
-        String longest_edge_type = "";
-
-
         //at least 4. game move: longest edge is already drawn
 
         //find the unplaced vertex with the highest number of neighbours
+        //TODO: collect vertices with equal number of neighbour and choose the vertex on the coordinate with the highest move quality
         Vertex new_vertex = null;
         int num_max_neigbours = 0;
         for (Vertex vertex : g.getVertices()){
@@ -95,8 +92,6 @@ public class MaximizePlaceVertexOnEdge implements Strategy {
             gameMove = Optional.of(new GameMove(new_vertex, new_coordinate.get()));
             return true;
         }
-
-
 
         return gameMove.isPresent();
     }
@@ -235,27 +230,30 @@ public class MaximizePlaceVertexOnEdge implements Strategy {
         return moveQuality;
     }
 
-    public Optional<GameMove> chooseHighestIntersection(MutableRTree<Edge, LineFloat> tree, Vertex unplacedVertex, Coordinate maxDistCoordinate, List<Coordinate> samples) {
-        Coordinate bestCoord = null;
-        var maxCrossings = Long.MIN_VALUE;
-        for (var sampleCoord : samples) {
+    /**
+     * computes move quality by computing the number of crossings
+     * for all edges that are created by placing the given vertex
+     * @param vertex ton place
+     * @return number of crossings
+     */
+    public long computeMoveQuality (Vertex vertex){
+        var placedVertices = gs.getPlacedVertices();
+        var vertexCoordinates = gs.getVertexCoordinates();
+        var incidentEdges = g.getIncidentEdges(vertex);
 
-            // Create a line to test for intersections
-            var line = LineFloat.create(maxDistCoordinate.getX(), maxDistCoordinate.getY(), sampleCoord.getX(), sampleCoord.getY());
-            var numCrossings = tree.getIntersections(line);
-            if (numCrossings > maxCrossings) {
-                maxCrossings = numCrossings;
-                bestCoord = sampleCoord;
+        long current_move_quality = 0;
+
+        //check for all edges that the vertex has, if they are already existing
+        for (Edge e : incidentEdges) {
+            if(placedVertices.contains(e.getS()) && placedVertices.contains(e.getT())){
+                var edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), vertexCoordinates.get(e.getT()).getX(), vertexCoordinates.get(e.getT()).getY());
+                current_move_quality += tree.getIntersections(edge);
             }
         }
 
-        if (maxCrossings <= 0) {
-            moveQuality = 0;
-            return Optional.empty();
-        }
-
-        // Use the best coordinate
-        moveQuality = maxCrossings;
-        return Optional.of(new GameMove(unplacedVertex, bestCoord));
+        //additionally add all crossings that will be created by the free neighbour edges
+        return current_move_quality + Helper.numIncidentVertices(g, gs, vertex, true);
     }
+
+
 }
