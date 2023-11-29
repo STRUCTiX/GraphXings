@@ -73,6 +73,15 @@ public class MaximizePlaceVertexOnEdge implements Strategy {
             return true;
         }
 
+        //at least 4. game move: longest edge is already drawn
+
+        //find the unplaced vertex with the highest number of neighbours
+        Vertex new_vertex;
+        int num_neigbours = 0;
+        for (Vertex vertex : g.getVertices()){
+            //if (!placedVertices.contains(vertex) && num_neigbours < Helper.)
+        }
+
 
 
         return gameMove.isPresent();

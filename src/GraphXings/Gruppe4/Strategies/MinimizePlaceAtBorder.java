@@ -119,7 +119,7 @@ public class MinimizePlaceAtBorder implements Strategy {
                 return false;
             }
         }
-        //check ricght border
+        //check right border
         for (int i = border; i < height-border-1; i++){
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), new Coordinate(width-border-1, i))){
                 return false;
