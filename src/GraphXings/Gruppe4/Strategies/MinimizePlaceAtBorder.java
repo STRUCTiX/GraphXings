@@ -1,5 +1,6 @@
 package GraphXings.Gruppe4.Strategies;
 
+import GraphXings.Algorithms.CrossingCalculator;
 import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
@@ -18,11 +19,11 @@ import java.util.Optional;
 
 public class MinimizePlaceAtBorder implements Strategy {
 
-    private Graph g;
-    private MutableRTree<Edge, LineFloat> tree;
-    private GameState gs;
-    private int width;
-    private int height;
+    private final Graph g;
+    private final MutableRTree<Edge, LineFloat> tree;
+    private final GameState gs;
+    private final int width;
+    private final int height;
 
     private Optional<GameMove> gameMove = Optional.empty();
 
@@ -42,12 +43,12 @@ public class MinimizePlaceAtBorder implements Strategy {
      * Executes the heuristic as the first or second move.
      *
      * @param lastMove Is empty on first move otherwise provides the last opponent game move.
-     * @return True on success, false otherwise.
+     * @return false (its not necessary for the minimizer)
      */
     @Override
     public boolean executeHeuristic(Optional<GameMove> lastMove) {
-        gameMove = Heuristics.getFreeGameMoveOnCanvasCenter(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), null, gs.getPlacedVertices(), width, height);
-        return gameMove.isPresent();
+        //gameMove = Heuristics.getFreeGameMoveOnCanvasCenter(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), null, gs.getPlacedVertices(), width, height);
+        return false;
     }
 
     /**
@@ -62,10 +63,11 @@ public class MinimizePlaceAtBorder implements Strategy {
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
 
-        var freeCoordinateAtBorder = isBorderFull();
-        int maxBorder = Math.max(width, height);
-        if (isBorderFull().isEmpty() && border < maxBorder/2){
+        var freeCoordinateAtBorder = pickFreeCoordinateAtBorder();
+        int maxBorder = Math.min(width, height);
+        while (freeCoordinateAtBorder.isEmpty() && border < maxBorder/2){
             border += 1;
+            freeCoordinateAtBorder = pickFreeCoordinateAtBorder();
         }
 
         for (var vertex : placedVertices){
@@ -74,25 +76,34 @@ public class MinimizePlaceAtBorder implements Strategy {
             //check for the vertex, if it is at the border and if it has an unplaced neighbour and if there is a free coordinate at the border
             var coordinate_neighbour = findNextFreeCoordinateAtBorder(vertexCoordinate);
             if (isAtBorder(vertexCoordinate) && neighbourVertex.isPresent() && coordinate_neighbour.isPresent()){
+                //compute intersections for the new optinal move to check the quality
                 var edge = LineFloat.create(vertexCoordinate.getX(), vertexCoordinate.getY(), coordinate_neighbour.get().getX(), coordinate_neighbour.get().getY());
                 long current_move_quality = tree.getIntersections(edge);
+
+                //only update game move, if the quality of the optional current move is better than the quality of the best move
                 if (this.moveQuality > current_move_quality){
                     gameMove = Optional.of(new GameMove(neighbourVertex.get(), coordinate_neighbour.get()));
                     this.moveQuality = current_move_quality;
                 }
             }
+            //move with the best quality was found
             if (moveQuality == 0){
                 return true;
             }
         }
 
+        //move was found, but quality is worse than 0
         if (gameMove.isPresent()) {
             return true;
         }
 
-        //take unused vertex with at least 1 free neighbour
+        //TODO: maybe it has a better move quality to place a new vertex to the border
+
+        //take unused vertex with at least 1 free neighbour and put it on the free coordinate on the border
         for (Vertex vertex : g.getVertices()){
-            if (!placedVertices.contains(vertex) && freeCoordinateAtBorder.isPresent()){
+            if (!placedVertices.contains(vertex) && freeCoordinateAtBorder.isPresent() && Helper.numIncidentVertices(g, gs, vertex, true) >= 1){
+                //TODO: find vertex with best move quality
+                //TODO: compute crossings for all existing edges
                 gameMove = Optional.of(new GameMove(vertex, freeCoordinateAtBorder.get()));
                 return true;
             }
@@ -103,7 +114,11 @@ public class MinimizePlaceAtBorder implements Strategy {
     }
 
 
-    private Optional<Coordinate> isBorderFull (){
+    /**
+     * picks the first free Coordinate at the border
+     * @return the free Coordinate
+     */
+    private Optional<Coordinate> pickFreeCoordinateAtBorder (){
         //check top border
         for (int i = border; i < width-border-1; i++){
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), i,border)){
@@ -135,7 +150,7 @@ public class MinimizePlaceAtBorder implements Strategy {
 
     /**
      * finds the next free coordinate at the border from the given coordinate
-     * @param coordinate border coordinate
+     * @param coordinate
      * @return next free coordinate
      */
     private Optional<Coordinate> findNextFreeCoordinateAtBorder (Coordinate coordinate){
@@ -181,11 +196,12 @@ public class MinimizePlaceAtBorder implements Strategy {
             }
         }
 
+        // given coordinate is not at the border or no next coordinate is free
         return Optional.empty();
     }
 
     /**
-     * Checks if the given vertex is at the border
+     * Checks if a given coordinate is at the border
      * @param coordinate to check
      * @return true or false
      */

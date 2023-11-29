@@ -1,10 +1,17 @@
 package GraphXings;
 
+import GraphXings.Algorithms.CrossingCalculator;
 import GraphXings.Algorithms.NewRandomPlayer;
+import GraphXings.Data.Coordinate;
+import GraphXings.Data.Edge;
+import GraphXings.Data.Graph;
+import GraphXings.Data.Vertex;
 import GraphXings.Game.GameInstance.RandomCycleFactory;
 import GraphXings.Game.Match.NewMatch;
 import GraphXings.Gruppe4.RTreePlayer;
 import GraphXings.Game.GameInstance.RandomCycleFactory;
+
+import java.util.HashMap;
 
 
 public class GraphXings
@@ -53,6 +60,18 @@ public class GraphXings
         //g.addEdge(e9);
         //g.addEdge(e10);
 
+        /*
+        HashMap<Vertex, Coordinate> vertexCoordinates = new HashMap<>();
+        vertexCoordinates.put(v1, new Coordinate(0,3));
+        vertexCoordinates.put(v2, new Coordinate(1,3));
+        vertexCoordinates.put(v3, new Coordinate(2,3));
+        vertexCoordinates.put(v4, new Coordinate(1,2));
+        vertexCoordinates.put(v5, new Coordinate(1,4));
+
+        CrossingCalculator c = new CrossingCalculator(g, vertexCoordinates);
+        System.out.println(c.computeCrossingNumber());
+        */
+
         //// Play 1000 games so we can see if the new player wins consistently
         //int player1 = 0, player2 = 0;
         //var randPlayer = new RandomPlayer("Player 1");
@@ -76,7 +95,7 @@ public class GraphXings
         //System.out.println("Total games: " + gamesNum + ", Player 1 wins: " + player1 + ", Player 2 wins: " + player2);
 
         var rcf = new RandomCycleFactory(21122012, true);
-        var match = new NewMatch(new NewRandomPlayer("RandomPlayer"), new RTreePlayer("RTreePlayer"), rcf, 100);
+        var match = new NewMatch(new NewRandomPlayer("RandomPlayer"), new RTreePlayer("RTreePlayer"), rcf, 10);
         var result = match.play();
         System.out.println(result.announceResult());
     }

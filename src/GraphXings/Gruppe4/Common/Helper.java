@@ -190,12 +190,24 @@ public class Helper {
      * This function returns the amount of unplaced vertices which are connected via an edge to the given vertex.
      * @param g
      * @param gs
+     * @param onlyFreeNeighbours should only the free neighbours be computed (true) or all (false)
      * @param vertex A given placed or unplaced vertex.
      * @return The amount of free vertices. 0 if no vertex is unplaced.
      */
-    public static int freeIncidentVertices(Graph g, GameState gs, Vertex vertex) {
+    public static int numIncidentVertices(Graph g, GameState gs, Vertex vertex, boolean onlyFreeNeighbours) {
         var incidentEdges = g.getIncidentEdges(vertex);
-        int counter = 0;
+
+        List<Edge> edgeList = new ArrayList<>();
+        incidentEdges.forEach(edgeList :: add);
+
+        if (onlyFreeNeighbours){
+            edgeList.removeIf(edge -> !edge.getS().equals(vertex) && gs.getPlacedVertices().contains(edge.getS()));
+            edgeList.removeIf(edge -> !edge.getT().equals(vertex) && gs.getPlacedVertices().contains(edge.getT()));
+        }
+
+        return edgeList.size();
+
+        /*int counter = 0;
         for (var edge : incidentEdges) {
             // Check if edge source is not the given vertex and is unplaced
             if (!edge.getS().equals(vertex) && !gs.getPlacedVertices().contains(edge.getS())) {
@@ -205,7 +217,7 @@ public class Helper {
                 counter += 1;
             }
         }
-        return counter;
+        return counter;*/
     }
 
 
