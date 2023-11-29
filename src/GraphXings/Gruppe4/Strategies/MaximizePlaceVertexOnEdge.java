@@ -113,27 +113,33 @@ public class MaximizePlaceVertexOnEdge implements Strategy {
         for (int i = 1; i < max_length/2; i++){
             int x = 0;
             int y = 0;
+            int x_end = 0;
+            int y_end = 0;
             switch (edgeType) {
                 case "diagonal" -> {
                     x = i;
                     y = i;
+                    x_end = width-i;
+                    y_end = height-i;
                 }
                 case "vertical" -> {
                     y = i;
+                    y_end = height-i;
                 }
                 case "horizontal" -> {
                     x = i;
+                    x_end = width-i;
                 }
-                //default ->
-                    //throw new IllegalArgumentException("edge type must be one of: diagonal, vertical, horizontal, but it was " + edgeType);
+                default ->
+                    throw new IllegalArgumentException("edge type must be one of: diagonal, vertical, horizontal, but it was " + edgeType);
             }
             // check free coordinate at the start of the edge
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), x, y)){
                 return Optional.of(new Coordinate(x, y));
             }
             //test free coordinate at the end of the edge
-            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), Math.max(0, width-x-1), Math.max(0,height-y-1))){
-                return Optional.of(new Coordinate(Math.max(0, width-x-1), Math.max(0, height-y-1)));
+            if (Helper.isCoordinateFree(gs.getUsedCoordinates(), x_end, y_end)){
+                return Optional.of(new Coordinate(x_end, y_end));
             }
         }
         return Optional.empty();
