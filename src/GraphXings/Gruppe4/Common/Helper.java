@@ -186,13 +186,13 @@ public class Helper {
     }
 
     /**
-     * Check how many free vertices are placed around a given vertex.
+     * Check how many vertices are placed around a given vertex.
      * This function returns the amount of unplaced vertices which are connected via an edge to the given vertex.
      * @param g
      * @param gs
      * @param onlyFreeNeighbours should only the free neighbours be computed (true) or all (false)
      * @param vertex A given placed or unplaced vertex.
-     * @return The amount of free vertices. 0 if no vertex is unplaced.
+     * @return The amount of vertices.
      */
     public static int numIncidentVertices(Graph g, GameState gs, Vertex vertex, boolean onlyFreeNeighbours) {
         var incidentEdges = g.getIncidentEdges(vertex);
