@@ -137,7 +137,7 @@ public class RTreePlayer implements NewPlayer {
 
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
-
+        
         return move.get();
     }
 
@@ -160,7 +160,7 @@ public class RTreePlayer implements NewPlayer {
         this.g = g;
         this.width = width;
         this.height = height;
-        gs = new GameState(width, height);
+        gs = new GameState(g, width, height);
     }
 
     @Override
