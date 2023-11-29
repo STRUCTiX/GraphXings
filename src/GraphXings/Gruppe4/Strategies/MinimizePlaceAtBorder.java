@@ -54,6 +54,11 @@ public class MinimizePlaceAtBorder implements Strategy {
      * Execute the main strategy and calculate a game move.
      * The move must be stored and retrievable by getGameMove.
      *
+     * Strategy: search for a vertex at the border and place its neighbour next to it
+     * (use the move with the lowest number of crossings)
+     * if this is not possible use a free vertex with at least one free neighbour an place it at the border
+     * if the border is full: new border goes one coordinate inside
+     *
      * @param lastMove The last opponent move.
      * @return True on success, false otherwise
      */
