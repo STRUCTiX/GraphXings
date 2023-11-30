@@ -9,7 +9,6 @@ import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
 import GraphXings.Gruppe4.Strategies.MaximizeDiagonalCrossing;
 import GraphXings.Gruppe4.Strategies.MaximizePlaceInDenseRegion;
-import GraphXings.Gruppe4.Strategies.MinimizePlaceAtBorder;
 import GraphXings.Gruppe4.Strategies.MinimizePlaceNextToOpponent;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
