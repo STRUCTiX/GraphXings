@@ -72,7 +72,7 @@ public class GraphXings
         //TODO: add players here
         RandomCycleFactory factory = new RandomCycleFactory(24091869, true);
         long timeLimit = 300000000000l;
-        NewLeague l = new NewLeague(players,3,timeLimit,factory);
+        NewLeague l = new NewLeague(players,5,timeLimit,factory);
         NewLeagueResult lr = l.runLeague();
         System.out.println(lr.announceResults());
 
