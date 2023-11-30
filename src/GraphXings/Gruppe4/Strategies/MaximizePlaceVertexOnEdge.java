@@ -239,7 +239,8 @@ public class MaximizePlaceVertexOnEdge implements Strategy {
     /**
      * computes move quality by computing the number of crossings
      * for all edges that are created by placing the given vertex
-     * @param vertex ton place
+     * @param vertex to place
+     * @param coordinate at which the vertex should be placed
      * @return number of crossings
      */
     public long computeMoveQuality (Vertex vertex, Coordinate coordinate){
