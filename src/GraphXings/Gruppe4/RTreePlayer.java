@@ -43,6 +43,7 @@ public class RTreePlayer implements NewPlayer {
 
     private Graph g;
 
+
     /**
      * Creates a random player with the assigned name.
      * @param name
@@ -55,6 +56,8 @@ public class RTreePlayer implements NewPlayer {
     @Override
     public GameMove maximizeCrossings(GameMove lastMove)
     {
+
+
         if (lastMove != null) {
             gs.applyMove(lastMove);
         }
@@ -77,9 +80,14 @@ public class RTreePlayer implements NewPlayer {
         }
         move = maximizer.getGameMove();
 
+        if(move.isPresent()){
+            //System.out.println("Strategy - Move Quality:" + maximizer.getGameMoveQuality() + ", # placed nodes:" + gs.getPlacedVertices().size() + ", #nodes:" + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+        }
         // This is our fallback. If our strategy fails, return a random move
         if (move.isEmpty()) {
             move = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
+            //System.out.println("Random - Move Quality:" + maximizer.getGameMoveQuality() + ", # placed nodes:" + gs.getPlacedVertices().size() + ", #nodes:" + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+
         }
 
         gs.applyMove(move.get());
@@ -118,8 +126,8 @@ public class RTreePlayer implements NewPlayer {
         }
         move = minimizer.getGameMove();
 
-        if (minimizer.getGameMoveQuality() > 5 && minimizer.getGameMove().isPresent()){
-            System.out.println("Move Quality:" + minimizer.getGameMoveQuality() + ", # placed nodes:" + gs.getPlacedVertices().size() + ", #nodes:" + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+        if (minimizer.getGameMoveQuality() > 1000 && minimizer.getGameMove().isPresent()){
+            System.out.println("Move Quality:" + minimizer.getGameMoveQuality() + ", # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
         }
 
         // This is our fallback. If our strategy fails, return a random move

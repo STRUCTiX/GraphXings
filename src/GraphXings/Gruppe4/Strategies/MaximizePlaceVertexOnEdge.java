@@ -90,12 +90,17 @@ public class MaximizePlaceVertexOnEdge implements Strategy {
         var new_coordinate = nextFreeCoordinateOnEdge();
         if (new_coordinate.isPresent() && new_vertex != null){
             gameMove = Optional.of(new GameMove(new_vertex, new_coordinate.get()));
+            moveQuality = computeMoveQuality(new_vertex, new_coordinate.get());
             return true;
         }
 
-        //gameMove =
+        if (gameMove.isPresent()){
+            moveQuality = computeMoveQuality(new_vertex, new_coordinate.get());
+
+        }
         return gameMove.isEmpty();
     }
+
 
     /**
      * finds the next free coordinate on the largest edge from outside to inside
@@ -237,17 +242,22 @@ public class MaximizePlaceVertexOnEdge implements Strategy {
      * @param vertex ton place
      * @return number of crossings
      */
-    public long computeMoveQuality (Vertex vertex){
+    public long computeMoveQuality (Vertex vertex, Coordinate coordinate){
         var placedVertices = gs.getPlacedVertices();
         var vertexCoordinates = gs.getVertexCoordinates();
         var incidentEdges = g.getIncidentEdges(vertex);
-
         long current_move_quality = 0;
 
         //check for all edges that the vertex has, if they are already existing
         for (Edge e : incidentEdges) {
-            if(placedVertices.contains(e.getS()) && placedVertices.contains(e.getT())){
-                var edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), vertexCoordinates.get(e.getT()).getX(), vertexCoordinates.get(e.getT()).getY());
+            if(placedVertices.contains(e.getS()) || placedVertices.contains(e.getT())){
+                LineFloat edge = null;
+                if (e.getT().equals(vertex)){
+                    edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), coordinate.getX(), coordinate.getY());
+                } else {
+                    edge = LineFloat.create(coordinate.getX(), coordinate.getY(), coordinate.getX(), coordinate.getY());
+
+                }
                 current_move_quality += tree.getIntersections(edge);
             }
         }

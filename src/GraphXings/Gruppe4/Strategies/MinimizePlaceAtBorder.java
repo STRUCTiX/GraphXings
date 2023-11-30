@@ -83,7 +83,7 @@ public class MinimizePlaceAtBorder implements Strategy {
             var coordinate_neighbour = findNextFreeCoordinateAtBorder(vertexCoordinate);
             if (isAtBorder(vertexCoordinate) && neighbourVertex.isPresent() && coordinate_neighbour.isPresent()){
                 //compute intersections for the new optional move to check the quality
-                long current_move_quality = computeMoveQuality(vertex);
+                long current_move_quality = computeMoveQuality(neighbourVertex.get(), coordinate_neighbour.get());
 
                 //only update game move, if the quality of the optional current move is better than the quality of the best move
                 if (this.moveQuality > current_move_quality){
@@ -107,7 +107,7 @@ public class MinimizePlaceAtBorder implements Strategy {
         //take unused vertex with at least 1 free neighbour and put it on the free coordinate on the border
         for (Vertex vertex : g.getVertices()){
             if (!placedVertices.contains(vertex) && freeCoordinateAtBorder.isPresent() && Helper.numIncidentVertices(g, gs, vertex, true) >= 1){
-                long current_move_quality = computeMoveQuality(vertex);
+                long current_move_quality = computeMoveQuality(vertex, freeCoordinateAtBorder.get());
                 if (moveQuality > current_move_quality){
                     gameMove = Optional.of(new GameMove(vertex, freeCoordinateAtBorder.get()));
                     moveQuality = current_move_quality;
@@ -249,21 +249,27 @@ public class MinimizePlaceAtBorder implements Strategy {
      * @param vertex ton place
      * @return number of crossings
      */
-    public long computeMoveQuality (Vertex vertex){
+    public long computeMoveQuality (Vertex vertex, Coordinate coordinate){
         var placedVertices = gs.getPlacedVertices();
         var vertexCoordinates = gs.getVertexCoordinates();
         var incidentEdges = g.getIncidentEdges(vertex);
-
         long current_move_quality = 0;
 
         //check for all edges that the vertex has, if they are already existing
         for (Edge e : incidentEdges) {
-            if(placedVertices.contains(e.getS()) && placedVertices.contains(e.getT())){
-                var edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), vertexCoordinates.get(e.getT()).getX(), vertexCoordinates.get(e.getT()).getY());
-                 current_move_quality += tree.getIntersections(edge);
+            if(placedVertices.contains(e.getS()) || placedVertices.contains(e.getT())){
+                LineFloat edge;
+                if (e.getT().equals(vertex)){
+                    edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), coordinate.getX(), coordinate.getY());
+                } else {
+                    edge = LineFloat.create(coordinate.getX(), coordinate.getY(), coordinate.getX(), coordinate.getY());
+
+                }
+                current_move_quality += tree.getIntersections(edge);
             }
         }
 
+        //additionally add all crossings that will be created by the free neighbour edges
         return current_move_quality;
     }
 
