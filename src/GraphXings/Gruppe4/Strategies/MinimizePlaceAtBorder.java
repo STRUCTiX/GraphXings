@@ -12,6 +12,7 @@ import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
 import GraphXings.Gruppe4.Strategy;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
+import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -68,11 +69,11 @@ public class MinimizePlaceAtBorder implements Strategy {
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
 
-        var freeCoordinateAtBorder = pickFreeCoordinateAtBorder();
+        var freeCoordinateAtBorder = pickFreeCoordinateAtBorder(border);
         int maxBorder = Math.min(width, height);
         while (freeCoordinateAtBorder.isEmpty() && border < maxBorder/2){
             border += 1;
-            freeCoordinateAtBorder = pickFreeCoordinateAtBorder();
+            freeCoordinateAtBorder = pickFreeCoordinateAtBorder(border);
         }
 
         for (var vertex : placedVertices){
@@ -97,9 +98,9 @@ public class MinimizePlaceAtBorder implements Strategy {
         }
 
         //move was found, but quality is worse than 0
-        if (gameMove.isPresent()) {
+        /*if (gameMove.isPresent()) {
             return true;
-        }
+        }*/
 
         //TODO: maybe it has a better move quality to place a new vertex to the border????
 
@@ -127,7 +128,7 @@ public class MinimizePlaceAtBorder implements Strategy {
      * @return the free Coordinate
      */
     //TODO: find the free coordinate that creates less crossings not only the first one that is found
-    private Optional<Coordinate> pickFreeCoordinateAtBorder (){
+    private Optional<Coordinate> pickFreeCoordinateAtBorder (int border){
         //check top border
         for (int i = border; i < width-border-1; i++){
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), i,border)){
@@ -155,6 +156,8 @@ public class MinimizePlaceAtBorder implements Strategy {
 
         return Optional.empty();
     }
+
+
 
 
     /**

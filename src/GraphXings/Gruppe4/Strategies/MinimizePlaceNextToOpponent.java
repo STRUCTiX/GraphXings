@@ -2,6 +2,7 @@ package GraphXings.Gruppe4.Strategies;
 
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
+import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
@@ -23,7 +24,7 @@ public class MinimizePlaceNextToOpponent implements Strategy {
 
     private Optional<GameMove> gameMove;
 
-    private long moveQuality = 0;
+    private long moveQuality = Long.MAX_VALUE;
 
     public MinimizePlaceNextToOpponent(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
         this.g = g;
@@ -69,6 +70,7 @@ public class MinimizePlaceNextToOpponent implements Strategy {
             var gameMove = minimizeBounds(usedCoordinates, tree, unplacedVertex.get(), lastCoord, 1, 1);
             if (gameMove.isPresent()) {
                 this.gameMove = gameMove;
+                moveQuality = computeMoveQuality(gameMove.get().getVertex());
                 return true;
             }
         }
@@ -80,6 +82,7 @@ public class MinimizePlaceNextToOpponent implements Strategy {
             var result = Heuristics.getFirstFreeGameMoveOnCanvasOutline(g, usedCoordinates, width, height, unplacedVertex.get());
             if (result.isPresent()) {
                 this.gameMove = result;
+                this.moveQuality = computeMoveQuality(result.get().getVertex());
                 return true;
             }
         }
@@ -89,6 +92,8 @@ public class MinimizePlaceNextToOpponent implements Strategy {
             if (!placedVertices.contains(v)) {
                 this.gameMove = Heuristics.getFirstFreeGameMoveOnCanvasOutline(g, usedCoordinates, width, height, v);
                 // In this case we return a result, or we do a random move.
+                gameMove.ifPresent(move -> moveQuality = computeMoveQuality(move.getVertex()));
+
                 return gameMove.isPresent();
             }
         }
@@ -102,7 +107,7 @@ public class MinimizePlaceNextToOpponent implements Strategy {
      */
     @Override
     public Optional<GameMove> getGameMove() {
-        return Optional.empty();
+        return gameMove;
     }
 
     /**
@@ -114,6 +119,24 @@ public class MinimizePlaceNextToOpponent implements Strategy {
      */
     @Override
     public long getGameMoveQuality() {
-        return 0;
+        return moveQuality;
+    }
+
+    public long computeMoveQuality (Vertex vertex){
+        var placedVertices = gs.getPlacedVertices();
+        var vertexCoordinates = gs.getVertexCoordinates();
+        var incidentEdges = g.getIncidentEdges(vertex);
+
+        long current_move_quality = 0;
+
+        //check for all edges that the vertex has, if they are already existing
+        for (Edge e : incidentEdges) {
+            if(placedVertices.contains(e.getS()) && placedVertices.contains(e.getT())){
+                var edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), vertexCoordinates.get(e.getT()).getX(), vertexCoordinates.get(e.getT()).getY());
+                current_move_quality += tree.getIntersections(edge);
+            }
+        }
+
+        return current_move_quality;
     }
 }

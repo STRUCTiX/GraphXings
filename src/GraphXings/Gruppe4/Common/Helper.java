@@ -9,6 +9,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.Rectangle;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
+import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 
 import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
@@ -32,6 +33,27 @@ public class Helper {
      */
     public static boolean isCoordinateFree(int[][] usedCoordinates, int x, int y) {
         return usedCoordinates[x][y] == 0;
+    }
+
+    /**
+     * Helper fuction to check whether a coordinate is crossed by an edge
+     * @param g
+     * @param gs
+     * @param coordinate
+     * @return the Edge that crosses the coordinate if exists
+     */
+    public Optional<Edge> isCoordinateCrossed (Graph g, GameState gs, Coordinate coordinate){
+        var vertexCoordinates = gs.getVertexCoordinates();
+        var point = PointFloat.create(coordinate.getX(), coordinate.getY());
+
+        var edges = g.getEdges();
+        for (Edge e : edges){
+            var line = LineFloat.create(vertexCoordinates.get(e.getS()).getX(),vertexCoordinates.get(e.getS()).getY(),vertexCoordinates.get(e.getT()).getX(),vertexCoordinates.get(e.getT()).getY());
+            if (line.intersects(point)){
+                return Optional.of(e);
+            }
+        }
+        return Optional.empty();
     }
 
 

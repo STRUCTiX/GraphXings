@@ -108,7 +108,7 @@ public class RTreePlayer implements NewPlayer {
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
         // Calculate the game move.
-        var minimizer = new MinimizePlaceAtBorder(g, gs, tree, width, height);
+        var minimizer = new MinimizePlaceNextToOpponent(g, gs, tree, width, height);
         Optional<GameMove> move;
 
         // Check if we've got the first move and must execute the heuristic
@@ -122,6 +122,7 @@ public class RTreePlayer implements NewPlayer {
         // This is our fallback. If our strategy fails, return a random move
         if (move.isEmpty()) {
             move = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
+            System.out.println("#nodes:" + gs.getPlacedVertices().size() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
         }
 
 
@@ -134,7 +135,11 @@ public class RTreePlayer implements NewPlayer {
 
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
-        
+
+        if (minimizer.getGameMoveQuality() >= 0 && minimizer.getGameMove().isPresent()){
+            System.out.println("Move Quality:" + minimizer.getGameMoveQuality() + ", #nodes:" + gs.getPlacedVertices().size() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+        }
+
         return move.get();
     }
 
