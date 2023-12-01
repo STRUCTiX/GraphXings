@@ -7,11 +7,14 @@ import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
+import GraphXings.Gruppe4.Gui.GuiExport;
 import GraphXings.Gruppe4.Strategies.MaximizeDiagonalCrossing;
 import GraphXings.Gruppe4.Strategies.MaximizePlaceInDenseRegion;
 import GraphXings.Gruppe4.Strategies.MinimizePlaceNextToOpponent;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
+
+import java.io.IOException;
 import java.util.*;
 import GraphXings.Data.Edge;
 
@@ -44,6 +47,11 @@ public class RTreePlayer implements NewPlayer {
     private int height;
 
     private Graph g;
+
+    private GuiExport guiExport;
+
+    // Set to true if you'd like to export data
+    private boolean enableExport = false;
 
     /**
      * Creates a random player with the assigned name.
@@ -101,6 +109,16 @@ public class RTreePlayer implements NewPlayer {
     {
         if (lastMove != null) {
             gs.applyMove(lastMove);
+
+            // Last move must have been a maximize move.
+            // Therefore, export the move from opponent.
+            if (enableExport) {
+                try {
+                    guiExport.exportVertexPlacement(lastMove, Role.MAX);
+                } catch (IOException e) {
+                    enableExport = false;
+                }
+            }
         }
 
         // Add lines to tree by observing last game move if not empty.
@@ -129,6 +147,14 @@ public class RTreePlayer implements NewPlayer {
 
 
         gs.applyMove(move.get());
+
+        if (enableExport) {
+            try {
+                guiExport.exportVertexPlacement(move.get(), Role.MIN);
+            } catch (IOException e) {
+                enableExport = false;
+            }
+        }
 
         // Add our own move to the trees
         // Add lines to tree by observing last game move if not empty.
@@ -160,6 +186,17 @@ public class RTreePlayer implements NewPlayer {
         this.width = width;
         this.height = height;
         gs = new GameState(g, width, height);
+
+        if (enableExport) {
+            try {
+                guiExport = new GuiExport();
+
+                // Export the initial graph
+                guiExport.exportGraphStructure(g);
+            } catch (IOException e) {
+                enableExport = false;
+            }
+        }
     }
 
     @Override
