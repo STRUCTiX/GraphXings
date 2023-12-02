@@ -1,18 +1,23 @@
 package GraphXings.Gruppe4;
 
 import GraphXings.Algorithms.NewPlayer;
+import GraphXings.Data.Coordinate;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
+import GraphXings.Gruppe4.Strategies.*;
 import GraphXings.Gruppe4.Strategies.MaximizeDiagonalCrossing;
 import GraphXings.Gruppe4.Strategies.MaximizePlaceInDenseRegion;
 import GraphXings.Gruppe4.Strategies.MinimizePlaceAtBorder;
 import GraphXings.Gruppe4.Strategies.MinimizePlaceNextToOpponent;
+import GraphXings.Gruppe4.Gui.GuiExport;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
+
+import java.io.IOException;
 import java.util.*;
 import GraphXings.Data.Edge;
 
@@ -46,6 +51,11 @@ public class RTreePlayer implements NewPlayer {
 
     private Graph g;
 
+    private GuiExport guiExport;
+
+    // Set to true if you'd like to export data
+    private boolean enableExport = true;
+
     /**
      * Creates a random player with the assigned name.
      * @param name
@@ -58,8 +68,20 @@ public class RTreePlayer implements NewPlayer {
     @Override
     public GameMove maximizeCrossings(GameMove lastMove)
     {
+
+
         if (lastMove != null) {
             gs.applyMove(lastMove);
+
+            // Last move must have been a minimize move.
+            // Therefore, export the move from opponent.
+            if (enableExport) {
+                try {
+                    guiExport.exportVertexPlacement(lastMove, Role.MIN);
+                } catch (IOException e) {
+                    enableExport = false;
+                }
+            }
         }
 
         // Add lines to tree by observing last game move if not empty.
@@ -69,23 +91,61 @@ public class RTreePlayer implements NewPlayer {
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
         // Calculate the game move.
-        var maximizer = new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height);
+        var maximizer_vertexOnEdge = new MaximizePlaceVertexOnEdge(g, gs, tree, width, height);
+        var maximizer_denseRegion = new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height);
+        var maximizer_diagonalCrossing = new MaximizeDiagonalCrossing(g, gs, tree, width, height);
         Optional<GameMove> move;
 
         // Check if we've got the first move and must execute the heuristic
         if (gs.getPlacedVertices().isEmpty()) {
-            maximizer.executeHeuristic(Optional.ofNullable(lastMove));
+            maximizer_vertexOnEdge.executeHeuristic(Optional.ofNullable(lastMove));
+            maximizer_diagonalCrossing.executeHeuristic(Optional.ofNullable(lastMove));
+            maximizer_denseRegion.executeHeuristic(Optional.ofNullable(lastMove));
         } else {
-            maximizer.executeStrategy(lastMove);
+            maximizer_vertexOnEdge.executeStrategy(lastMove);
+            maximizer_diagonalCrossing.executeStrategy(lastMove);
+            maximizer_denseRegion.executeStrategy(lastMove);
         }
-        move = maximizer.getGameMove();
+        var move_vertexOnEdge = maximizer_vertexOnEdge.getGameMove();
+        var move_denseRegion = maximizer_denseRegion.getGameMove();
+        var move_diagonalCrossing = maximizer_diagonalCrossing.getGameMove();
+        var random_move = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
 
-        // This is our fallback. If our strategy fails, return a random move
-        if (move.isEmpty()) {
-            move = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
+        long quality_vertexOnEdge = maximizer_vertexOnEdge.getGameMoveQuality();
+        long quality_denseRegion = maximizer_denseRegion.getGameMoveQuality();
+        long quality_diagonalCrossing = maximizer_diagonalCrossing.getGameMoveQuality();
+        long quality_randMove = computeMoveQuality(random_move.get().getVertex(), random_move.get().getCoordinate());
+
+        move = random_move;
+        if (move_vertexOnEdge.isPresent() && quality_vertexOnEdge > quality_denseRegion && quality_vertexOnEdge > quality_diagonalCrossing && quality_vertexOnEdge > quality_randMove){
+            move = move_vertexOnEdge;
+            //System.out.println("Vertex  - Move Quality:" + quality_vertexOnEdge + "(" + quality_denseRegion + ":" + quality_diagonalCrossing + ":" +  quality_randMove + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+
         }
+        if (move_denseRegion.isPresent() && quality_denseRegion > quality_diagonalCrossing && quality_denseRegion > quality_randMove && quality_denseRegion > quality_vertexOnEdge){
+            move = move_denseRegion;
+            //System.out.println("denseReg - Move Quality:" + quality_denseRegion + "(" + quality_randMove + ":" + quality_diagonalCrossing + ":" +  quality_vertexOnEdge + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+
+        }
+        if (move_diagonalCrossing.isPresent() && quality_diagonalCrossing > quality_denseRegion && quality_diagonalCrossing > quality_randMove && quality_diagonalCrossing > quality_vertexOnEdge){
+            move = move_diagonalCrossing;
+            //System.out.println("diagonal - Move Quality:" + quality_diagonalCrossing + "(" + quality_denseRegion + ":" + quality_randMove + ":" +  quality_vertexOnEdge + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+
+        }
+        if (quality_randMove > quality_denseRegion && quality_randMove > quality_diagonalCrossing && quality_randMove > quality_vertexOnEdge){
+            //System.out.println("Random   - Move Quality:" + quality_randMove + "(" + quality_denseRegion + ":" + quality_diagonalCrossing + ":" +  quality_vertexOnEdge + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+        }
+
 
         gs.applyMove(move.get());
+
+        if (enableExport) {
+            try {
+                guiExport.exportVertexPlacement(move.get(), Role.MAX);
+            } catch (IOException e) {
+                enableExport = false;
+            }
+        }
 
         // Add our own move to the trees
         // Add lines to tree by observing last game move if not empty.
@@ -93,7 +153,6 @@ public class RTreePlayer implements NewPlayer {
 
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
-
         return move.get();
     }
 
@@ -102,6 +161,16 @@ public class RTreePlayer implements NewPlayer {
     {
         if (lastMove != null) {
             gs.applyMove(lastMove);
+
+            // Last move must have been a maximize move.
+            // Therefore, export the move from opponent.
+            if (enableExport) {
+                try {
+                    guiExport.exportVertexPlacement(lastMove, Role.MAX);
+                } catch (IOException e) {
+                    enableExport = false;
+                }
+            }
         }
 
         // Add lines to tree by observing last game move if not empty.
@@ -111,25 +180,56 @@ public class RTreePlayer implements NewPlayer {
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
         // Calculate the game move.
-        var minimizer = new MinimizePlaceNextToOpponent(g, gs, tree, width, height);
+        var minimize_placeNextToOpponent = new MinimizePlaceNextToOpponent(g, gs, tree, width, height);
+        var minimize_placeAtBorder = new MinimizePlaceAtBorder(g, gs, tree, width, height);
         Optional<GameMove> move;
 
         // Check if we've got the first move and must execute the heuristic
         if (gs.getPlacedVertices().isEmpty()) {
-            minimizer.executeHeuristic(Optional.ofNullable(lastMove));
+            minimize_placeNextToOpponent.executeHeuristic(Optional.ofNullable(lastMove));
+            minimize_placeAtBorder.executeHeuristic(Optional.ofNullable(lastMove));
         } else {
-            minimizer.executeStrategy(lastMove);
+            minimize_placeNextToOpponent.executeStrategy(lastMove);
+            minimize_placeAtBorder.executeStrategy(lastMove);
         }
-        move = minimizer.getGameMove();
+
+        var move_nextToOpponent = minimize_placeNextToOpponent.getGameMove();
+        var move_placeAtBorder = minimize_placeAtBorder.getGameMove();
+        var random_move = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
+        move = random_move;
+
+
+        long quality_nextToOpponent = minimize_placeNextToOpponent.getGameMoveQuality();
+        long quality_randMove = computeMoveQuality(random_move.get().getVertex(), random_move.get().getCoordinate());
+        long quality_placeAtBorder = minimize_placeAtBorder.getGameMoveQuality();
+
+
 
         // This is our fallback. If our strategy fails, return a random move
-        if (move.isEmpty()) {
-            move = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
+        if (quality_randMove < quality_nextToOpponent && quality_randMove < quality_placeAtBorder) {
+            //System.out.println("Random   - Move Quality:" + quality_randMove + "(" + quality_nextToOpponent + ":" + quality_placeAtBorder  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+            //System.out.println("minimize - Move Quality:" + minimizer.getGameMoveQuality() + ", # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+            //System.out.println("random   - Move Quality:" + rand_move_quality + ", # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
         }
-
+        if (move_nextToOpponent.isPresent() /*&& quality_nextToOpponent < quality_randMove /*&& quality_nextToOpponent < quality_placeAtBorder*/){
+            //System.out.println("Opponent - Move Quality:" + quality_nextToOpponent + "(" + quality_placeAtBorder + ":" + quality_randMove  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+            move = move_nextToOpponent;
+        }
+        if (move_placeAtBorder.isPresent() && quality_placeAtBorder < quality_nextToOpponent && quality_placeAtBorder < quality_randMove){
+            //System.out.println("Border   - Move Quality:" + quality_placeAtBorder + "(" + quality_nextToOpponent + ":" + quality_randMove  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+            move = move_placeAtBorder;
+        }
 
 
         gs.applyMove(move.get());
+
+        if (enableExport) {
+            try {
+                guiExport.exportVertexPlacement(move.get(), Role.MIN);
+            } catch (IOException e) {
+                enableExport = false;
+            }
+        }
 
         // Add our own move to the trees
         // Add lines to tree by observing last game move if not empty.
@@ -137,7 +237,9 @@ public class RTreePlayer implements NewPlayer {
 
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
-        
+
+
+
         return move.get();
     }
 
@@ -161,12 +263,47 @@ public class RTreePlayer implements NewPlayer {
         this.width = width;
         this.height = height;
         gs = new GameState(g, width, height);
+
+        if (enableExport) {
+            try {
+                guiExport = new GuiExport();
+
+                // Export the initial graph
+                guiExport.exportGraphStructure(g, role, name);
+            } catch (IOException e) {
+                enableExport = false;
+            }
+        }
     }
 
     @Override
     public String getName()
     {
         return name;
+    }
+
+    public long computeMoveQuality (Vertex vertex, Coordinate coordinate){
+        var placedVertices = gs.getPlacedVertices();
+        var vertexCoordinates = gs.getVertexCoordinates();
+        var incidentEdges = g.getIncidentEdges(vertex);
+        long current_move_quality = 0;
+
+        //check for all edges that the vertex has, if they are already existing
+        for (Edge e : incidentEdges) {
+            if(placedVertices.contains(e.getS()) || placedVertices.contains(e.getT())){
+                LineFloat edge = null;
+                if (e.getT().equals(vertex)){
+                    edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), coordinate.getX(), coordinate.getY());
+                } else {
+                    edge = LineFloat.create(coordinate.getX(), coordinate.getY(), coordinate.getX(), coordinate.getY());
+
+                }
+                current_move_quality += tree.getIntersections(edge);
+            }
+        }
+
+        //additionally add all crossings that will be created by the free neighbour edges
+        return current_move_quality;
     }
 
 }

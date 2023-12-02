@@ -23,7 +23,7 @@ public class MaximizeDiagonalCrossing implements Strategy {
     private final int width;
     private final int height;
 
-    private Optional<GameMove> gameMove;
+    private Optional<GameMove> gameMove =Optional.empty();
 
     private long moveQuality = 0;
 

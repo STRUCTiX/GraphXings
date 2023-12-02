@@ -157,6 +157,7 @@ public class NewGame
 				}
 				catch (Exception ex)
 				{
+					ex.printStackTrace();
 					System.out.println("E003:" +maximizer.getName() + " threw a " + ex.getClass() + " exception!");
 					throw new NewInvalidMoveException(maximizer);
 				}
@@ -179,6 +180,7 @@ public class NewGame
 				}
 				catch (Exception ex)
 				{
+					ex.printStackTrace();
 					System.out.println("E004:" +minimizer.getName() + " threw a " + ex.getClass() + " exception!" );
 					throw new NewInvalidMoveException(minimizer);
 				}

@@ -1,7 +1,9 @@
 package GraphXings.Gruppe4.Strategies;
 
+import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
+import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
@@ -21,9 +23,9 @@ public class MinimizePlaceNextToOpponent implements Strategy {
     private final int width;
     private final int height;
 
-    private Optional<GameMove> gameMove;
+    private Optional<GameMove> gameMove = Optional.empty();
 
-    private long moveQuality = 0;
+    private long moveQuality = Long.MAX_VALUE;
 
     public MinimizePlaceNextToOpponent(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
         this.g = g;
@@ -69,6 +71,7 @@ public class MinimizePlaceNextToOpponent implements Strategy {
             var gameMove = minimizeBounds(usedCoordinates, tree, unplacedVertex.get(), lastCoord, 1, 1);
             if (gameMove.isPresent()) {
                 this.gameMove = gameMove;
+                moveQuality = computeMoveQuality(gameMove.get().getVertex(), gameMove.get().getCoordinate());
                 return true;
             }
         }
@@ -80,6 +83,7 @@ public class MinimizePlaceNextToOpponent implements Strategy {
             var result = Heuristics.getFirstFreeGameMoveOnCanvasOutline(g, usedCoordinates, width, height, unplacedVertex.get());
             if (result.isPresent()) {
                 this.gameMove = result;
+                this.moveQuality = computeMoveQuality(result.get().getVertex(), result.get().getCoordinate());
                 return true;
             }
         }
@@ -89,6 +93,8 @@ public class MinimizePlaceNextToOpponent implements Strategy {
             if (!placedVertices.contains(v)) {
                 this.gameMove = Heuristics.getFirstFreeGameMoveOnCanvasOutline(g, usedCoordinates, width, height, v);
                 // In this case we return a result, or we do a random move.
+                gameMove.ifPresent(move -> moveQuality = computeMoveQuality(move.getVertex(), move.getCoordinate()));
+
                 return gameMove.isPresent();
             }
         }
@@ -102,7 +108,7 @@ public class MinimizePlaceNextToOpponent implements Strategy {
      */
     @Override
     public Optional<GameMove> getGameMove() {
-        return Optional.empty();
+        return gameMove;
     }
 
     /**
@@ -114,6 +120,37 @@ public class MinimizePlaceNextToOpponent implements Strategy {
      */
     @Override
     public long getGameMoveQuality() {
-        return 0;
+        return moveQuality;
+    }
+
+    /**
+     * computes move quality by computing the number of crossings
+     * for all edges that are created by placing the given vertex
+     * @param vertex to place
+     * @param coordinate at which the vertex should be placed
+     * @return number of crossings
+     */
+    public long computeMoveQuality (Vertex vertex, Coordinate coordinate){
+        var placedVertices = gs.getPlacedVertices();
+        var vertexCoordinates = gs.getVertexCoordinates();
+        var incidentEdges = g.getIncidentEdges(vertex);
+        long current_move_quality = 0;
+
+        //check for all edges that the vertex has, if they are already existing
+        for (Edge e : incidentEdges) {
+            if(placedVertices.contains(e.getS()) || placedVertices.contains(e.getT())){
+                LineFloat edge = null;
+                if (e.getT().equals(vertex)){
+                    edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), coordinate.getX(), coordinate.getY());
+                } else {
+                    edge = LineFloat.create(coordinate.getX(), coordinate.getY(), coordinate.getX(), coordinate.getY());
+
+                }
+                current_move_quality += tree.getIntersections(edge);
+            }
+        }
+
+        //additionally add all crossings that will be created by the free neighbour edges
+        return current_move_quality;
     }
 }

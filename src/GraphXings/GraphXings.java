@@ -25,6 +25,7 @@ public class GraphXings
         ArrayList<NewPlayer> players = new ArrayList<>();
         players.add(new RTreePlayer("RTreePlayer"));
         players.add(new NewRandomPlayer("RandomPlayer"));
+        //players.add(new RTreePlayer("RTreePlayer2"));
 
 
         /*
@@ -66,14 +67,16 @@ public class GraphXings
         var match = new NewMatch(new NewRandomPlayer("RandomPlayer"), new RTreePlayer("RTreePlayer"), rcf, 10);
         var result = match.play();
         System.out.println(result.announceResult());
-         */
+        */
+
 
         //TODO: add players here
         RandomCycleFactory factory = new RandomCycleFactory(24091869, true);
         long timeLimit = 300000000000l;
-        NewLeague l = new NewLeague(players,3,timeLimit,factory);
+        NewLeague l = new NewLeague(players,5,timeLimit,factory);
         NewLeagueResult lr = l.runLeague();
         System.out.println(lr.announceResults());
+
 
     }
 }
