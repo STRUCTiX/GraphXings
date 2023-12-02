@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-
+# Data structure of parsed data
 class GraphData:
     playername = ""
     playerrole = ""
@@ -9,6 +9,7 @@ class GraphData:
     edges = []
     gamemoves = []
 
+    # Parse the content of the file into the data structure
     def parseLines(self, lines):
         parsemode = 0
         for line in lines:
@@ -32,12 +33,14 @@ class GraphData:
                 sp = cleanline.split(",")
                 self.gamemoves.append((sp[0], sp[1], sp[2], sp[3], sp[4]))
 
+    # Returns a dictionary of vertices and their positions
     def getVerticesPosition(self):
         pos = {}
         for g in self.gamemoves:
             pos[g[1]] = (int(g[2]), int(g[3]))
         return pos
     
+    # Read the file and parse the content
     def readFile(self, filename):
         f = open(filename, "r")
         lines = f.readlines()
@@ -45,6 +48,7 @@ class GraphData:
         #self.printData()
         f.close()
 
+    # Print the data structure for debugging
     def printData(self):
         print("Player Name: " + self.playername)
         print("Player Role: " + self.playerrole)
@@ -56,6 +60,7 @@ class GraphData:
         print(self.gamemoves)
 
 
+# Draw the graph
 def draw_graph(graphData: GraphData):
     # Create an empty graph
     G = nx.Graph()
@@ -80,6 +85,7 @@ def draw_graph(graphData: GraphData):
     plt.show()
 
 
+# Main call
 gd = GraphData()
 gd.readFile("test.txt")
 draw_graph(gd)
