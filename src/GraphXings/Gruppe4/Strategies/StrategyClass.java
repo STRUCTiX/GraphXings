@@ -84,19 +84,17 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
     /**
      * choose the coordinate with the highest Intersection for a given vertex
      * and builds a new game move
-     * @param tree
      * @param unplacedVertex
      * @param maxDistCoordinate
      * @param samples set of vertices to choose from
      * @return game move if present
      */
-    public Optional<GameMove> chooseHighestIntersection(MutableRTree<Edge, LineFloat> tree, Vertex unplacedVertex, Coordinate maxDistCoordinate, List<Coordinate> samples) {
+    public Optional<GameMove> chooseHighestIntersection(Vertex unplacedVertex, Coordinate maxDistCoordinate, List<Coordinate> samples) {
         Coordinate bestCoord = null;
-        var maxCrossings = Long.MIN_VALUE;
+        long maxCrossings = 0;
         for (var sampleCoord : samples) {
 
-            // Create a line to test for intersections
-            var numCrossings = computeMoveQuality(unplacedVertex, sampleCoord);
+            long numCrossings = computeMoveQuality(unplacedVertex, sampleCoord);
             if (numCrossings > maxCrossings) {
                 maxCrossings = numCrossings;
                 bestCoord = sampleCoord;
@@ -133,7 +131,7 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
                 if (e.getT().equals(vertex)){
                     edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), coordinate.getX(), coordinate.getY());
                 } else {
-                    edge = LineFloat.create(coordinate.getX(), coordinate.getY(), coordinate.getX(), coordinate.getY());
+                    edge = LineFloat.create(coordinate.getX(), coordinate.getY(), vertexCoordinates.get(e.getT()).getX(), vertexCoordinates.get(e.getT()).getY());
 
                 }
                 current_move_quality += tree.getIntersections(edge);

@@ -79,7 +79,7 @@ public class MaximizePlaceInDenseRegion extends StrategyClass {
             // This is not optimal because we should cross completely through the rectangle
             // to get the max. crossings. But for simplicity we just use this rectangle to search for free coordinates.
             var samples = Helper.randPickFreeCoordinatesPerimeter(gs.getUsedCoordinates(), rectangleOption.get(), 10);
-            samples.ifPresent(s -> gameMove = chooseHighestIntersection(tree, finalUnplacedVertex, lastMove.getCoordinate(), s));
+            samples.ifPresent(s -> gameMove = chooseHighestIntersection(finalUnplacedVertex, lastMove.getCoordinate(), s));
         } else {
             // In this case we have no dense edge region. Fallback to a dense vertex region instead.
 
