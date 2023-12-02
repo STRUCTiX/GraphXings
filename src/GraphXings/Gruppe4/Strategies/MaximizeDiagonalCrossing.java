@@ -11,6 +11,7 @@ import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
+import java.util.List;
 import java.util.Optional;
 
 public class MaximizeDiagonalCrossing extends StrategyClass {
@@ -91,8 +92,8 @@ public class MaximizeDiagonalCrossing extends StrategyClass {
         var samples = Helper.randPickFreeCoordinatesPerimeter(usedCoordinates, maxDistCoordinates, width / 3, height / 3, 10);
 
         // Test for max. crossings
-        if (samples.isPresent()) {
-            gameMove = chooseHighestIntersection(unplacedVertex, samples.get());
+        if (samples.isPresent() && unplacedVertex != null) {
+            gameMove = chooseHighestIntersection(List.of(unplacedVertex), samples.get());
         }
 
         return gameMove.isPresent();

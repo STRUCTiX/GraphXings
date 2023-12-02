@@ -12,6 +12,7 @@ import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 
+import java.util.List;
 import java.util.Optional;
 
 public class MaximizePlaceInDenseRegion extends StrategyClass {
@@ -79,7 +80,7 @@ public class MaximizePlaceInDenseRegion extends StrategyClass {
             // This is not optimal because we should cross completely through the rectangle
             // to get the max. crossings. But for simplicity we just use this rectangle to search for free coordinates.
             var samples = Helper.randPickFreeCoordinatesPerimeter(gs.getUsedCoordinates(), rectangleOption.get(), 10);
-            samples.ifPresent(s -> gameMove = chooseHighestIntersection(finalUnplacedVertex, s));
+            samples.ifPresent(s -> gameMove = chooseHighestIntersection(List.of(finalUnplacedVertex), s));
         } else {
             // In this case we have no dense edge region. Fallback to a dense vertex region instead.
 

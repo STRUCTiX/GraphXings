@@ -111,6 +111,69 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
     }
 
     /**
+     * Computes the Vertex and Coordinate with the lowest Intersection
+     * out of a given set of sample Vertices and sample Coordinates
+     * @param sampleVertices given set of Vertices
+     * @param sampleCoordinates given set of Coordinates
+     * @return the Game Move with the lowest number of intersections (if present)
+     */
+    public Optional<GameMove> chooseLowestIntersection(List<Vertex> sampleVertices, List<Coordinate> sampleCoordinates){
+        Coordinate bestCoordinate = null;
+        Vertex bestVertex = null;
+        long maxCrossings = Long.MAX_VALUE;
+
+        for (Vertex v : sampleVertices){
+            for (Coordinate c : sampleCoordinates){
+                long numCrossings = computeMoveQuality(v, c);
+                    if (numCrossings < maxCrossings){
+                        maxCrossings = numCrossings;
+                        bestCoordinate = c;
+                        bestVertex = v;
+                    }
+                }
+            }
+
+        if (bestVertex == null || bestCoordinate == null){
+            return Optional.empty();
+        } else {
+            moveQuality = maxCrossings;
+            return Optional.of(new GameMove(bestVertex, bestCoordinate));
+        }
+    }
+
+
+    /**
+     * Computes the Vertex and Coordinate with the highest Intersection
+     * out of a given set of sample Vertices and sample Coordinates
+     * @param sampleVertices given set of Vertices
+     * @param sampleCoordinates given set of Coordinates
+     * @return the Game Move with the highest number of intersections (if present)
+     */
+    public Optional<GameMove> chooseHighestIntersection(List<Vertex> sampleVertices, List<Coordinate> sampleCoordinates){
+        Coordinate bestCoordinate = null;
+        Vertex bestVertex = null;
+        long maxCrossings = Long.MIN_VALUE;
+
+        for (Vertex v : sampleVertices){
+            for (Coordinate c : sampleCoordinates){
+                long numCrossings = computeMoveQuality(v, c);
+                    if (numCrossings > maxCrossings){
+                        maxCrossings = numCrossings;
+                        bestCoordinate = c;
+                        bestVertex = v;
+                    }
+                }
+            }
+        if (bestVertex == null || bestCoordinate == null){
+            return Optional.empty();
+        } else {
+            moveQuality = maxCrossings;
+            return Optional.of(new GameMove(bestVertex, bestCoordinate));
+        }
+    }
+
+
+    /**
      * computes move quality by computing the number of crossings
      * for all edges that are created by placing the given vertex
      * @param vertex to place
