@@ -82,7 +82,7 @@ public class RTreePlayer implements NewPlayer {
             maximizer_denseRegion.executeHeuristic(Optional.ofNullable(lastMove));
         } else {
             maximizer_vertexOnEdge.executeStrategy(lastMove);
-            maximizer_diagonalCrossing.executeStrategy(lastMove);
+            //maximizer_diagonalCrossing.executeStrategy(lastMove);
             maximizer_denseRegion.executeStrategy(lastMove);
         }
         var move_vertexOnEdge = maximizer_vertexOnEdge.getGameMove();
@@ -95,7 +95,7 @@ public class RTreePlayer implements NewPlayer {
         long quality_diagonalCrossing = maximizer_diagonalCrossing.getGameMoveQuality();
         long quality_randMove = computeMoveQuality(random_move.get().getVertex(), random_move.get().getCoordinate());
 
-        move = random_move;
+        move = move_denseRegion;
         if (move_vertexOnEdge.isPresent() && quality_vertexOnEdge > quality_denseRegion && quality_vertexOnEdge > quality_diagonalCrossing && quality_vertexOnEdge > quality_randMove){
             move = move_vertexOnEdge;
             //System.out.println("Vertex   - Move Quality:" + quality_vertexOnEdge + "(" + quality_denseRegion + ":" + quality_diagonalCrossing + ":" +  quality_randMove + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
@@ -111,8 +111,9 @@ public class RTreePlayer implements NewPlayer {
             //System.out.println("diagonal - Move Quality:" + quality_diagonalCrossing + "(" + quality_denseRegion + ":" + quality_randMove + ":" +  quality_vertexOnEdge + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
 
         }
-        if (quality_randMove > quality_denseRegion && quality_randMove > quality_diagonalCrossing && quality_randMove > quality_vertexOnEdge){
+        if (move.isEmpty() || quality_randMove > quality_denseRegion && quality_randMove > quality_diagonalCrossing && quality_randMove > quality_vertexOnEdge){
             //System.out.println("Random   - Move Quality:" + quality_randMove + "(" + quality_denseRegion + ":" + quality_diagonalCrossing + ":" +  quality_vertexOnEdge + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+            move = random_move;
         }
 
 
@@ -169,15 +170,15 @@ public class RTreePlayer implements NewPlayer {
         // This is our fallback. If our strategy fails, return a random move
 
         if (move_nextToOpponent.isPresent() && quality_nextToOpponent < quality_randMove && quality_nextToOpponent < quality_placeAtBorder){
-            System.out.println("Opponent - Move Quality:" + quality_nextToOpponent + "(" + quality_placeAtBorder + ":" + quality_randMove  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+            //System.out.println("Opponent - Move Quality:" + quality_nextToOpponent + "(" + quality_placeAtBorder + ":" + quality_randMove  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
             move = move_nextToOpponent;
         }
         if (move_placeAtBorder.isPresent() && quality_placeAtBorder < quality_nextToOpponent && quality_placeAtBorder < quality_randMove){
-            System.out.println("Border   - Move Quality:" + quality_placeAtBorder + "(" + quality_nextToOpponent + ":" + quality_randMove  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+            //System.out.println("Border   - Move Quality:" + quality_placeAtBorder + "(" + quality_nextToOpponent + ":" + quality_randMove  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
             //move = move_placeAtBorder;
         }
-        if (move.isEmpty() || (quality_randMove < quality_nextToOpponent && quality_randMove < quality_placeAtBorder)) {
-            System.out.println("Random   - Move Quality:" + quality_randMove + "(" + quality_nextToOpponent + ":" + quality_placeAtBorder  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+        if (move.isEmpty() || quality_randMove < quality_nextToOpponent && quality_randMove < quality_placeAtBorder) {
+            //System.out.println("Random   - Move Quality:" + quality_randMove + "(" + quality_nextToOpponent + ":" + quality_placeAtBorder  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
             //System.out.println("minimize - Move Quality:" + minimizer.getGameMoveQuality() + ", # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
             //System.out.println("random   - Move Quality:" + rand_move_quality + ", # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
             move = random_move;
@@ -192,8 +193,6 @@ public class RTreePlayer implements NewPlayer {
 
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
-
-        System.out.println(move.get().getCoordinate().getX() + ":" + move.get().getCoordinate().getY());
 
 
         return move.get();

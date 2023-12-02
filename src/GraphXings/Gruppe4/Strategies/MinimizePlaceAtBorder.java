@@ -48,7 +48,7 @@ public class MinimizePlaceAtBorder extends StrategyClass {
      * @param lastMove The last opponent move.
      * @return True on success, false otherwise
      */
-    /*@Override
+    @Override
     public boolean executeStrategy(GameMove lastMove) {
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
@@ -99,7 +99,7 @@ public class MinimizePlaceAtBorder extends StrategyClass {
 
 
         return gameMove.isPresent();
-    }*/
+    }
 
     public Optional<List<Coordinate>> filterCoordinates(Rectangle region, List<Coordinate> coordinateList){
 
@@ -107,7 +107,7 @@ public class MinimizePlaceAtBorder extends StrategyClass {
         return Optional.of(coordinateList);
     }
 
-    public boolean executeStrategy(GameMove lastMove){
+    /*public boolean executeStrategy(GameMove lastMove){
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
         var usedCoordinates = gs.getUsedCoordinates();
@@ -127,8 +127,8 @@ public class MinimizePlaceAtBorder extends StrategyClass {
             //check for each vertex if it is at the border and if it has a free neighbour
             if (Helper.isAtBorder(coordinate_vertex, rightBorder, leftBorder, topBorder, bottomBorder) && neighbourVertices.isPresent() && neighbourCoordinates.isPresent()){
 
-                var move_lowestIntersection = chooseLowestIntersection(neighbourVertices.get(), neighbourCoordinates.get());
-                var move_lowestEdgeLength = minimizeEdgeLengths(neighbourVertices.get(), neighbourCoordinates.get());
+                //var move_lowestIntersection = chooseLowestIntersection(neighbourVertices.get(), neighbourCoordinates.get());
+                //var move_lowestEdgeLength = minimizeEdgeLengths(neighbourVertices.get(), neighbourCoordinates.get());
 
                 gameMove = chooseLowestIntersection(neighbourVertices.get(), neighbourCoordinates.get());
             }
@@ -147,7 +147,7 @@ public class MinimizePlaceAtBorder extends StrategyClass {
 
         } else {
             sampleCoordinates = List.of(freeCoordinatesAtBorder.get().get(0));
-        }*/
+        }
         for (Vertex vertex : g.getVertices()){
             if (!placedVertices.contains(vertex) && Helper.numIncidentVertices(g, gs, vertex, true) >= 1){
                 sampleVertices.add(vertex);
@@ -157,7 +157,7 @@ public class MinimizePlaceAtBorder extends StrategyClass {
 
 
         return gameMove.isPresent();
-    }
+    }*/
 
 
     private Optional<List<Coordinate>> findFreeNeighbourCoordinate(Coordinate coordinate){
