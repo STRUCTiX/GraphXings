@@ -6,6 +6,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.Common.EdgeHelper;
 import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
@@ -118,17 +119,21 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
      * @return the Game Move with the lowest number of intersections (if present)
      */
     public Optional<GameMove> chooseLowestIntersection(List<Vertex> sampleVertices, List<Coordinate> sampleCoordinates){
-        Coordinate bestCoordinate = null;
-        Vertex bestVertex = null;
-        long maxCrossings = Long.MAX_VALUE;
+        Coordinate bestCoordinate = gameMove.map(GameMove::getCoordinate).orElse(null);
+        Vertex bestVertex = gameMove.map(GameMove::getVertex).orElse(null);
+        //long maxCrossings = Long.MAX_VALUE;
 
         for (Vertex v : sampleVertices){
             for (Coordinate c : sampleCoordinates){
                 long numCrossings = computeMoveQuality(v, c);
-                    if (numCrossings < maxCrossings){
-                        maxCrossings = numCrossings;
+                    if (numCrossings < moveQuality){
+                        moveQuality = numCrossings;
                         bestCoordinate = c;
                         bestVertex = v;
+                    }
+                    //found best Game Move
+                    if (numCrossings == 0){
+                        return Optional.of(new GameMove(bestVertex, bestCoordinate));
                     }
                 }
             }
@@ -136,7 +141,7 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
         if (bestVertex == null || bestCoordinate == null){
             return Optional.empty();
         } else {
-            moveQuality = maxCrossings;
+            //moveQuality = maxCrossings;
             return Optional.of(new GameMove(bestVertex, bestCoordinate));
         }
     }
@@ -203,4 +208,34 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
         //additionally add all crossings that will be created by the free neighbour edges
         return current_move_quality;
     }
+
+
+    public Optional<GameMove> minimizeEdgeLengths(List<Vertex> sampleVertices, List<Coordinate> sampleCoordinates){
+        Coordinate bestCoordinate = gameMove.map(GameMove::getCoordinate).orElse(null);
+        Vertex bestVertex = gameMove.map(GameMove::getVertex).orElse(null);
+        double minLength = Double.MAX_VALUE;
+
+        for (Vertex v : sampleVertices){
+            for (Coordinate c : sampleCoordinates){
+                double length = EdgeHelper.getSumEdgeLenths(g, gs, v, c);
+                if (minLength > length){
+                    minLength = length;
+                    bestCoordinate = c;
+                    bestVertex = v;
+                }
+                //found best Game Move
+                if (minLength == 0){
+                    return Optional.of(new GameMove(bestVertex, bestCoordinate));
+                }
+            }
+        }
+
+        if (bestVertex == null || bestCoordinate == null){
+            return Optional.empty();
+        } else {
+            return Optional.of(new GameMove(bestVertex, bestCoordinate));
+        }
+    }
+
+
 }

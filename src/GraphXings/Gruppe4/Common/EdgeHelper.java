@@ -2,7 +2,9 @@ package GraphXings.Gruppe4.Common;
 
 import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
+import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
+import GraphXings.Game.GameState;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
@@ -50,5 +52,28 @@ public class EdgeHelper {
             }
         }
         return Optional.empty();
+    }
+
+    public static double getSumEdgeLenths(Graph g, GameState gs, Vertex vertex, Coordinate coordinate){
+        var incidentEdges = g.getIncidentEdges(vertex);
+        var vertexCoordinates = gs.getVertexCoordinates();
+
+        double sum_lenghts = 0;
+        for (Edge edge : incidentEdges){
+            double x = 0;
+            double y = 0;
+            if (edge.getS().equals(vertex) && vertexCoordinates.containsKey(edge.getT())){
+                Coordinate target = vertexCoordinates.get(edge.getT());
+                x = Math.abs(target.getX() - coordinate.getX());
+                y = Math.abs(target.getY() - coordinate.getY());
+            } else if (vertexCoordinates.containsKey(edge.getS())){
+                Coordinate source = vertexCoordinates.get(edge.getS());
+                x = Math.abs(source.getX() - coordinate.getX());
+                y = Math.abs(source.getY() - coordinate.getY());
+            }
+            sum_lenghts += Math.sqrt(x*x + y*y);
+        }
+        return sum_lenghts;
+
     }
 }
