@@ -9,36 +9,23 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
-import GraphXings.Gruppe4.Strategy;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
-import java.util.List;
 import java.util.Optional;
 
-public class MaximizeDiagonalCrossing implements Strategy {
-
-    private final Graph g;
-    private final MutableRTree<Edge, LineFloat> tree;
-    private final GameState gs;
-    private final int width;
-    private final int height;
-
-    private Optional<GameMove> gameMove =Optional.empty();
-
-    private long moveQuality = 0;
+public class MaximizeDiagonalCrossing extends StrategyClass {
 
 
     public MaximizeDiagonalCrossing(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
-        this.g = g;
-        this.tree = tree;
-        this.gs = gs;
-        this.width = width;
-        this.height = height;
+        super(g, gs, tree, width, height);
+        moveQuality = 0;
     }
 
 
     /**
      * Executes the heuristic as the first or second move.
+     *
+     * Heuristic: Places a vertex into the middle of the match field
      *
      * @param lastMove Is empty on first move otherwise provides the last opponent game move.
      * @return True on success, false otherwise.
@@ -111,50 +98,5 @@ public class MaximizeDiagonalCrossing implements Strategy {
         return gameMove.isPresent();
     }
 
-    /**
-     * Retrieve a calculated game move.
-     *
-     * @return A game move. Empty if execution wasn't successful.
-     */
-    @Override
-    public Optional<GameMove> getGameMove() {
-        return gameMove;
-    }
-
-    /**
-     * Quality of the current game move.
-     * This number represents how many crossings can be achieved by a game move.
-     * For a maximizer this number should be large.
-     *
-     * @return Number of crossings.
-     */
-    @Override
-    public long getGameMoveQuality() {
-        return moveQuality;
-    }
-
-    public Optional<GameMove> chooseHighestIntersection(MutableRTree<Edge, LineFloat> tree, Vertex unplacedVertex, Coordinate maxDistCoordinate, List<Coordinate> samples) {
-        Coordinate bestCoord = null;
-        var maxCrossings = Long.MIN_VALUE;
-        for (var sampleCoord : samples) {
-
-            // Create a line to test for intersections
-            var line = LineFloat.create(maxDistCoordinate.getX(), maxDistCoordinate.getY(), sampleCoord.getX(), sampleCoord.getY());
-            var numCrossings = tree.getIntersections(line);
-            if (numCrossings > maxCrossings) {
-                maxCrossings = numCrossings;
-                bestCoord = sampleCoord;
-            }
-        }
-
-        if (maxCrossings <= 0) {
-            moveQuality = 0;
-            return Optional.empty();
-        }
-
-        // Use the best coordinate
-        moveQuality = maxCrossings;
-        return Optional.of(new GameMove(unplacedVertex, bestCoord));
-    }
 
 }

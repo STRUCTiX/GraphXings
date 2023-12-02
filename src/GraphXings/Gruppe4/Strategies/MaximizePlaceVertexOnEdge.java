@@ -7,33 +7,16 @@ import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
-import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
-import GraphXings.Gruppe4.Strategy;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
-import java.util.List;
 import java.util.Optional;
 
-public class MaximizePlaceVertexOnEdge implements Strategy {
-    private final Graph g;
-    private final MutableRTree<Edge, LineFloat> tree;
-    private final GameState gs;
-    private final int width;
-    private final int height;
-
-    private Optional<GameMove> gameMove = Optional.empty();
-
-    private long moveQuality = 0;
-
-
+public class MaximizePlaceVertexOnEdge extends StrategyClass {
 
     public MaximizePlaceVertexOnEdge(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
-        this.g = g;
-        this.tree = tree;
-        this.gs = gs;
-        this.width = width;
-        this.height = height;
+        super(g, gs, tree, width, height);
+        moveQuality = 0;
     }
 
 
@@ -214,57 +197,17 @@ public class MaximizePlaceVertexOnEdge implements Strategy {
         }
     }
 
-    /**
-     * Retrieve a calculated game move.
-     *
-     * @return A game move. Empty if execution wasn't successful.
-     */
-    @Override
-    public Optional<GameMove> getGameMove() {
-        return gameMove;
-    }
 
     /**
-     * Quality of the current game move.
-     * This number represents how many crossings can be achieved by a game move.
-     * For a maximizer this number should be large.
+     *computes quality by additionally adding the number of unplaced edges
      *
-     * @return Number of crossings.
-     */
-    @Override
-    public long getGameMoveQuality() {
-        return moveQuality;
-    }
-
-    /**
-     * computes move quality by computing the number of crossings
-     * for all edges that are created by placing the given vertex
      * @param vertex to place
      * @param coordinate at which the vertex should be placed
      * @return number of crossings
      */
+    @Override
     public long computeMoveQuality (Vertex vertex, Coordinate coordinate){
-        var placedVertices = gs.getPlacedVertices();
-        var vertexCoordinates = gs.getVertexCoordinates();
-        var incidentEdges = g.getIncidentEdges(vertex);
-        long current_move_quality = 0;
-
-        //check for all edges that the vertex has, if they are already existing
-        for (Edge e : incidentEdges) {
-            if(placedVertices.contains(e.getS()) || placedVertices.contains(e.getT())){
-                LineFloat edge = null;
-                if (e.getT().equals(vertex)){
-                    edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), coordinate.getX(), coordinate.getY());
-                } else {
-                    edge = LineFloat.create(coordinate.getX(), coordinate.getY(), coordinate.getX(), coordinate.getY());
-
-                }
-                current_move_quality += tree.getIntersections(edge);
-            }
-        }
-
-        //additionally add all crossings that will be created by the free neighbour edges
-        return current_move_quality + Helper.numIncidentVertices(g, gs, vertex, true);
+        return super.computeMoveQuality(vertex, coordinate) + Helper.numIncidentVertices(g, gs, vertex, true);
     }
 
 

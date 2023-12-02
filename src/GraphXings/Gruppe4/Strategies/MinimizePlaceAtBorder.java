@@ -1,6 +1,5 @@
 package GraphXings.Gruppe4.Strategies;
 
-import GraphXings.Algorithms.CrossingCalculator;
 import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
@@ -8,49 +7,21 @@ import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.Common.Helper;
-import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
-import GraphXings.Gruppe4.Strategy;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
-import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
-public class MinimizePlaceAtBorder implements Strategy {
+public class MinimizePlaceAtBorder extends StrategyClass {
 
-    private final Graph g;
-    private final MutableRTree<Edge, LineFloat> tree;
-    private final GameState gs;
-    private final int width;
-    private final int height;
-
-    private Optional<GameMove> gameMove = Optional.empty();
-
-    private long moveQuality = Long.MAX_VALUE;
     private int border = 0;
 
     public MinimizePlaceAtBorder(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
-        this.g = g;
-        this.tree = tree;
-        this.gs = gs;
-        this.width = width;
-        this.height = height;
+        super(g, gs, tree,  width, height);
+        moveQuality = Long.MAX_VALUE;
     }
 
 
-    /**
-     * Executes the heuristic as the first or second move.
-     *
-     * @param lastMove Is empty on first move otherwise provides the last opponent game move.
-     * @return false (its not necessary for the minimizer)
-     */
-    @Override
-    public boolean executeHeuristic(Optional<GameMove> lastMove) {
-        //gameMove = Heuristics.getFreeGameMoveOnCanvasCenter(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), null, gs.getPlacedVertices(), width, height);
-        return false;
-    }
 
     /**
      * Execute the main strategy and calculate a game move.
@@ -96,13 +67,6 @@ public class MinimizePlaceAtBorder implements Strategy {
                 return true;
             }
         }
-
-        //move was found, but quality is worse than 0
-        /*if (gameMove.isPresent()) {
-            return true;
-        }*/
-
-        //TODO: maybe it has a better move quality to place a new vertex to the border????
 
         //take unused vertex with at least 1 free neighbour and put it on the free coordinate on the border
         for (Vertex vertex : g.getVertices()){
@@ -221,58 +185,6 @@ public class MinimizePlaceAtBorder implements Strategy {
         return coordinate.getX() == border || coordinate.getX() == width-border-1 || coordinate.getY() == 0 || coordinate.getY() == height-border-1;
     }
 
-    /**
-     * Retrieve a calculated game move.
-     *
-     * @return A game move. Empty if execution wasn't successful.
-     */
-    @Override
-    public Optional<GameMove> getGameMove() {
-        return gameMove;
-    }
-
-    /**
-     * Quality of the current game move.
-     * This number represents how many crossings can be achieved by a game move.
-     * For a maximizer this number should be large.
-     *
-     * @return Number of crossings.
-     */
-    @Override
-    public long getGameMoveQuality() {
-        return moveQuality;
-    }
-
-    /**
-     * computes move quality by computing the number of crossings
-     * for all edges that are created by placing the given vertex
-     * @param vertex to place
-     * @param coordinate at which the vertex should be placed
-     * @return number of crossings
-     */
-    public long computeMoveQuality (Vertex vertex, Coordinate coordinate){
-        var placedVertices = gs.getPlacedVertices();
-        var vertexCoordinates = gs.getVertexCoordinates();
-        var incidentEdges = g.getIncidentEdges(vertex);
-        long current_move_quality = 0;
-
-        //check for all edges that the vertex has, if they are already existing
-        for (Edge e : incidentEdges) {
-            if(placedVertices.contains(e.getS()) || placedVertices.contains(e.getT())){
-                LineFloat edge;
-                if (e.getT().equals(vertex)){
-                    edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), coordinate.getX(), coordinate.getY());
-                } else {
-                    edge = LineFloat.create(coordinate.getX(), coordinate.getY(), coordinate.getX(), coordinate.getY());
-
-                }
-                current_move_quality += tree.getIntersections(edge);
-            }
-        }
-
-        //additionally add all crossings that will be created by the free neighbour edges
-        return current_move_quality;
-    }
 
 
 }
