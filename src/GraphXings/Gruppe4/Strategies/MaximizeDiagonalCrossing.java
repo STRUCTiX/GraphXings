@@ -92,7 +92,7 @@ public class MaximizeDiagonalCrossing extends StrategyClass {
 
         // Test for max. crossings
         if (samples.isPresent()) {
-            gameMove = chooseHighestIntersection(unplacedVertex, lastMove.getCoordinate(), samples.get());
+            gameMove = chooseHighestIntersection(unplacedVertex, samples.get());
         }
 
         return gameMove.isPresent();
