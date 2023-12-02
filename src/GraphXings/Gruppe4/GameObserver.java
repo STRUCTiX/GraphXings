@@ -22,4 +22,20 @@ public class GameObserver {
 
         // TODO: Do something with the game move
     }
+
+    /**
+     * Returns how many moves are left before the game ends
+     * @return Amount of remaining moves
+     */
+    public int remainingMoves() {
+        return totalVerticesCount - currentVerticesCount;
+    }
+
+    /**
+     * Returns a double between 0-100% of already placed moves
+     * @return A double
+     */
+    public double percentagePlacedMoves() {
+        return currentVerticesCount / (double) totalVerticesCount * 100.0;
+    }
 }
