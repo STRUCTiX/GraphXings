@@ -25,6 +25,7 @@ public class GraphXings
         ArrayList<NewPlayer> players = new ArrayList<>();
         players.add(new RTreePlayer("RTreePlayer"));
         players.add(new NewRandomPlayer("RandomPlayer"));
+        //players.add(new RTreePlayer("RTreePlayer2"));
 
 
         /*
