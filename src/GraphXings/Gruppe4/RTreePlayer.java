@@ -51,7 +51,7 @@ public class RTreePlayer implements NewPlayer {
     private GuiExport guiExport;
 
     // Set to true if you'd like to export data
-    private boolean enableExport = false;
+    private boolean enableExport = true;
 
     /**
      * Creates a random player with the assigned name.
@@ -67,6 +67,16 @@ public class RTreePlayer implements NewPlayer {
     {
         if (lastMove != null) {
             gs.applyMove(lastMove);
+
+            // Last move must have been a minimize move.
+            // Therefore, export the move from opponent.
+            if (enableExport) {
+                try {
+                    guiExport.exportVertexPlacement(lastMove, Role.MIN);
+                } catch (IOException e) {
+                    enableExport = false;
+                }
+            }
         }
 
         // Add lines to tree by observing last game move if not empty.
@@ -93,6 +103,14 @@ public class RTreePlayer implements NewPlayer {
         }
 
         gs.applyMove(move.get());
+
+        if (enableExport) {
+            try {
+                guiExport.exportVertexPlacement(move.get(), Role.MAX);
+            } catch (IOException e) {
+                enableExport = false;
+            }
+        }
 
         // Add our own move to the trees
         // Add lines to tree by observing last game move if not empty.
@@ -192,7 +210,7 @@ public class RTreePlayer implements NewPlayer {
                 guiExport = new GuiExport();
 
                 // Export the initial graph
-                guiExport.exportGraphStructure(g);
+                guiExport.exportGraphStructure(g, role, name);
             } catch (IOException e) {
                 enableExport = false;
             }
