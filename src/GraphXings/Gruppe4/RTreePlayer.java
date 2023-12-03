@@ -54,7 +54,7 @@ public class RTreePlayer implements NewPlayer {
     private GuiExport guiExport;
 
     // Set to true if you'd like to export data
-    private boolean enableExport = true;
+    private boolean enableExport = false;
 
     /**
      * Creates a random player with the assigned name.
