@@ -119,6 +119,12 @@ public class Helper {
      * @return
      */
     public static Optional<List<Coordinate>> randPickFreeCoordinatesPerimeter(int[][] usedCoordinates, Coordinate coordinate, int perimeterX, int perimeterY, int amountSamples) {
+        if (perimeterX <= 0) {
+            perimeterX = 1;
+        }
+        if (perimeterY <= 0) {
+            perimeterY = 1;
+        }
         var samples = new ArrayList<Coordinate>();
         Random rng = new Random();
 
