@@ -1,26 +1,44 @@
 package GraphXings.Gruppe4;
 
+import GraphXings.Algorithms.NewPlayer;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import GraphXings.Gruppe4.Strategies.StrategyName;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class GameObserver {
 
     private final int totalVerticesCount;
     private int currentVerticesCount = 0;
+    private NewPlayer.Role ourRole;
+    private final HashMap<StrategyName, Integer> strategyNamesCounts;
+    private ArrayList<GameMove> ourMoves;
+    private ArrayList<GameMove> opponentMoves;
 
-    public GameObserver(Graph g) {
+    public GameObserver(Graph g, NewPlayer.Role ourRole) {
         totalVerticesCount = ((HashSet<Vertex>) g.getVertices()).size();
+        strategyNamesCounts = new HashMap<>(StrategyName.values().length);
+        ourMoves = new ArrayList<>(totalVerticesCount / 2);
+        opponentMoves = new ArrayList<>(totalVerticesCount / 2);
 
-
+        this.ourRole = ourRole;
     }
 
-    public void addGameMove(GameMove move) {
+    public void addOwnGameMove(GameMove move, StrategyName strategyName) {
         currentVerticesCount += 1;
 
-        // TODO: Do something with the game move
+        incrementUsedStrategies(strategyName);
+        ourMoves.add(move);
+    }
+
+    public void addOpponentGameMove(GameMove move) {
+        currentVerticesCount += 1;
+
+        opponentMoves.add(move);
     }
 
     /**
@@ -37,5 +55,20 @@ public class GameObserver {
      */
     public double percentagePlacedMoves() {
         return currentVerticesCount / (double) totalVerticesCount * 100.0;
+    }
+
+    /**
+     * Count how often we use our own strategies.
+     * @param strategyName The strategy name which should get incremented
+     */
+    private void incrementUsedStrategies(StrategyName strategyName) {
+        if (strategyNamesCounts.containsKey(strategyName)) {
+            // Counter value is already present. Get, increment, put
+            var count = strategyNamesCounts.get(strategyName);
+            count += 1;
+            strategyNamesCounts.put(strategyName, count);
+        } else {
+            strategyNamesCounts.put(strategyName, 1);
+        }
     }
 }
