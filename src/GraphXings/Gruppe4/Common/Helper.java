@@ -119,6 +119,12 @@ public class Helper {
      * @return
      */
     public static Optional<List<Coordinate>> randPickFreeCoordinatesPerimeter(int[][] usedCoordinates, Coordinate coordinate, int perimeterX, int perimeterY, int amountSamples) {
+        if (perimeterX <= 0) {
+            perimeterX = 1;
+        }
+        if (perimeterY <= 0) {
+            perimeterY = 1;
+        }
         var samples = new ArrayList<Coordinate>();
         Random rng = new Random();
 
@@ -207,6 +213,29 @@ public class Helper {
         return Optional.ofNullable(unplacedVertex);
     }
 
+
+    public static Optional<List<Vertex>> getAllNeighbourVertices (Graph g, GameState gs, Vertex vertex){
+        List<Vertex> neighbourVertices = new ArrayList<>();
+        var incidentEdges = g.getIncidentEdges(vertex);
+        var placedVertices = gs.getPlacedVertices();
+
+        for (Edge e : incidentEdges){
+            if (!e.getS().equals(vertex) && !placedVertices.contains(e.getS())){
+                neighbourVertices.add(e.getS());
+            } else if (!placedVertices.contains(e.getT())){
+                neighbourVertices.add(e.getT());
+            }
+        }
+
+        if (neighbourVertices.isEmpty()){
+            return Optional.empty();
+        } else {
+            return Optional.of(neighbourVertices);
+        }
+    }
+
+
+
     /**
      * Check how many vertices are placed around a given vertex.
      * This function returns the amount of unplaced vertices which are connected via an edge to the given vertex.
@@ -228,18 +257,6 @@ public class Helper {
         }
 
         return edgeList.size();
-
-        /*int counter = 0;
-        for (var edge : incidentEdges) {
-            // Check if edge source is not the given vertex and is unplaced
-            if (!edge.getS().equals(vertex) && !gs.getPlacedVertices().contains(edge.getS())) {
-                counter += 1;
-            } else if (!edge.getT().equals(vertex) && !gs.getPlacedVertices().contains(edge.getT())) {
-                // Same check for the target edge vertex
-                counter += 1;
-            }
-        }
-        return counter;*/
     }
 
 
@@ -279,6 +296,106 @@ public class Helper {
         }
         while (usedCoordinates[c.getX()][c.getY()]!=0);
         return new GameMove(v,c);
+    }
+
+    /**
+     * Checks if a given coordinate is at the border
+     * @param coordinate to check
+     * @return true or false
+     */
+    public static boolean isAtBorder(Coordinate coordinate, int rightBorder, int leftBorder, int topBorder, int bottomBorder){
+        return coordinate.getX() == leftBorder || coordinate.getX() == rightBorder || coordinate.getY() == topBorder || coordinate.getY() == bottomBorder;
+    }
+
+    /**
+     *Searches through the border which Coordinates are free
+     *
+     * @param usedCoordinates
+     * @param rightBorder
+     * @param leftBorder
+     * @param topBorder
+     * @param bottomBorder
+     * @return List of free Coordinates
+     */
+    public static Optional<List<Coordinate>> findFreeCoordinatesAtBorder(int[][] usedCoordinates, int rightBorder, int leftBorder, int topBorder, int bottomBorder){
+        List<Coordinate> freeCoordinates = new ArrayList<>();
+
+        // search through top border
+        for (int i = leftBorder; i <= rightBorder; i++){
+            if (isCoordinateFree(usedCoordinates, i, 0)){
+                freeCoordinates.add(new Coordinate(i,0));
+            }
+        }
+
+        //search through bottom border
+        for (int i = leftBorder; i <= rightBorder; i++){
+            if (isCoordinateFree(usedCoordinates, i, bottomBorder)){
+                freeCoordinates.add(new Coordinate(i,bottomBorder));
+            }
+        }
+
+        //search through left border
+        for (int i = topBorder; i <= bottomBorder; i++){
+            if (isCoordinateFree(usedCoordinates, 0, i)){
+                freeCoordinates.add(new Coordinate(0, i));
+            }
+        }
+
+        //search through right border
+        for (int i = topBorder; i <= bottomBorder; i++){
+            if (isCoordinateFree(usedCoordinates, rightBorder, i)){
+                freeCoordinates.add(new Coordinate(rightBorder, i));
+            }
+        }
+
+        if (freeCoordinates.isEmpty()){
+            return Optional.empty();
+        } else {
+            return Optional.of(freeCoordinates);
+        }
+    }
+
+    /**
+     * searches through a horizontal row of the field
+     * to find its free coordinates
+     * @param usedCoordinates
+     * @param rightBorder
+     * @param leftBorder
+     * @param rowNumber
+     * @return List of free Coordinates of the row
+     */
+    public static List<Coordinate> findFreeCoordinatesInHorizontalRow (int[][] usedCoordinates, int rightBorder, int leftBorder, int rowNumber){
+        List<Coordinate> freeCoordinates = new ArrayList<>();
+
+        for (int i = rightBorder; i <= leftBorder; i++){
+            if (isCoordinateFree(usedCoordinates, i, rowNumber)){
+                freeCoordinates.add(new Coordinate(i, rowNumber));
+            }
+        }
+
+        return freeCoordinates;
+    }
+
+
+    /**
+     * searches through a vertical row of the field
+     * to find its free coordinates
+     * @param usedCoordinates
+     * @param topBorder
+     * @param bottomBorder
+     * @param rowNumber
+     * @return List of free Coordinates of the row
+     */
+    public static List<Coordinate> findFreeCoordinatesInVerticalRow (int[][] usedCoordinates, int topBorder, int bottomBorder, int rowNumber){
+        List<Coordinate> freeCoordinates = new ArrayList<>();
+
+        for (int i = topBorder; i <= bottomBorder; i++){
+            if (isCoordinateFree(usedCoordinates, rowNumber, i)){
+                freeCoordinates.add(new Coordinate(rowNumber, i));
+            }
+        }
+
+        return freeCoordinates;
     }
 
 

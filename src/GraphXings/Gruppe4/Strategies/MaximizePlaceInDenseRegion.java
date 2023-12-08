@@ -1,6 +1,5 @@
 package GraphXings.Gruppe4.Strategies;
 
-import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
@@ -10,41 +9,28 @@ import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
-import GraphXings.Gruppe4.Strategy;
-import com.github.davidmoten.rtree2.geometry.Point;
-import com.github.davidmoten.rtree2.geometry.Rectangle;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 
 import java.util.List;
 import java.util.Optional;
 
-public class MaximizePlaceInDenseRegion implements Strategy {
+public class MaximizePlaceInDenseRegion extends StrategyClass {
 
-    private final Graph g;
-    private final MutableRTree<Edge, LineFloat> tree;
-    private final MutableRTree<Vertex, PointFloat> vertexTree;
-    private final GameState gs;
-    private final int width;
-    private final int height;
 
-    private Optional<GameMove> gameMove = Optional.empty();
-
-    private long moveQuality = 0;
-
+    private MutableRTree<Vertex, PointFloat> vertexTree;
 
     public MaximizePlaceInDenseRegion(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, MutableRTree<Vertex, PointFloat> vertexTree, int width, int height) {
-        this.g = g;
-        this.tree = tree;
-        this.vertexTree = vertexTree;
-        this.gs = gs;
-        this.width = width;
-        this.height = height;
+       super(g, gs, tree, width, height);
+       this.vertexTree = vertexTree;
+       moveQuality = 0;
     }
 
 
     /**
      * Executes the heuristic as the first or second move.
+     *
+     * Heuristic: place vertex into the middle of the match field
      *
      * @param lastMove Is empty on first move otherwise provides the last opponent game move.
      * @return True on success, false otherwise.
@@ -64,7 +50,7 @@ public class MaximizePlaceInDenseRegion implements Strategy {
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
-        var usedCoordinates = gs.getUsedCoordinates();
+        //var usedCoordinates = gs.getUsedCoordinates();
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
 
@@ -94,7 +80,7 @@ public class MaximizePlaceInDenseRegion implements Strategy {
             // This is not optimal because we should cross completely through the rectangle
             // to get the max. crossings. But for simplicity we just use this rectangle to search for free coordinates.
             var samples = Helper.randPickFreeCoordinatesPerimeter(gs.getUsedCoordinates(), rectangleOption.get(), 10);
-            samples.ifPresent(s -> gameMove = chooseHighestIntersection(tree, finalUnplacedVertex, lastMove.getCoordinate(), s));
+            samples.ifPresent(s -> gameMove = chooseHighestIntersection(List.of(finalUnplacedVertex), s));
         } else {
             // In this case we have no dense edge region. Fallback to a dense vertex region instead.
 
@@ -111,52 +97,6 @@ public class MaximizePlaceInDenseRegion implements Strategy {
         }
 
         return gameMove.isPresent();
-    }
-
-    /**
-     * Retrieve a calculated game move.
-     *
-     * @return A game move. Empty if execution wasn't successful.
-     */
-    @Override
-    public Optional<GameMove> getGameMove() {
-        return gameMove;
-    }
-
-    /**
-     * Quality of the current game move.
-     * This number represents how many crossings can be achieved by a game move.
-     * For a maximizer this number should be large.
-     *
-     * @return Number of crossings.
-     */
-    @Override
-    public long getGameMoveQuality() {
-        return moveQuality;
-    }
-
-    public Optional<GameMove> chooseHighestIntersection(MutableRTree<Edge, LineFloat> tree, Vertex unplacedVertex, Coordinate maxDistCoordinate, List<Coordinate> samples) {
-        Coordinate bestCoord = null;
-        var maxCrossings = Long.MIN_VALUE;
-        for (var sampleCoord : samples) {
-
-            // Create a line to test for intersections
-            var line = LineFloat.create(maxDistCoordinate.getX(), maxDistCoordinate.getY(), sampleCoord.getX(), sampleCoord.getY());
-            var numCrossings = tree.getIntersections(line);
-            if (numCrossings > maxCrossings) {
-                maxCrossings = numCrossings;
-                bestCoord = sampleCoord;
-            }
-        }
-
-        if (maxCrossings <= 0) {
-            moveQuality = 0;
-            return Optional.empty();
-        }
-
-        // Use the best coordinate
-        moveQuality = maxCrossings;
-        return Optional.of(new GameMove(unplacedVertex, bestCoord));
     }
 
 }

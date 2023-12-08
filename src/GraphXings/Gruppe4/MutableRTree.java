@@ -104,4 +104,27 @@ public class MutableRTree<T, S extends Geometry> {
         return Optional.of(highestDensity);
     }
 
+    public Optional<Rectangle> findLowestDensity(int tiling) {
+        int w = width / tiling;
+        int h = height / tiling;
+
+        Rectangle lowestDensity = null;
+        long maxCrossings = Long.MAX_VALUE;
+        for (int i = 0; i < tiling - 1; i++) {
+            for (int k = 0; k < tiling - 1; k++) {
+                var rect = RectangleFloat.create(i * w, k * h, (i + 1) * w, (k + 1) * h);
+                var crossings = Iterables.size(tree.search(rect));
+                if (crossings < maxCrossings) {
+                    lowestDensity = rect;
+                    maxCrossings = crossings;
+                }
+            }
+        }
+
+        if (lowestDensity == null || maxCrossings <= 0) {
+            return Optional.empty();
+        }
+        return Optional.of(lowestDensity);
+    }
+
 }
