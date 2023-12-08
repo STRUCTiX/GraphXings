@@ -86,51 +86,38 @@ public class RTreePlayer implements NewPlayer {
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
+        // Instantiate the strategies
+        Strategy[] minimizer = {
+                new MaximizePlaceVertexOnEdge(g, gs, tree, width, height),
+                new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height),
+                new MaximizeDiagonalCrossing(g, gs, tree, width, height)
+        };
+
+        // This is our fallback. If our strategy fails, return a random move
+        var randomMove = new RandomMove(g, gs, tree, width, height);
+        randomMove.executeHeuristic(Optional.ofNullable(lastMove));
+
         // Calculate the game move.
-        var maximizer_vertexOnEdge = new MaximizePlaceVertexOnEdge(g, gs, tree, width, height);
-        var maximizer_denseRegion = new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height);
-        var maximizer_diagonalCrossing = new MaximizeDiagonalCrossing(g, gs, tree, width, height);
-        Optional<GameMove> move;
+        Optional<GameMove> move = randomMove.getGameMove();
+        long moveQuality = randomMove.getGameMoveQuality();
 
-        // Check if we've got the first move and must execute the heuristic
-        if (gs.getPlacedVertices().isEmpty()) {
-            maximizer_vertexOnEdge.executeHeuristic(Optional.ofNullable(lastMove));
-            maximizer_diagonalCrossing.executeHeuristic(Optional.ofNullable(lastMove));
-            maximizer_denseRegion.executeHeuristic(Optional.ofNullable(lastMove));
-        } else {
-            maximizer_vertexOnEdge.executeStrategy(lastMove);
-            //maximizer_diagonalCrossing.executeStrategy(lastMove);
-            maximizer_denseRegion.executeStrategy(lastMove);
-        }
-        var move_vertexOnEdge = maximizer_vertexOnEdge.getGameMove();
-        var move_denseRegion = maximizer_denseRegion.getGameMove();
-        var move_diagonalCrossing = maximizer_diagonalCrossing.getGameMove();
-        var random_move = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
+        for (var strat : minimizer) {
+            // Check if we've got the first move and must execute the heuristic
+            if (gs.getPlacedVertices().isEmpty()) {
+                strat.executeHeuristic(Optional.ofNullable(lastMove));
+            } else {
+                strat.executeStrategy(lastMove);
+            }
 
-        long quality_vertexOnEdge = maximizer_vertexOnEdge.getGameMoveQuality();
-        long quality_denseRegion = maximizer_denseRegion.getGameMoveQuality();
-        long quality_diagonalCrossing = maximizer_diagonalCrossing.getGameMoveQuality();
-        long quality_randMove = computeMoveQuality(random_move.get().getVertex(), random_move.get().getCoordinate());
+            // Check the quality
+            var currentMove = strat.getGameMove();
+            var currentQuality = strat.getGameMoveQuality();
 
-        move = move_denseRegion;
-        if (move_vertexOnEdge.isPresent() && quality_vertexOnEdge > quality_denseRegion && quality_vertexOnEdge > quality_diagonalCrossing && quality_vertexOnEdge > quality_randMove){
-            move = move_vertexOnEdge;
-            //System.out.println("Vertex   - Move Quality:" + quality_vertexOnEdge + "(" + quality_denseRegion + ":" + quality_diagonalCrossing + ":" +  quality_randMove + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
+            if (currentMove.isPresent() && currentQuality > moveQuality) {
+                moveQuality = currentQuality;
+                move = currentMove;
+            }
 
-        }
-        if (move_denseRegion.isPresent() && quality_denseRegion > quality_diagonalCrossing && quality_denseRegion > quality_randMove && quality_denseRegion > quality_vertexOnEdge){
-            move = move_denseRegion;
-            //System.out.println("dense    - Move Quality:" + quality_denseRegion + "(" + quality_randMove + ":" + quality_diagonalCrossing + ":" +  quality_vertexOnEdge + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
-
-        }
-        if (move_diagonalCrossing.isPresent() && quality_diagonalCrossing > quality_denseRegion && quality_diagonalCrossing > quality_randMove && quality_diagonalCrossing > quality_vertexOnEdge){
-            move = move_diagonalCrossing;
-            //System.out.println("diagonal - Move Quality:" + quality_diagonalCrossing + "(" + quality_denseRegion + ":" + quality_randMove + ":" +  quality_vertexOnEdge + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
-
-        }
-        if (move.isEmpty() || quality_randMove > quality_denseRegion && quality_randMove > quality_diagonalCrossing && quality_randMove > quality_vertexOnEdge){
-            //System.out.println("Random   - Move Quality:" + quality_randMove + "(" + quality_denseRegion + ":" + quality_diagonalCrossing + ":" +  quality_vertexOnEdge + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
-            move = random_move;
         }
 
 
@@ -176,49 +163,38 @@ public class RTreePlayer implements NewPlayer {
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
-        // Calculate the game move.
-        var minimize_placeNextToOpponent = new MinimizePlaceNextToOpponent(g, gs, tree, width, height);
-        var minimize_placeAtBorder = new MinimizePlaceAtBorder(g, gs, tree, width, height);
-        Optional<GameMove> move;
-
-        // Check if we've got the first move and must execute the heuristic
-        if (gs.getPlacedVertices().isEmpty()) {
-            minimize_placeNextToOpponent.executeHeuristic(Optional.ofNullable(lastMove));
-            minimize_placeAtBorder.executeHeuristic(Optional.ofNullable(lastMove));
-        } else {
-            minimize_placeNextToOpponent.executeStrategy(lastMove);
-            minimize_placeAtBorder.executeStrategy(lastMove);
-        }
-
-        var move_nextToOpponent = minimize_placeNextToOpponent.getGameMove();
-        var move_placeAtBorder = minimize_placeAtBorder.getGameMove();
-        var random_move = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
-        move = move_placeAtBorder;
-
-
-        long quality_nextToOpponent = minimize_placeNextToOpponent.getGameMoveQuality();
-        long quality_randMove = computeMoveQuality(random_move.get().getVertex(), random_move.get().getCoordinate());
-        long quality_placeAtBorder = minimize_placeAtBorder.getGameMoveQuality();
-
-
+        // Instantiate the strategies
+        Strategy[] minimizer = {
+                new MinimizePlaceNextToOpponent(g, gs, tree, width, height),
+                new MinimizePlaceAtBorder(g, gs, tree, width, height),
+        };
 
         // This is our fallback. If our strategy fails, return a random move
+        var randomMove = new RandomMove(g, gs, tree, width, height);
+        randomMove.executeHeuristic(Optional.ofNullable(lastMove));
 
-        if (move_nextToOpponent.isPresent() && quality_nextToOpponent < quality_randMove && quality_nextToOpponent < quality_placeAtBorder){
-            //System.out.println("Opponent - Move Quality:" + quality_nextToOpponent + "(" + quality_placeAtBorder + ":" + quality_randMove  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
-            move = move_nextToOpponent;
-        }
-        if (move_placeAtBorder.isPresent() && quality_placeAtBorder < quality_nextToOpponent && quality_placeAtBorder < quality_randMove){
-            //System.out.println("Border   - Move Quality:" + quality_placeAtBorder + "(" + quality_nextToOpponent + ":" + quality_randMove  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
-            //move = move_placeAtBorder;
-        }
-        if (move.isEmpty() || quality_randMove < quality_nextToOpponent && quality_randMove < quality_placeAtBorder) {
-            //System.out.println("Random   - Move Quality:" + quality_randMove + "(" + quality_nextToOpponent + ":" + quality_placeAtBorder  + "), # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
-            //System.out.println("minimize - Move Quality:" + minimizer.getGameMoveQuality() + ", # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
-            //System.out.println("random   - Move Quality:" + rand_move_quality + ", # placed nodes:" + gs.getPlacedVertices().size() + " of " + g.getN() + ", percent: " + gs.getPlacedVertices().size()/(double) g.getN());
-            move = random_move;
-        }
+        // Calculate the game move.
+        Optional<GameMove> move = randomMove.getGameMove();
+        long moveQuality = randomMove.getGameMoveQuality();
 
+        for (var strat : minimizer) {
+            // Check if we've got the first move and must execute the heuristic
+            if (gs.getPlacedVertices().isEmpty()) {
+                strat.executeHeuristic(Optional.ofNullable(lastMove));
+            } else {
+                strat.executeStrategy(lastMove);
+            }
+
+            // Check the quality
+            var currentMove = strat.getGameMove();
+            var currentQuality = strat.getGameMoveQuality();
+
+            if (currentMove.isPresent() && currentQuality < moveQuality) {
+                moveQuality = currentQuality;
+                move = currentMove;
+            }
+
+        }
 
         gs.applyMove(move.get());
 
