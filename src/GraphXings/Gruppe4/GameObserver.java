@@ -18,6 +18,10 @@ public class GameObserver {
     private final HashMap<StrategyName, Integer> strategyNamesCounts;
     private ArrayList<GameMove> ourMoves;
     private ArrayList<GameMove> opponentMoves;
+    private long startTime;
+    private long totalElapsedTime = 0;
+    private long currentGameMoveTime = 0;
+    private final long timeLimit = 300000000000L;
 
     public GameObserver(Graph g, NewPlayer.Role ourRole) {
         totalVerticesCount = ((HashSet<Vertex>) g.getVertices()).size();
@@ -55,6 +59,32 @@ public class GameObserver {
      */
     public double percentagePlacedMoves() {
         return currentVerticesCount / (double) totalVerticesCount * 100.0;
+    }
+
+    public void startTimer() {
+        startTime = System.nanoTime();
+    }
+
+    public void stopTimer() {
+       var stopTime = System.nanoTime();
+
+       currentGameMoveTime = stopTime - startTime;
+
+       totalElapsedTime += currentGameMoveTime;
+    }
+
+    public long getTotalElapsedTime() {
+        return totalElapsedTime;
+    }
+
+    public long getSingleGameMoveTime() {
+        long gameMove = timeLimit / totalVerticesCount;
+
+        // One game move should at least have 5ms time to compute
+        if (gameMove < 5) {
+            return 5;
+        }
+        return gameMove;
     }
 
     /**
