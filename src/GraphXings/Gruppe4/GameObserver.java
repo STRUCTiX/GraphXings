@@ -4,6 +4,8 @@ import GraphXings.Algorithms.NewPlayer;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import GraphXings.Gruppe4.CanvasObservations.ObserveBorders;
+import GraphXings.Gruppe4.CanvasObservations.ObserveOpponentPlacesNeighbours;
 import GraphXings.Gruppe4.Strategies.StrategyName;
 
 import java.util.ArrayList;
@@ -22,6 +24,9 @@ public class GameObserver {
     private long totalElapsedTime = 0;
     private long currentGameMoveTime = 0;
     private final long timeLimit = 300000000000L;
+
+    // This is a safety measure so we don't get a timeout
+    private final long timeLimitBuffer = 100000L;
 
     public GameObserver(Graph g, NewPlayer.Role ourRole) {
         totalVerticesCount = ((HashSet<Vertex>) g.getVertices()).size();
@@ -78,7 +83,7 @@ public class GameObserver {
     }
 
     public long getSingleGameMoveTime() {
-        long gameMove = timeLimit / totalVerticesCount;
+        long gameMove = (timeLimit - timeLimitBuffer) / totalVerticesCount;
 
         // One game move should at least have 5ms time to compute
         if (gameMove < 5) {
@@ -100,5 +105,38 @@ public class GameObserver {
         } else {
             strategyNamesCounts.put(strategyName, 1);
         }
+    }
+
+    /**
+     * This routine runs all CanvasObservations and calculates the best
+     * strategy for our next move.
+     * @return A counter-attack strategy
+     */
+    public StrategyName observationRunner(Graph g, GameMove lastMove) {
+        // Define all available observers
+        CanvasObservation[] observers = {
+                new ObserveBorders(),
+                new ObserveOpponentPlacesNeighbours(g, ourMoves, opponentMoves)
+        };
+
+        // Choose the observation with the best score (max. = 100)
+        CanvasObservation bestChoice = null;
+        int bestObservationScore = 0;
+        for (var observer : observers) {
+            observer.calculateObservation(lastMove);
+
+            if (observer.getObservation() > bestObservationScore) {
+                bestChoice = observer;
+                bestObservationScore = observer.getObservation();
+            }
+        }
+
+        // Return the best counter strategy
+        if (bestChoice != null) {
+            return bestChoice.getEffectiveCounterStrategy();
+        }
+
+        // Or return unknown if we don't know what to do :D
+        return StrategyName.Unknown;
     }
 }

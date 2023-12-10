@@ -10,11 +10,15 @@ import java.util.List;
 public class ObserveOpponentPlacesNeighbours implements CanvasObservation {
 
     private final Graph g;
-    private final List<GameMove> lastMoves;
+    private final List<GameMove> ourMoves;
+    private final List<GameMove> opponentMoves;
 
-    public ObserveOpponentPlacesNeighbours(Graph g, List<GameMove> lastMoves) {
+    private int observation = 0;
+
+    public ObserveOpponentPlacesNeighbours(Graph g, List<GameMove> ourMoves, List<GameMove> opponentMoves) {
         this.g = g;
-        this.lastMoves = lastMoves;
+        this.ourMoves = ourMoves;
+        this.opponentMoves = opponentMoves;
     }
 
     /**
@@ -24,7 +28,16 @@ public class ObserveOpponentPlacesNeighbours implements CanvasObservation {
      */
     @Override
     public void calculateObservation(GameMove lastMove) {
+        // Last move is the one from opponent
+        var ourLastMove = ourMoves.getLast();
 
+        var incidentEdges = g.getIncidentEdges(ourLastMove.getVertex());
+        for (var e : incidentEdges) {
+            if ((e.getS() != null && e.getS().equals(lastMove.getVertex())) || (e.getT() != null && e.getT().equals(lastMove.getVertex()))) {
+                observation = 100;
+                break;
+            }
+        }
     }
 
     /**
@@ -35,7 +48,7 @@ public class ObserveOpponentPlacesNeighbours implements CanvasObservation {
      */
     @Override
     public int getObservation() {
-        return 0;
+        return observation;
     }
 
     /**
@@ -45,6 +58,7 @@ public class ObserveOpponentPlacesNeighbours implements CanvasObservation {
      */
     @Override
     public StrategyName getEffectiveCounterStrategy() {
-        return null;
+        // TODO: Evaluate which strategy is effective. This is just a random value
+        return StrategyName.MaximizeDiagonalCrossing;
     }
 }
