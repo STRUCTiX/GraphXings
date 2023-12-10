@@ -49,6 +49,8 @@ public class RTreePlayer implements NewPlayer {
 
     private GuiExport guiExport;
 
+    private GameObserver gameObserver;
+
     // Set to true if you'd like to export data
     private boolean enableExport = false;
 
@@ -64,7 +66,7 @@ public class RTreePlayer implements NewPlayer {
     @Override
     public GameMove maximizeCrossings(GameMove lastMove)
     {
-
+        gameObserver.startTimer();
 
         if (lastMove != null) {
             gs.applyMove(lastMove);
@@ -137,12 +139,15 @@ public class RTreePlayer implements NewPlayer {
 
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
+
+        gameObserver.stopTimer();
         return move.get();
     }
 
     @Override
     public GameMove minimizeCrossings(GameMove lastMove)
     {
+        gameObserver.startTimer();
         if (lastMove != null) {
             gs.applyMove(lastMove);
 
@@ -213,6 +218,7 @@ public class RTreePlayer implements NewPlayer {
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
+        gameObserver.stopTimer();
 
         return move.get();
     }
@@ -237,6 +243,8 @@ public class RTreePlayer implements NewPlayer {
         this.width = width;
         this.height = height;
         gs = new GameState(g, width, height);
+
+        this.gameObserver = new GameObserver(g, role);
 
         if (enableExport) {
             try {
