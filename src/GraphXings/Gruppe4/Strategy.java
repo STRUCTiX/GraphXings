@@ -1,6 +1,7 @@
 package GraphXings.Gruppe4;
 
 import GraphXings.Game.GameMove;
+import GraphXings.Gruppe4.Strategies.StrategyName;
 
 import java.util.Optional;
 
@@ -34,4 +35,11 @@ public interface Strategy {
      * @return Number of crossings.
      */
     public long getGameMoveQuality();
+
+    /**
+     * This should return a fixed strategy name
+     * which is used by the GameObserver.
+     * @return A strategy name
+     */
+    public StrategyName getStrategyName();
 }

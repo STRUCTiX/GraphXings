@@ -84,6 +84,17 @@ public class MaximizePlaceVertexOnEdge extends StrategyClass {
         return gameMove.isEmpty();
     }
 
+    /**
+     * This should return a fixed strategy name
+     * which is used by the GameObserver.
+     *
+     * @return A strategy name
+     */
+    @Override
+    public StrategyName getStrategyName() {
+        return StrategyName.MaximizePlaceVertexOnEdge;
+    }
+
 
     /**
      * finds the next free coordinate on the largest edge from outside to inside

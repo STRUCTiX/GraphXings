@@ -81,6 +81,16 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
         return moveQuality;
     }
 
+    /**
+     * This should return a fixed strategy name
+     * which is used by the GameObserver.
+     *
+     * @return A strategy name
+     */
+    @Override
+    public StrategyName getStrategyName() {
+        return StrategyName.Unknown;
+    }
 
     /**
      * choose the coordinate with the highest Intersection for a given vertex

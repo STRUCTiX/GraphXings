@@ -101,6 +101,18 @@ public class MinimizePlaceAtBorder extends StrategyClass {
         return gameMove.isPresent();
     }
 
+
+    /**
+     * This should return a fixed strategy name
+     * which is used by the GameObserver.
+     *
+     * @return A strategy name
+     */
+    @Override
+    public StrategyName getStrategyName() {
+        return StrategyName.MinimizePlaceAtBorder;
+    }
+
     public Optional<List<Coordinate>> filterCoordinates(Rectangle region, List<Coordinate> coordinateList){
 
         coordinateList.removeIf(coordinate -> coordinate.getX() < region.x1() || coordinate.getX() > region.x2() || coordinate.getY() < region.y1() || coordinate.getY() > region.y2());

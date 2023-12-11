@@ -116,7 +116,7 @@ public class GameObserver {
         // Define all available observers
         CanvasObservation[] observers = {
                 new ObserveBorders(),
-                new ObserveOpponentPlacesNeighbours(g, ourMoves, opponentMoves)
+                new ObserveOpponentPlacesNeighbours(g, ourMoves, opponentMoves, ourRole)
         };
 
         // Choose the observation with the best score (max. = 100)

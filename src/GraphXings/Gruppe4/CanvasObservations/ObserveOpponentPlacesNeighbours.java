@@ -1,5 +1,6 @@
 package GraphXings.Gruppe4.CanvasObservations;
 
+import GraphXings.Algorithms.NewPlayer;
 import GraphXings.Data.Graph;
 import GraphXings.Game.GameMove;
 import GraphXings.Gruppe4.CanvasObservation;
@@ -12,13 +13,15 @@ public class ObserveOpponentPlacesNeighbours implements CanvasObservation {
     private final Graph g;
     private final List<GameMove> ourMoves;
     private final List<GameMove> opponentMoves;
+    private final NewPlayer.Role ourRole;
 
     private int observation = 0;
 
-    public ObserveOpponentPlacesNeighbours(Graph g, List<GameMove> ourMoves, List<GameMove> opponentMoves) {
+    public ObserveOpponentPlacesNeighbours(Graph g, List<GameMove> ourMoves, List<GameMove> opponentMoves, NewPlayer.Role role) {
         this.g = g;
         this.ourMoves = ourMoves;
         this.opponentMoves = opponentMoves;
+        this.ourRole = role;
     }
 
     /**

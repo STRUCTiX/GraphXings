@@ -70,6 +70,7 @@ public class RTreePlayer implements NewPlayer {
 
         if (lastMove != null) {
             gs.applyMove(lastMove);
+            gameObserver.addOpponentGameMove(lastMove);
 
             // Last move must have been a minimize move.
             // Therefore, export the move from opponent.
@@ -102,6 +103,7 @@ public class RTreePlayer implements NewPlayer {
         // Calculate the game move.
         Optional<GameMove> move = randomMove.getGameMove();
         long moveQuality = randomMove.getGameMoveQuality();
+        StrategyName usedStrategy = randomMove.getStrategyName();
 
         for (var strat : minimizer) {
             // Check if we've got the first move and must execute the heuristic
@@ -118,12 +120,14 @@ public class RTreePlayer implements NewPlayer {
             if (currentMove.isPresent() && currentQuality > moveQuality) {
                 moveQuality = currentQuality;
                 move = currentMove;
+                usedStrategy = strat.getStrategyName();
             }
 
         }
 
 
         gs.applyMove(move.get());
+        gameObserver.addOwnGameMove(move.get(), usedStrategy);
 
         if (enableExport) {
             try {

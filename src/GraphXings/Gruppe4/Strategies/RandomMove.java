@@ -50,4 +50,16 @@ public class RandomMove extends StrategyClass {
         moveQuality = computeMoveQuality(gameMove.get().getVertex(), gameMove.get().getCoordinate());
         return true;
     }
+
+
+    /**
+     * This should return a fixed strategy name
+     * which is used by the GameObserver.
+     *
+     * @return A strategy name
+     */
+    @Override
+    public StrategyName getStrategyName() {
+        return StrategyName.RandomMove;
+    }
 }

@@ -99,5 +99,16 @@ public class MaximizeDiagonalCrossing extends StrategyClass {
         return gameMove.isPresent();
     }
 
+    /**
+     * This should return a fixed strategy name
+     * which is used by the GameObserver.
+     *
+     * @return A strategy name
+     */
+    @Override
+    public StrategyName getStrategyName() {
+        return StrategyName.MaximizeDiagonalCrossing;
+    }
+
 
 }
