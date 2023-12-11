@@ -6,6 +6,7 @@ import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Gruppe4.CanvasObservations.ObserveBorders;
 import GraphXings.Gruppe4.CanvasObservations.ObserveOpponentPlacesNeighbours;
+import GraphXings.Gruppe4.CanvasObservations.SampleSize;
 import GraphXings.Gruppe4.Strategies.StrategyName;
 
 import java.util.ArrayList;
@@ -82,14 +83,33 @@ public class GameObserver {
         return totalElapsedTime;
     }
 
+    /**
+     * Retrieve the optimal runtime of a single game move in nano seconds
+     * @return Game move runtime
+     */
     public long getSingleGameMoveTime() {
         long gameMove = (timeLimit - timeLimitBuffer) / totalVerticesCount;
 
         // One game move should at least have 5ms time to compute
+        // TODO: These are nano seconds...
         if (gameMove < 5) {
             return 5;
         }
         return gameMove;
+    }
+
+    public SampleSize getSampleSizeAdjustment() {
+        long timeDiff = getSingleGameMoveTime() - currentGameMoveTime;
+        // If we have more than 10ms to spend then increment sample size
+        if (timeDiff > 10000) {
+            return SampleSize.Increment;
+        } else if (timeDiff < 0) {
+            // If difference is negative we would run too long
+            return SampleSize.Decrement;
+        }
+
+        // We've found a nice sample size
+        return SampleSize.Keep;
     }
 
     /**
