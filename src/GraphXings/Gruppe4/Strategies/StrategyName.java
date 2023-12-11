@@ -11,6 +11,8 @@ public enum StrategyName {
     MaximizePlaceVertexOnEdge,
     MinimizePlaceAtBorder,
     MinimizePlaceNextToOpponent,
+    MinimizeRandomSampleMove,
+    MaximizeRandomSampleMove,
     RandomMove,
     Unknown
 }

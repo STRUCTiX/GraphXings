@@ -96,7 +96,8 @@ public class RTreePlayer implements NewPlayer {
         Strategy[] minimizer = {
                 new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters),
                 new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
-                new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters)
+                new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters),
+                new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters),
         };
 
         // This is our fallback. If our strategy fails, return a random move
@@ -182,6 +183,7 @@ public class RTreePlayer implements NewPlayer {
         Strategy[] minimizer = {
                 new MinimizePlaceNextToOpponent(g, gs, tree, width, height, sampleParameters),
                 new MinimizePlaceAtBorder(g, gs, tree, width, height, sampleParameters),
+                new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters),
         };
 
         // This is our fallback. If our strategy fails, return a random move
@@ -211,7 +213,14 @@ public class RTreePlayer implements NewPlayer {
 
         }
 
-        gs.applyMove(move.get());
+        if (move.isPresent()) {
+            gs.applyMove(move.get());
+        } else {
+            // This should never happen but just in case, execute another random move
+            var panicMove = new RandomMove(g, gs, tree, width, height, sampleParameters);
+            panicMove.executeHeuristic(Optional.ofNullable(lastMove));
+            gs.applyMove(panicMove.getGameMove().get());
+        }
 
         if (enableExport) {
             try {

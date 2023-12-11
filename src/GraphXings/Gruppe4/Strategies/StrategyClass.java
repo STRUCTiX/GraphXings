@@ -146,7 +146,7 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
                     }
                     //found best Game Move
                     if (numCrossings == 0){
-                        return Optional.of(new GameMove(bestVertex, bestCoordinate));
+                        break;
                     }
                 }
             }

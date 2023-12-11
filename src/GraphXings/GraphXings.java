@@ -75,7 +75,7 @@ public class GraphXings
         //RandomCycleFactory factory = new RandomCycleFactory(24091869, true);
         PlanarExampleInstanceFactory factory = new PlanarExampleInstanceFactory();
         long timeLimit = 300000000000l;
-        NewLeague l = new NewLeague(players,10,timeLimit,factory);
+        NewLeague l = new NewLeague(players,100,timeLimit,factory);
         NewLeagueResult lr = l.runLeague();
         System.out.println(lr.announceResults());
 
