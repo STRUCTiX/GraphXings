@@ -5,6 +5,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
 import GraphXings.Gruppe4.Heuristics;
@@ -20,8 +21,8 @@ public class MaximizePlaceInDenseRegion extends StrategyClass {
 
     private MutableRTree<Vertex, PointFloat> vertexTree;
 
-    public MaximizePlaceInDenseRegion(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, MutableRTree<Vertex, PointFloat> vertexTree, int width, int height) {
-       super(g, gs, tree, width, height);
+    public MaximizePlaceInDenseRegion(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, MutableRTree<Vertex, PointFloat> vertexTree, int width, int height, SampleParameters sampleParameters) {
+       super(g, gs, tree, width, height, sampleParameters);
        this.vertexTree = vertexTree;
        moveQuality = 0;
     }

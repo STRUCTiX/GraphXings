@@ -6,6 +6,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
@@ -17,8 +18,8 @@ import java.util.Optional;
 public class MaximizeDiagonalCrossing extends StrategyClass {
 
 
-    public MaximizeDiagonalCrossing(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
-        super(g, gs, tree, width, height);
+    public MaximizeDiagonalCrossing(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
+        super(g, gs, tree, width, height, sampleParameters);
         moveQuality = 0;
     }
 
@@ -86,10 +87,10 @@ public class MaximizeDiagonalCrossing extends StrategyClass {
             unplacedVertex = unplacedVertexOption.get();
         }
 
-        // Pick 10 random coordinates out of a perimeter and test for the max. crossings
+        // Pick 10/more/less random coordinates out of a perimeter and test for the max. crossings
         // The perimeter is 1/3 of the width/height
         // TODO: Why should we use maxDistCoordinates? This should be lastMove coordinate instead?
-        var samples = Helper.randPickFreeCoordinatesPerimeter(usedCoordinates, maxDistCoordinates, width / 3, height / 3, 10);
+        var samples = Helper.randPickFreeCoordinatesPerimeter(usedCoordinates, maxDistCoordinates, width / 3, height / 3, sampleParameters.samples());
 
         // Test for max. crossings
         if (samples.isPresent() && unplacedVertex != null) {

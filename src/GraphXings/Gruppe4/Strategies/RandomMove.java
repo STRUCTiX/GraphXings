@@ -6,6 +6,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
@@ -16,8 +17,8 @@ import java.util.Optional;
 
 public class RandomMove extends StrategyClass {
 
-    public RandomMove(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
-        super(g, gs, tree, width, height);
+    public RandomMove(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
+        super(g, gs, tree, width, height, sampleParameters);
         moveQuality = 0;
     }
 

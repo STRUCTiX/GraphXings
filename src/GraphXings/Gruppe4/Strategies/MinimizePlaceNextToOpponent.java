@@ -4,6 +4,7 @@ import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
@@ -17,8 +18,8 @@ public class MinimizePlaceNextToOpponent extends StrategyClass {
 
 
 
-    public MinimizePlaceNextToOpponent(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
-        super(g, gs, tree, width, height);
+    public MinimizePlaceNextToOpponent(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
+        super(g, gs, tree, width, height, sampleParameters);
         moveQuality = Long.MAX_VALUE;
     }
 

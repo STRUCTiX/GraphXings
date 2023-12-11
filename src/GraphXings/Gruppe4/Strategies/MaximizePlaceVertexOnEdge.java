@@ -6,6 +6,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
@@ -14,8 +15,8 @@ import java.util.Optional;
 
 public class MaximizePlaceVertexOnEdge extends StrategyClass {
 
-    public MaximizePlaceVertexOnEdge(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
-        super(g, gs, tree, width, height);
+    public MaximizePlaceVertexOnEdge(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
+        super(g, gs, tree, width, height, sampleParameters);
         moveQuality = 0;
     }
 

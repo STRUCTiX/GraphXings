@@ -89,15 +89,18 @@ public class RTreePlayer implements NewPlayer {
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
+        // Get the estimated SampleParameters
+        var sampleParameters = gameObserver.calculateSampleSizeParameters();
+
         // Instantiate the strategies
         Strategy[] minimizer = {
-                new MaximizePlaceVertexOnEdge(g, gs, tree, width, height),
-                new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height),
-                new MaximizeDiagonalCrossing(g, gs, tree, width, height)
+                new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters),
+                new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
+                new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters)
         };
 
         // This is our fallback. If our strategy fails, return a random move
-        var randomMove = new RandomMove(g, gs, tree, width, height);
+        var randomMove = new RandomMove(g, gs, tree, width, height, sampleParameters);
         randomMove.executeHeuristic(Optional.ofNullable(lastMove));
 
         // Calculate the game move.
@@ -172,14 +175,17 @@ public class RTreePlayer implements NewPlayer {
         // Add point to the vertex tree by converting the last game move
         TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
+        // Get the estimated SampleParameters
+        var sampleParameters = gameObserver.calculateSampleSizeParameters();
+
         // Instantiate the strategies
         Strategy[] minimizer = {
-                new MinimizePlaceNextToOpponent(g, gs, tree, width, height),
-                new MinimizePlaceAtBorder(g, gs, tree, width, height),
+                new MinimizePlaceNextToOpponent(g, gs, tree, width, height, sampleParameters),
+                new MinimizePlaceAtBorder(g, gs, tree, width, height, sampleParameters),
         };
 
         // This is our fallback. If our strategy fails, return a random move
-        var randomMove = new RandomMove(g, gs, tree, width, height);
+        var randomMove = new RandomMove(g, gs, tree, width, height, sampleParameters);
         randomMove.executeHeuristic(Optional.ofNullable(lastMove));
 
         // Calculate the game move.

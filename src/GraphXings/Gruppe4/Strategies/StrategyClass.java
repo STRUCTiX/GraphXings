@@ -6,6 +6,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.EdgeHelper;
 import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
@@ -20,17 +21,19 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
     protected final GameState gs;
     protected final int width;
     protected final int height;
+    protected final SampleParameters sampleParameters;
 
     protected Optional<GameMove> gameMove =Optional.empty();
 
     protected long moveQuality;
 
-    public StrategyClass(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height) {
+    public StrategyClass(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
         this.g = g;
         this.tree = tree;
         this.gs = gs;
         this.width = width;
         this.height = height;
+        this.sampleParameters = sampleParameters;
     }
 
     /**

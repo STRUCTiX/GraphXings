@@ -6,6 +6,7 @@ import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Gruppe4.CanvasObservations.ObserveBorders;
 import GraphXings.Gruppe4.CanvasObservations.ObserveOpponentPlacesNeighbours;
+import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.CanvasObservations.SampleSize;
 import GraphXings.Gruppe4.Strategies.StrategyName;
 
@@ -24,6 +25,8 @@ public class GameObserver {
     private long startTime;
     private long totalElapsedTime = 0;
     private long currentGameMoveTime = 0;
+    private SampleParameters sampleParameters = new SampleParameters(SampleSize.Keep, 10, 1);
+
     private final long timeLimit = 300000000000L;
 
     // This is a safety measure so we don't get a timeout
@@ -98,6 +101,10 @@ public class GameObserver {
         return gameMove;
     }
 
+    /**
+     * Retrieve an estimation if the sample size should increase/decrease
+     * @return
+     */
     public SampleSize getSampleSizeAdjustment() {
         long timeDiff = getSingleGameMoveTime() - currentGameMoveTime;
         // If we have more than 10ms to spend then increment sample size
@@ -110,6 +117,48 @@ public class GameObserver {
 
         // We've found a nice sample size
         return SampleSize.Keep;
+    }
+
+    /**
+     * Return a new SampleParameters record for the current round.
+     * This will alter the sample parameters so only use once per round.
+     * If you'd like to get the parameters again, use the get method instead.
+     * @return A new SampleParameters object
+     */
+    public SampleParameters calculateSampleSizeParameters() {
+        var sampleSize = getSampleSizeAdjustment();
+        var samples = sampleParameters.samples();
+        var perimeter = sampleParameters.perimeter();
+
+        switch (sampleSize) {
+            case Increment -> {
+                samples++;
+                perimeter++;
+            }
+            case Decrement -> {
+                samples--;
+                perimeter--;
+            }
+            case Keep -> {
+                // Do nothing
+            }
+        }
+        if (samples <= 0) {
+            samples = 1;
+        }
+        if (perimeter <= 0) {
+            perimeter = 1;
+        }
+        sampleParameters = new SampleParameters(sampleSize, samples, perimeter);
+        return sampleParameters;
+    }
+
+    /**
+     * Get the SampleParameters without triggering recalculation.
+     * @return A SampleParameters record
+     */
+    public SampleParameters getSampleParameters() {
+        return sampleParameters;
     }
 
     /**
