@@ -58,7 +58,7 @@ public class MinimizePlaceNextToOpponent extends StrategyClass {
         if (unplacedVertex.isPresent()) {
             var lastCoord = lastMove.getCoordinate();
 
-            var gameMove = minimizeBounds(usedCoordinates, tree, unplacedVertex.get(), lastCoord, 1, 1);
+            var gameMove = minimizeBounds(usedCoordinates, tree, unplacedVertex.get(), lastCoord, sampleParameters.perimeter(), sampleParameters.perimeter());
             if (gameMove.isPresent()) {
                 this.gameMove = gameMove;
                 moveQuality = computeMoveQuality(gameMove.get().getVertex(), gameMove.get().getCoordinate());
