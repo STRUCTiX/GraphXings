@@ -91,7 +91,8 @@ public class GameObserver {
      * @return Game move runtime
      */
     public long getSingleGameMoveTime() {
-        long gameMove = (timeLimit - timeLimitBuffer) / totalVerticesCount;
+        // We divide our time limit by the amount of vertices we have to place
+        long gameMove = (timeLimit - timeLimitBuffer) / (totalVerticesCount / 2);
 
         // One game move should at least have 5ms time to compute
         // TODO: These are nano seconds...
@@ -107,8 +108,8 @@ public class GameObserver {
      */
     public SampleSize getSampleSizeAdjustment() {
         long timeDiff = getSingleGameMoveTime() - currentGameMoveTime;
-        // If we have more than 10ms to spend then increment sample size
-        if (timeDiff > 10000) {
+        // If we have more than 1s to spend then increment sample size
+        if (timeDiff > 1000000000) {
             return SampleSize.Increment;
         } else if (timeDiff < 0) {
             // If difference is negative we would run too long
