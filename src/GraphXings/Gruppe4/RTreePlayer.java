@@ -98,6 +98,7 @@ public class RTreePlayer implements NewPlayer {
                 new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
                 new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters),
                 new MaximizePointReflection(g, gs, tree, width, height, sampleParameters),
+                new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters),
         };
 
