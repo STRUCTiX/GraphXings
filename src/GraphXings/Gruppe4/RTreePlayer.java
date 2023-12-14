@@ -93,10 +93,11 @@ public class RTreePlayer implements NewPlayer {
         var sampleParameters = gameObserver.calculateSampleSizeParameters();
 
         // Instantiate the strategies
-        Strategy[] minimizer = {
+        Strategy[] maximizer = {
                 new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters),
                 new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
                 new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters),
+                new MaximizePointReflection(g, gs, tree, width, height, sampleParameters),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters),
         };
 
@@ -109,7 +110,7 @@ public class RTreePlayer implements NewPlayer {
         long moveQuality = randomMove.getGameMoveQuality();
         StrategyName usedStrategy = randomMove.getStrategyName();
 
-        for (var strat : minimizer) {
+        for (var strat : maximizer) {
             // Check if we've got the first move and must execute the heuristic
             if (gs.getPlacedVertices().isEmpty()) {
                 strat.executeHeuristic(Optional.ofNullable(lastMove));

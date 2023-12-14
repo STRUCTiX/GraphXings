@@ -14,5 +14,6 @@ public enum StrategyName {
     MinimizeRandomSampleMove,
     MaximizeRandomSampleMove,
     RandomMove,
+    MaximizePointReflection,
     Unknown
 }
