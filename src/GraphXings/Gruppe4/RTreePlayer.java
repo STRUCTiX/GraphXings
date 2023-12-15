@@ -99,6 +99,7 @@ public class RTreePlayer implements NewPlayer {
                 new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters),
                 new MaximizePointReflection(g, gs, tree, width, height, sampleParameters),
                 new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters),
+                new MaximizeGrid(g, gs, tree, width, height, sampleParameters),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters),
         };
 
