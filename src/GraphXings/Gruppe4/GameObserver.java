@@ -4,6 +4,7 @@ import GraphXings.Algorithms.NewPlayer;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
+import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.CanvasObservations.ObserveBorders;
 import GraphXings.Gruppe4.CanvasObservations.ObserveOpponentPlacesNeighbours;
 import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
@@ -13,13 +14,17 @@ import GraphXings.Gruppe4.Strategies.StrategyName;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class GameObserver {
 
     private final int totalVerticesCount;
     private int currentVerticesCount = 0;
     private NewPlayer.Role ourRole;
+    private int width;
+    private int height;
     private final HashMap<StrategyName, Integer> strategyNamesCounts;
+    private final ArrayList<StrategyName> strategyNamesList;
     private ArrayList<GameMove> ourMoves;
     private ArrayList<GameMove> opponentMoves;
     private long startTime;
@@ -32,11 +37,14 @@ public class GameObserver {
     // This is a safety measure, so we don't get a timeout
     private final long timeLimitBuffer = 10000000000L; //10s
 
-    public GameObserver(Graph g, NewPlayer.Role ourRole) {
+    public GameObserver(Graph g, NewPlayer.Role ourRole, int width, int height) {
         totalVerticesCount = ((HashSet<Vertex>) g.getVertices()).size();
         strategyNamesCounts = new HashMap<>(StrategyName.values().length);
+        strategyNamesList = new ArrayList<>(totalVerticesCount);
         ourMoves = new ArrayList<>(totalVerticesCount / 2);
         opponentMoves = new ArrayList<>(totalVerticesCount / 2);
+        this.width = width;
+        this.height = height;
 
         this.ourRole = ourRole;
     }
@@ -167,6 +175,7 @@ public class GameObserver {
      * @param strategyName The strategy name which should get incremented
      */
     private void incrementUsedStrategies(StrategyName strategyName) {
+        strategyNamesList.add(strategyName);
         if (strategyNamesCounts.containsKey(strategyName)) {
             // Counter value is already present. Get, increment, put
             var count = strategyNamesCounts.get(strategyName);
@@ -178,14 +187,53 @@ public class GameObserver {
     }
 
     /**
+     * Print all stats
+     */
+    public void report() {
+        System.out.println("Used strategies counter:");
+        System.out.println(reportUsedStrategiesCount());
+
+        System.out.println("Used strategies steps:");
+        System.out.println(reportUsedStrategiesSteps());
+    }
+
+    /**
+     * Report all strategies and their counters.
+     * @return The report string
+     */
+    public String reportUsedStrategiesCount() {
+        StringBuilder output = new StringBuilder();
+
+        // Use a string builder for better performance
+        for (Map.Entry<StrategyName, Integer> entry : strategyNamesCounts.entrySet()) {
+            output.append(entry.getKey().name()).append(",").append(entry.getValue());
+        }
+
+        return output.toString();
+    }
+
+    public String reportUsedStrategiesSteps() {
+        StringBuilder output = new StringBuilder();
+
+        // Use a string builder for better performance
+        int num = 0;
+        for (var item : strategyNamesList) {
+            output.append(num).append(",").append(item.name());
+            num++;
+        }
+
+        return output.toString();
+    }
+
+    /**
      * This routine runs all CanvasObservations and calculates the best
      * strategy for our next move.
      * @return A counter-attack strategy
      */
-    public StrategyName observationRunner(Graph g, GameMove lastMove) {
+    public StrategyName observationRunner(Graph g, GameState gs, GameMove lastMove) {
         // Define all available observers
         CanvasObservation[] observers = {
-                new ObserveBorders(),
+                new ObserveBorders(g, ourMoves, opponentMoves, ourRole, gs, width, height),
                 new ObserveOpponentPlacesNeighbours(g, ourMoves, opponentMoves, ourRole)
         };
 

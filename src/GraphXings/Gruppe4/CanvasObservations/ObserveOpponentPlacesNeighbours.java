@@ -8,6 +8,11 @@ import GraphXings.Gruppe4.Strategies.StrategyName;
 
 import java.util.List;
 
+/**
+ * This observation returns 100 if the opponent places a vertex which is connected
+ * by an edge of our last placed vertex.
+ * This metric doesn't take the position on the canvas into account.
+ */
 public class ObserveOpponentPlacesNeighbours implements CanvasObservation {
 
     private final Graph g;

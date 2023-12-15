@@ -263,7 +263,7 @@ public class RTreePlayer implements NewPlayer {
         this.height = height;
         gs = new GameState(g, width, height);
 
-        this.gameObserver = new GameObserver(g, role);
+        this.gameObserver = new GameObserver(g, role, width, height);
 
         if (enableExport) {
             try {
@@ -305,6 +305,14 @@ public class RTreePlayer implements NewPlayer {
 
         //additionally add all crossings that will be created by the free neighbour edges
         return current_move_quality;
+    }
+
+    /**
+     * Get the GameObserver instance
+     * @return GameObserver instance
+     */
+    public GameObserver getGameObserver() {
+        return gameObserver;
     }
 
 }
