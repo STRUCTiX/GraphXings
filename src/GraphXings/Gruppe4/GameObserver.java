@@ -27,6 +27,7 @@ public class GameObserver {
     private final ArrayList<StrategyName> strategyNamesList;
     private ArrayList<GameMove> ourMoves;
     private ArrayList<GameMove> opponentMoves;
+    private NewPlayer.Role[][] usedCoordinatesRoles;
     private long startTime;
     private long totalElapsedTime = 0;
     private long currentGameMoveTime = 0;
@@ -46,11 +47,17 @@ public class GameObserver {
         this.width = width;
         this.height = height;
 
+        usedCoordinatesRoles = new NewPlayer.Role[width][height];
+
         this.ourRole = ourRole;
     }
 
     public void addOwnGameMove(GameMove move, StrategyName strategyName) {
         currentVerticesCount += 1;
+
+        // Update the roles data structure
+        var coordinate = move.getCoordinate();
+        usedCoordinatesRoles[coordinate.getX()][coordinate.getY()] = ourRole;
 
         incrementUsedStrategies(strategyName);
         ourMoves.add(move);
@@ -58,6 +65,10 @@ public class GameObserver {
 
     public void addOpponentGameMove(GameMove move) {
         currentVerticesCount += 1;
+
+        // Update the roles data structure
+        var coordinate = move.getCoordinate();
+        usedCoordinatesRoles[coordinate.getX()][coordinate.getY()] = (ourRole == NewPlayer.Role.MAX) ? NewPlayer.Role.MIN : NewPlayer.Role.MAX;
 
         opponentMoves.add(move);
     }
@@ -233,7 +244,7 @@ public class GameObserver {
     public StrategyName observationRunner(Graph g, GameState gs, GameMove lastMove) {
         // Define all available observers
         CanvasObservation[] observers = {
-                new ObserveBorders(g, ourMoves, opponentMoves, ourRole, gs, width, height),
+                new ObserveBorders(g, ourMoves, opponentMoves, ourRole, gs, usedCoordinatesRoles, width, height),
                 new ObserveOpponentPlacesNeighbours(g, ourMoves, opponentMoves, ourRole)
         };
 
