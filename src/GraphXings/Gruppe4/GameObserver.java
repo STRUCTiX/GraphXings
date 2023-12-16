@@ -5,10 +5,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
-import GraphXings.Gruppe4.CanvasObservations.ObserveBorders;
-import GraphXings.Gruppe4.CanvasObservations.ObserveOpponentPlacesNeighbours;
-import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
-import GraphXings.Gruppe4.CanvasObservations.SampleSize;
+import GraphXings.Gruppe4.CanvasObservations.*;
 import GraphXings.Gruppe4.Strategies.StrategyName;
 
 import java.util.ArrayList;
@@ -245,7 +242,8 @@ public class GameObserver {
         // Define all available observers
         CanvasObservation[] observers = {
                 new ObserveBorders(g, ourMoves, opponentMoves, ourRole, gs, usedCoordinatesRoles, width, height),
-                new ObserveOpponentPlacesNeighbours(g, ourMoves, opponentMoves, ourRole)
+                new ObserveOpponentPlacesNeighbours(g, ourMoves, opponentMoves, ourRole),
+                new ObserveOpponentPlacesNextToUs(g, ourMoves, opponentMoves, ourRole)
         };
 
         // Choose the observation with the best score (max. = 100)
