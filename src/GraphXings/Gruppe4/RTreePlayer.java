@@ -100,6 +100,19 @@ public class RTreePlayer implements NewPlayer {
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters),
         };
 
+        var threads = new ArrayList<Thread>(4);
+        for (var strat : minimizer) {
+
+            threads.add(Thread.ofVirtual().start(() -> {
+                // Check if we've got the first move and must execute the heuristic
+                if (gs.getPlacedVertices().isEmpty()) {
+                    strat.executeHeuristic(Optional.ofNullable(lastMove));
+                } else {
+                    strat.executeStrategy(lastMove);
+                }
+            }));
+        }
+
         // This is our fallback. If our strategy fails, return a random move
         var randomMove = new RandomMove(g, gs, tree, width, height, sampleParameters);
         randomMove.executeHeuristic(Optional.ofNullable(lastMove));
@@ -109,14 +122,17 @@ public class RTreePlayer implements NewPlayer {
         long moveQuality = randomMove.getGameMoveQuality();
         StrategyName usedStrategy = randomMove.getStrategyName();
 
-        for (var strat : minimizer) {
-            // Check if we've got the first move and must execute the heuristic
-            if (gs.getPlacedVertices().isEmpty()) {
-                strat.executeHeuristic(Optional.ofNullable(lastMove));
-            } else {
-                strat.executeStrategy(lastMove);
-            }
 
+        // Wait for the threads to finish
+        for (var t : threads) {
+            try {
+                t.join(gameObserver.getSingleGameMoveTime());
+            } catch (InterruptedException e) {
+                // TODO Notify the game observer
+            }
+        }
+
+        for (var strat : minimizer) {
             // Check the quality
             var currentMove = strat.getGameMove();
             var currentQuality = strat.getGameMoveQuality();
@@ -126,7 +142,6 @@ public class RTreePlayer implements NewPlayer {
                 move = currentMove;
                 usedStrategy = strat.getStrategyName();
             }
-
         }
 
 
@@ -186,6 +201,18 @@ public class RTreePlayer implements NewPlayer {
                 new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters),
         };
 
+        var threads = new ArrayList<Thread>(4);
+        for (var strat : minimizer) {
+            threads.add(Thread.ofVirtual().start(() -> {
+                // Check if we've got the first move and must execute the heuristic
+                if (gs.getPlacedVertices().isEmpty()) {
+                    strat.executeHeuristic(Optional.ofNullable(lastMove));
+                } else {
+                    strat.executeStrategy(lastMove);
+                }
+            }));
+        }
+
         // This is our fallback. If our strategy fails, return a random move
         var randomMove = new RandomMove(g, gs, tree, width, height, sampleParameters);
         randomMove.executeHeuristic(Optional.ofNullable(lastMove));
@@ -194,14 +221,17 @@ public class RTreePlayer implements NewPlayer {
         Optional<GameMove> move = randomMove.getGameMove();
         long moveQuality = randomMove.getGameMoveQuality();
 
-        for (var strat : minimizer) {
-            // Check if we've got the first move and must execute the heuristic
-            if (gs.getPlacedVertices().isEmpty()) {
-                strat.executeHeuristic(Optional.ofNullable(lastMove));
-            } else {
-                strat.executeStrategy(lastMove);
+        // Join the threads
+        for (var t : threads) {
+            try {
+                t.join(gameObserver.getSingleGameMoveTime());
+            } catch (InterruptedException e) {
+                // TODO Notify the game observer
             }
+        }
 
+        // Calculate best move
+        for (var strat : minimizer) {
             // Check the quality
             var currentMove = strat.getGameMove();
             var currentQuality = strat.getGameMoveQuality();
