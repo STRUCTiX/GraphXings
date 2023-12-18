@@ -203,6 +203,9 @@ public class GameObserver {
 
         System.out.println("Used strategies steps:");
         System.out.println(reportUsedStrategiesSteps());
+
+        System.out.println("Total elapsed time:" + totalElapsedTime);
+        System.out.println("Last game move time: " + currentGameMoveTime);
     }
 
     /**
@@ -214,7 +217,7 @@ public class GameObserver {
 
         // Use a string builder for better performance
         for (Map.Entry<StrategyName, Integer> entry : strategyNamesCounts.entrySet()) {
-            output.append(entry.getKey().name()).append(",").append(entry.getValue());
+            output.append(entry.getKey().name()).append(",").append(entry.getValue()).append("\n");
         }
 
         return output.toString();
@@ -226,7 +229,7 @@ public class GameObserver {
         // Use a string builder for better performance
         int num = 0;
         for (var item : strategyNamesList) {
-            output.append(num).append(",").append(item.name());
+            output.append(num).append(",").append(item.name()).append("\n");
             num++;
         }
 

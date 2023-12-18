@@ -3,6 +3,7 @@ package GraphXings.Game;
 import GraphXings.Algorithms.CrossingCalculator;
 import GraphXings.Algorithms.NewPlayer;
 import GraphXings.Data.Graph;
+import GraphXings.Gruppe4.RTreePlayer;
 import GraphXings.Legacy.Game.InvalidMoveException;
 
 import java.util.Random;
@@ -209,6 +210,15 @@ public class NewGame
 			turn++;
 		}
 		CrossingCalculator cc = new CrossingCalculator(g,gs.getVertexCoordinates());
+
+		// Enable/disable GameObserver report
+		if (false) {
+			if (player1 instanceof RTreePlayer) {
+				((RTreePlayer) player1).getGameObserver().report();
+			} else {
+				((RTreePlayer) player2).getGameObserver().report();
+			}
+		}
 		return  cc.computeCrossingNumber();
 	}
 }
