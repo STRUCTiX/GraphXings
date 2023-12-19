@@ -26,7 +26,8 @@ public class GraphXings
     public static void main (String[] args)
     {
         ArrayList<NewPlayer> players = new ArrayList<>();
-        players.add(new RTreePlayer("RTreePlayer"));
+        RTreePlayer rTreePlayer = new RTreePlayer("RTreePlayer");
+        players.add(rTreePlayer);
         players.add(new NewRandomPlayer("RandomPlayer"));
         //players.add(new RTreePlayer("RTreePlayer2"));
 
@@ -81,7 +82,7 @@ public class GraphXings
         NewLeague l = new NewLeague(players,100,timeLimit,factory);
         NewLeagueResult lr = l.runLeague();
         System.out.println(lr.announceResults());
-
+        rTreePlayer.getGuiExport().close();
 
     }
 }

@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import sys
 
 # Data structure of parsed data
 class GraphData:
@@ -18,16 +19,15 @@ class GraphData:
                 parsemode += 1
                 continue # Skip the current line
             if parsemode == 0:
-                if cleanline.startswith("M"):
-                    self.playerrole = cleanline
-                else:
-                    self.playername = cleanline
+                self.playername = cleanline
             elif parsemode == 1:
-                self.vertices.append(cleanline)
+                self.playerrole = cleanline
             elif parsemode == 2:
+                self.vertices.append(cleanline)
+            elif parsemode == 3:
                 sp = cleanline.split(",")
                 self.edges.append((sp[0], sp[1]))
-            elif parsemode == 3:
+            elif parsemode == 4:
                 # We have the following format for game moves:
                 # role, vertex, x, y, player strategy
                 sp = cleanline.split(",")
@@ -35,10 +35,10 @@ class GraphData:
 
     # Returns a dictionary of vertices and their positions
     def getVerticesPosition(self):
-        pos = {}
+        positions = {}
         for g in self.gamemoves:
-            pos[g[1]] = (int(g[2]), int(g[3]))
-        return pos
+            positions[g[1]] = [int(g[2]), int(g[3])]
+        return positions
     
     # Read the file and parse the content
     def readFile(self, filename):
@@ -66,7 +66,8 @@ def draw_graph(graphData: GraphData):
     G = nx.Graph()
     
     # Add nodes
-    G.add_nodes_from(graphData.getVerticesPosition())
+    node_positions = graphData.getVerticesPosition()
+    G.add_nodes_from(node_positions)
     
     # Add edges
     G.add_edges_from(graphData.edges)
@@ -78,14 +79,18 @@ def draw_graph(graphData: GraphData):
     plt.grid(True)
 
     # Draw the graph with assigned colors
-    nx.draw_networkx(G, with_labels=False, node_color="blue", node_size=200, font_weight='medium')
-    #nx.draw(G, with_labels=False, node_color="blue", node_size=200, font_weight='medium')
-    
+    nx.draw_networkx(G, pos=node_positions, with_labels=True, node_color="blue", node_size=200, font_weight='medium')
+
     # Display the graph
     plt.show()
 
 
 # Main call
-gd = GraphData()
-gd.readFile("test.txt")
-draw_graph(gd)
+if len(sys.argv) > 1:
+    # Access the command-line arguments using sys.argv
+    filepath = sys.argv[1]
+    gd = GraphData()
+    gd.readFile(filepath)
+    draw_graph(gd)
+else:
+    print("No file-path provided.")

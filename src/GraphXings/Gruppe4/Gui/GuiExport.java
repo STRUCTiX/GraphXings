@@ -5,6 +5,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Game.GameMove;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -32,10 +33,15 @@ public class GuiExport {
 
 
     public GuiExport() throws IOException {
+        final String directoryPath = "./logs/";
         // Get the current time after the Unix epoch.
         // This ensures that filenames are unique
         long currentTime = System.currentTimeMillis();
-        file = new FileWriter("./logs/" + currentTime + ".txt");
+
+        File directory = new File(directoryPath);
+        directory.mkdirs();
+
+        file = new FileWriter(directoryPath + currentTime + ".txt");
         buffer = new BufferedWriter(file);
     }
 
@@ -48,6 +54,7 @@ public class GuiExport {
 
         // Write metadata
         buffer.write(playerName + "\n");
+        buffer.write("\\\n");
         buffer.write(role.name() + "\n");
         // Write a delimiter
         buffer.write("\\\n");
@@ -86,5 +93,14 @@ public class GuiExport {
 
     public void exportVertexPlacement(GameMove move, NewPlayer.Role role) throws IOException {
         exportVertexPlacement(move, role, "Unknown");
+    }
+
+    public void close() {
+        try {
+            buffer.flush();
+            buffer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -47,6 +47,10 @@ public class RTreePlayer implements NewPlayer {
 
     private Graph g;
 
+    public GuiExport getGuiExport() {
+        return guiExport;
+    }
+
     private GuiExport guiExport;
 
     private GameObserver gameObserver;
@@ -299,6 +303,9 @@ public class RTreePlayer implements NewPlayer {
 
         if (enableExport) {
             try {
+                if (guiExport != null) {
+                    guiExport.close();
+                }
                 guiExport = new GuiExport();
 
                 // Export the initial graph
