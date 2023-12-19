@@ -82,6 +82,7 @@ def render_gamemove_images(graph_data: GraphData, filename_prefix):
     node_colors = []
     nodes_visible = []
     edges_visible = set()
+    edges_invisible = graph_data.edges
 
     game_moves = graph_data.get_game_moves()
     for game_move, (role, vertex, x, y, player_strategy) in enumerate(game_moves):
@@ -96,9 +97,11 @@ def render_gamemove_images(graph_data: GraphData, filename_prefix):
         nodes_visible.append(vertex)
         node_colors.append(get_color_for_role(role))
 
-        for (v1, v2) in G.edges():
+        for edge in edges_invisible:
+            (v1, v2) = edge
             if (vertex == v1 or vertex == v2) and v1 in nodes_visible and v2 in nodes_visible:
-                edges_visible.add((v1, v2))
+                edges_invisible.remove(edge)
+                edges_visible.add(edge)
 
         plt.figure()
 
