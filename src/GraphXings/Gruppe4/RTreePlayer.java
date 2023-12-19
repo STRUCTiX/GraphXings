@@ -47,12 +47,16 @@ public class RTreePlayer implements NewPlayer {
 
     private Graph g;
 
+    public GuiExport getGuiExport() {
+        return guiExport;
+    }
+
     private GuiExport guiExport;
 
     private GameObserver gameObserver;
 
     // Set to true if you'd like to export data
-    private boolean enableExport = false;
+    private boolean enableExport = true;
 
     /**
      * Creates a random player with the assigned name.
@@ -296,6 +300,9 @@ public class RTreePlayer implements NewPlayer {
 
         if (enableExport) {
             try {
+                if (guiExport != null) {
+                    guiExport.close();
+                }
                 guiExport = new GuiExport();
 
                 // Export the initial graph
