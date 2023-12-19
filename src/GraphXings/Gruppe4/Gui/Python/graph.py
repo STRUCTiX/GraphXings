@@ -40,6 +40,13 @@ class GraphData:
             positions[g[1]] = [int(g[2]), int(g[3])]
         return positions
     
+    def getVerticesColor(self):
+        colors = []
+        for g in self.gamemoves:
+            color = (1,0,0,0.1) if g[0] == "MAX" else (0,0,1,0.1)
+            colors.append(color)
+        return colors
+    
     # Read the file and parse the content
     def readFile(self, filename):
         f = open(filename, "r")
@@ -66,6 +73,7 @@ def draw_graph(graphData: GraphData):
     G = nx.Graph()
     
     # Add nodes
+    node_colors = graphData.getVerticesColor()
     node_positions = graphData.getVerticesPosition()
     G.add_nodes_from(node_positions)
     
@@ -79,7 +87,7 @@ def draw_graph(graphData: GraphData):
     plt.grid(True)
 
     # Draw the graph with assigned colors
-    nx.draw_networkx(G, pos=node_positions, with_labels=True, node_color="blue", node_size=200, font_weight='medium')
+    nx.draw_networkx(G, pos=node_positions, with_labels=True, node_color=node_colors, node_size=200, font_weight='medium')
 
     # Display the graph
     plt.show()
