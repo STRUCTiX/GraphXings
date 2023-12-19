@@ -25,25 +25,28 @@ class GraphData:
             elif parsemode == 2:
                 self.vertices.append(cleanline)
             elif parsemode == 3:
-                sp = cleanline.split(",")
-                self.edges.append((sp[0], sp[1]))
+                v1, v2 = cleanline.split(",")
+                self.edges.append((v1, v2))
             elif parsemode == 4:
                 # We have the following format for game moves:
                 # role, vertex, x, y, player strategy
-                sp = cleanline.split(",")
-                self.gamemoves.append((sp[0], sp[1], sp[2], sp[3], sp[4]))
+                role, vertex, x, y, player_strategy = cleanline.split(",")
+                self.gamemoves.append((role, vertex, x, y, player_strategy))
+
+    def getGameMoves(self):
+        return self.gamemoves
 
     # Returns a dictionary of vertices and their positions
     def getVerticesPosition(self):
         positions = {}
-        for g in self.gamemoves:
-            positions[g[1]] = [int(g[2]), int(g[3])]
+        for _, vertex, x, y, _ in self.gamemoves:
+            positions[vertex] = [int(x), int(y)]
         return positions
     
     def getVerticesColor(self):
         colors = []
-        for g in self.gamemoves:
-            color = (1,0,0,0.1) if g[0] == "MAX" else (0,0,1,0.1)
+        for role, _, _, _, _ in self.gamemoves:
+            color = getColorForRole(role)
             colors.append(color)
         return colors
     
@@ -66,9 +69,11 @@ class GraphData:
         print("Game Moves: ")
         print(self.gamemoves)
 
+def getColorForRole(role):
+    return (1,0,0,0.1) if role == "MAX" else (0,0,1,0.1)
 
 # Draw the graph
-def draw_graph(graphData: GraphData):
+def show_graph_window(graphData: GraphData):
     # Create an empty graph
     G = nx.Graph()
     
@@ -99,6 +104,6 @@ if len(sys.argv) > 1:
     filepath = sys.argv[1]
     gd = GraphData()
     gd.readFile(filepath)
-    draw_graph(gd)
+    show_graph_window(gd)
 else:
     print("No file-path provided.")
