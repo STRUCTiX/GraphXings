@@ -6,7 +6,9 @@ import GraphXings.Data.Coordinate;
 import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
+import GraphXings.Game.GameInstance.MultiGameInstanceFactory;
 import GraphXings.Game.GameInstance.PlanarExampleInstanceFactory;
+import GraphXings.Game.GameInstance.PlanarGameInstanceFactory;
 import GraphXings.Game.GameInstance.RandomCycleFactory;
 import GraphXings.Game.League.NewLeague;
 import GraphXings.Game.League.NewLeagueResult;
@@ -73,7 +75,8 @@ public class GraphXings
 
         //TODO: add players here
         //RandomCycleFactory factory = new RandomCycleFactory(24091869, true);
-        PlanarExampleInstanceFactory factory = new PlanarExampleInstanceFactory();
+        //PlanarExampleInstanceFactory factory = new PlanarExampleInstanceFactory();
+        PlanarGameInstanceFactory factory = new PlanarGameInstanceFactory(1337);
         long timeLimit = 300000000000l;
         NewLeague l = new NewLeague(players,100,timeLimit,factory);
         NewLeagueResult lr = l.runLeague();
