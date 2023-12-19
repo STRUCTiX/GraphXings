@@ -95,34 +95,6 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
         return StrategyName.Unknown;
     }
 
-    /**
-     * choose the coordinate with the highest Intersection for a given vertex
-     * and builds a new game move
-     * @param unplacedVertex
-     * @param samples set of vertices to choose from
-     * @return game move if present
-     */
-    public Optional<GameMove> chooseHighestIntersection(Vertex unplacedVertex, List<Coordinate> samples) {
-        Coordinate bestCoord = null;
-        long maxCrossings = 0;
-        for (var sampleCoord : samples) {
-
-            long numCrossings = computeMoveQuality(unplacedVertex, sampleCoord);
-            if (numCrossings > maxCrossings) {
-                maxCrossings = numCrossings;
-                bestCoord = sampleCoord;
-            }
-        }
-
-        if (maxCrossings <= 0) {
-            moveQuality = 0;
-            return Optional.empty();
-        }
-
-        // Use the best coordinate
-        moveQuality = maxCrossings;
-        return Optional.of(new GameMove(unplacedVertex, bestCoord));
-    }
 
     /**
      * Computes the Vertex and Coordinate with the lowest Intersection
