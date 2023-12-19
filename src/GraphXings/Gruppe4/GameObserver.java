@@ -109,11 +109,18 @@ public class GameObserver {
     public long getSingleGameMoveTime() {
         // We divide our time limit by the amount of vertices we have to place
         long gameMove = (timeLimit - timeLimitBuffer) / (totalVerticesCount / 2);
+        //long remainingVertices = (totalVerticesCount / 2 - ourMoves.size());
+
+        //// Prevent division by zero
+        //if (remainingVertices == 0) {
+        //    remainingVertices = 1;
+        //}
+        //long gameMove = (timeLimit - timeLimitBuffer - getTotalElapsedTime()) / remainingVertices;
 
         // One game move should at least have 5ms time to compute
         // TODO: These are nano seconds...
-        if (gameMove < 5) {
-            return 5;
+        if (gameMove < 500) {
+            return 500;
         }
         return gameMove;
     }
@@ -125,9 +132,9 @@ public class GameObserver {
     public SampleSize getSampleSizeAdjustment() {
         long timeDiff = getSingleGameMoveTime() - currentGameMoveTime;
         // If we have more than 1s to spend then increment sample size
-        if (timeDiff > 1000000000) {
+        if (timeDiff > 2000000000) {
             return SampleSize.Increment;
-        } else if (timeDiff < 0) {
+        } else if (timeDiff < 100000000) { // 100ms
             // If difference is negative we would run too long
             return SampleSize.Decrement;
         }
@@ -206,6 +213,7 @@ public class GameObserver {
 
         System.out.println("Total elapsed time:" + totalElapsedTime);
         System.out.println("Last game move time: " + currentGameMoveTime);
+        System.out.println("Optimal single game move time: " + getSingleGameMoveTime());
     }
 
     /**

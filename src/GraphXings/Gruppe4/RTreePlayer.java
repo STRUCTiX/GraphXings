@@ -175,6 +175,7 @@ public class RTreePlayer implements NewPlayer {
         gameObserver.startTimer();
         if (lastMove != null) {
             gs.applyMove(lastMove);
+            gameObserver.addOpponentGameMove(lastMove);
 
             // Last move must have been a maximize move.
             // Therefore, export the move from opponent.
@@ -222,6 +223,7 @@ public class RTreePlayer implements NewPlayer {
         // Calculate the game move.
         Optional<GameMove> move = randomMove.getGameMove();
         long moveQuality = randomMove.getGameMoveQuality();
+        StrategyName usedStrategy = randomMove.getStrategyName();
 
         // Join the threads
         for (var t : threads) {
@@ -241,18 +243,13 @@ public class RTreePlayer implements NewPlayer {
             if (currentMove.isPresent() && currentQuality < moveQuality) {
                 moveQuality = currentQuality;
                 move = currentMove;
+                usedStrategy = strat.getStrategyName();
             }
 
         }
 
-        if (move.isPresent()) {
-            gs.applyMove(move.get());
-        } else {
-            // This should never happen but just in case, execute another random move
-            var panicMove = new RandomMove(g, gs, tree, width, height, sampleParameters);
-            panicMove.executeHeuristic(Optional.ofNullable(lastMove));
-            gs.applyMove(panicMove.getGameMove().get());
-        }
+        gs.applyMove(move.get());
+        gameObserver.addOwnGameMove(move.get(), usedStrategy);
 
         if (enableExport) {
             try {
