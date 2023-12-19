@@ -78,43 +78,47 @@ def get_color_for_role(role):
 
 def render_gamemove_images(graph_data: GraphData, filename_prefix):
     # Add nodes
-    node_positions = graph_data.get_vertices_position()
+    node_positions_todo = graph_data.get_vertices_position()
+    edges_todo = graph_data.edges
     node_colors = []
-    nodes_visible = []
-    edges_visible = set()
-    edges_invisible = graph_data.edges
+    node_positions = {}
+    nodes = []
+    edges = []
 
     game_moves = graph_data.get_game_moves()
     for game_move, (role, vertex, x, y, player_strategy) in enumerate(game_moves):
+        nodes.append(vertex)
+        node_positions[vertex] = node_positions_todo.pop(vertex)
+        node_colors.append(get_color_for_role(role))
+        for edge in edges_todo[:]:
+            (v1, v2) = edge
+            if (vertex == v1 or vertex == v2) and v1 in nodes and v2 in nodes:
+                edges_todo.remove(edge)
+                edges.append(edge)
+
         # Create an empty graph
         G = nx.Graph()
-
-        G.add_nodes_from(node_positions)
-
+        # Add nodes
+        G.add_nodes_from(nodes)
         # Add edges
-        G.add_edges_from(graph_data.edges)
+        G.add_edges_from(edges)
 
-        nodes_visible.append(vertex)
-        node_colors.append(get_color_for_role(role))
-
-        for edge in edges_invisible:
-            (v1, v2) = edge
-            if (vertex == v1 or vertex == v2) and v1 in nodes_visible and v2 in nodes_visible:
-                edges_invisible.remove(edge)
-                edges_visible.add(edge)
-
+        # Open new plot
         plt.figure()
 
         plt.grid(True)
 
         # Draw the graph with assigned colors
-        nx.draw_networkx(G, nodelist=nodes_visible, edgelist=edges_visible, pos=node_positions, with_labels=True,
-                         node_color=node_colors, node_size=200, font_weight='medium')
+        # nx.draw_networkx(G, nodelist=nodes, edgelist=edges, pos=node_positions_todo, with_labels=True,
+        #                  node_color=node_colors, node_size=200, font_weight='medium')
+        nx.draw_networkx(G, pos=node_positions, with_labels=True, node_color=node_colors, node_size=200,
+                         font_weight='medium')
 
         filepath = filename_prefix + f"_{game_move:010d}.png"
 
         # Display the graph
         plt.savefig(filepath, format="PNG")
+        plt.close()
 
 
 # Draw the graph
