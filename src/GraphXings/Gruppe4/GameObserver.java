@@ -33,7 +33,7 @@ public class GameObserver {
     private final long timeLimit = 300000000000L;
 
     // This is a safety measure, so we don't get a timeout
-    private final long timeLimitBuffer = 20000000000L; // 20s
+    private final long timeLimitBuffer = 50000000000L; // 50s
 
     public GameObserver(Graph g, NewPlayer.Role ourRole, int width, int height) {
         totalVerticesCount = ((HashSet<Vertex>) g.getVertices()).size();
