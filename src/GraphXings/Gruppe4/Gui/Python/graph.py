@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import sys
+import os
 
 # Data structure of parsed data
 class GraphData:
@@ -72,6 +73,43 @@ class GraphData:
 def getColorForRole(role):
     return (1,0,0,0.1) if role == "MAX" else (0,0,1,0.1)
 
+def render_gamemove_images(graphData: GraphData, filename_prefix):
+
+    # Add nodes
+    node_positions = graphData.getVerticesPosition()
+    node_colors = []
+    nodes_visible = []
+    edges_visible = set()
+
+    game_moves = graphData.getGameMoves()
+    for game_move, (role, vertex, x, y, player_strategy) in enumerate(game_moves):
+        # Create an empty graph
+        G = nx.Graph()
+
+        G.add_nodes_from(node_positions)
+
+        # Add edges
+        G.add_edges_from(graphData.edges)
+
+        nodes_visible.append(vertex)
+        node_colors.append(getColorForRole(role))
+
+        for (v1, v2) in G.edges():
+            if (vertex == v1 or vertex == v2) and v1 in nodes_visible and v2 in nodes_visible:
+                edges_visible.add((v1, v2))
+
+        plt.figure()
+
+        plt.grid(True)
+
+        # Draw the graph with assigned colors
+        nx.draw_networkx(G, nodelist=nodes_visible, edgelist=edges_visible, pos=node_positions, with_labels=True, node_color=node_colors, node_size=200, font_weight='medium')
+
+        filepath = filename_prefix + f"_{game_move:010d}.png"
+
+        # Display the graph
+        plt.savefig(filepath, format="PNG")
+
 # Draw the graph
 def show_graph_window(graphData: GraphData):
     # Create an empty graph
@@ -104,6 +142,12 @@ if len(sys.argv) > 1:
     filepath = sys.argv[1]
     gd = GraphData()
     gd.readFile(filepath)
-    show_graph_window(gd)
+
+    directory = os.path.dirname(filepath)
+    basename = os.path.basename(filepath)
+    filename, file_extension = os.path.splitext(basename)
+    render_gamemove_images(gd, os.path.join(directory,filename))
+
+    # show_graph_window(gd)
 else:
     print("No file-path provided.")
