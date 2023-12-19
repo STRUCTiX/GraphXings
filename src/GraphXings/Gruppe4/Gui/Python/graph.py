@@ -3,85 +3,87 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
+
 # Data structure of parsed data
 class GraphData:
-    playername = ""
-    playerrole = ""
+    player_name = ""
+    player_role = ""
     vertices = []
     edges = []
-    gamemoves = []
+    game_moves = []
 
     # Parse the content of the file into the data structure
-    def parseLines(self, lines):
-        parsemode = 0
+    def parse_lines(self, lines):
+        parse_mode = 0
         for line in lines:
-            cleanline = line.strip()
-            if cleanline == '\\':
-                parsemode += 1
-                continue # Skip the current line
-            if parsemode == 0:
-                self.playername = cleanline
-            elif parsemode == 1:
-                self.playerrole = cleanline
-            elif parsemode == 2:
-                self.vertices.append(cleanline)
-            elif parsemode == 3:
-                v1, v2 = cleanline.split(",")
+            clean_line = line.strip()
+            if clean_line == '\\':
+                parse_mode += 1
+                continue  # Skip the current line
+            if parse_mode == 0:
+                self.player_name = clean_line
+            elif parse_mode == 1:
+                self.player_role = clean_line
+            elif parse_mode == 2:
+                self.vertices.append(clean_line)
+            elif parse_mode == 3:
+                v1, v2 = clean_line.split(",")
                 self.edges.append((v1, v2))
-            elif parsemode == 4:
+            elif parse_mode == 4:
                 # We have the following format for game moves:
                 # role, vertex, x, y, player strategy
-                role, vertex, x, y, player_strategy = cleanline.split(",")
-                self.gamemoves.append((role, vertex, x, y, player_strategy))
+                role, vertex, x, y, player_strategy = clean_line.split(",")
+                self.game_moves.append((role, vertex, x, y, player_strategy))
 
-    def getGameMoves(self):
-        return self.gamemoves
+    def get_game_moves(self):
+        return self.game_moves
 
     # Returns a dictionary of vertices and their positions
-    def getVerticesPosition(self):
+    def get_vertices_position(self):
         positions = {}
-        for _, vertex, x, y, _ in self.gamemoves:
+        for _, vertex, x, y, _ in self.game_moves:
             positions[vertex] = [int(x), int(y)]
         return positions
-    
-    def getVerticesColor(self):
+
+    def get_vertices_color(self):
         colors = []
-        for role, _, _, _, _ in self.gamemoves:
-            color = getColorForRole(role)
+        for role, _, _, _, _ in self.game_moves:
+            color = get_color_for_role(role)
             colors.append(color)
         return colors
-    
+
     # Read the file and parse the content
-    def readFile(self, filename):
+    def read_file(self, filename):
         f = open(filename, "r")
         lines = f.readlines()
-        self.parseLines(lines)
-        #self.printData()
+        self.parse_lines(lines)
+        # self.printData()
         f.close()
 
     # Print the data structure for debugging
-    def printData(self):
-        print("Player Name: " + self.playername)
-        print("Player Role: " + self.playerrole)
+    def print_data(self):
+        print("Player Name: " + self.player_name)
+        print("Player Role: " + self.player_role)
         print("Vertices: ")
         print(self.vertices)
         print("Edges: ")
         print(self.edges)
         print("Game Moves: ")
-        print(self.gamemoves)
+        print(self.game_moves)
 
-def getColorForRole(role):
-    return (1,0,0,0.1) if role == "MAX" else (0,0,1,0.1)
 
-def render_gamemove_images(graphData: GraphData, filename_prefix):
+def get_color_for_role(role):
+    return (1, 0, 0, 0.1) if role == "MAX" else (0, 0, 1, 0.1)
 
+
+def render_gamemove_images(graph_data: GraphData, filename_prefix):
     # Add nodes
-    node_positions = graphData.getVerticesPosition()
+    node_positions = graph_data.get_vertices_position()
     node_colors = []
     nodes_visible = []
     edges_visible = set()
 
-    game_moves = graphData.getGameMoves()
+    game_moves = graph_data.get_game_moves()
     for game_move, (role, vertex, x, y, player_strategy) in enumerate(game_moves):
         # Create an empty graph
         G = nx.Graph()
@@ -89,10 +91,10 @@ def render_gamemove_images(graphData: GraphData, filename_prefix):
         G.add_nodes_from(node_positions)
 
         # Add edges
-        G.add_edges_from(graphData.edges)
+        G.add_edges_from(graph_data.edges)
 
         nodes_visible.append(vertex)
-        node_colors.append(getColorForRole(role))
+        node_colors.append(get_color_for_role(role))
 
         for (v1, v2) in G.edges():
             if (vertex == v1 or vertex == v2) and v1 in nodes_visible and v2 in nodes_visible:
@@ -103,51 +105,58 @@ def render_gamemove_images(graphData: GraphData, filename_prefix):
         plt.grid(True)
 
         # Draw the graph with assigned colors
-        nx.draw_networkx(G, nodelist=nodes_visible, edgelist=edges_visible, pos=node_positions, with_labels=True, node_color=node_colors, node_size=200, font_weight='medium')
+        nx.draw_networkx(G, nodelist=nodes_visible, edgelist=edges_visible, pos=node_positions, with_labels=True,
+                         node_color=node_colors, node_size=200, font_weight='medium')
 
         filepath = filename_prefix + f"_{game_move:010d}.png"
 
         # Display the graph
         plt.savefig(filepath, format="PNG")
 
+
 # Draw the graph
-def show_graph_window(graphData: GraphData):
+def show_graph_window(graph_data: GraphData):
     # Create an empty graph
     G = nx.Graph()
-    
+
     # Add nodes
-    node_colors = graphData.getVerticesColor()
-    node_positions = graphData.getVerticesPosition()
+    node_colors = graph_data.get_vertices_color()
+    node_positions = graph_data.get_vertices_position()
     G.add_nodes_from(node_positions)
-    
+
     # Add edges
-    G.add_edges_from(graphData.edges)
-    
+    G.add_edges_from(graph_data.edges)
+
     # Assign colors to nodes based on even/odd
-    #node_colors = ['blue' if node % 2 == 0 else 'green' for node in G.nodes()]
-    #plt.figure("Game Graph", figsize=(1000, 1000), dpi=1)
+    # node_colors = ['blue' if node % 2 == 0 else 'green' for node in G.nodes()]
+    # plt.figure("Game Graph", figsize=(1000, 1000), dpi=1)
 
     plt.grid(True)
 
     # Draw the graph with assigned colors
-    nx.draw_networkx(G, pos=node_positions, with_labels=True, node_color=node_colors, node_size=200, font_weight='medium')
+    nx.draw_networkx(G, pos=node_positions, with_labels=True, node_color=node_colors, node_size=200,
+                     font_weight='medium')
 
     # Display the graph
     plt.show()
 
 
 # Main call
-if len(sys.argv) > 1:
-    # Access the command-line arguments using sys.argv
-    filepath = sys.argv[1]
-    gd = GraphData()
-    gd.readFile(filepath)
+def main(argv):
+    if len(argv) > 1:
+        # Access the command-line arguments using sys.argv
+        filepath = argv[1]
+        gd = GraphData()
+        gd.read_file(filepath)
 
-    directory = os.path.dirname(filepath)
-    basename = os.path.basename(filepath)
-    filename, file_extension = os.path.splitext(basename)
-    render_gamemove_images(gd, os.path.join(directory,filename))
+        directory = os.path.dirname(filepath)
+        basename = os.path.basename(filepath)
+        filename, file_extension = os.path.splitext(basename)
+        render_gamemove_images(gd, os.path.join(directory, filename))
 
-    # show_graph_window(gd)
-else:
-    print("No file-path provided.")
+        # show_graph_window(gd)
+    else:
+        print("No file-path provided.")
+
+
+main(sys.argv)
