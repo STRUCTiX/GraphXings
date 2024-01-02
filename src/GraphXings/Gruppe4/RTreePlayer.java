@@ -313,6 +313,16 @@ public class RTreePlayer implements NewPlayer {
         }
     }
 
+    public GameMove maximizeCrossingAngles(GameMove lastMove) {
+        // TODO
+        return maximizeCrossings(lastMove);
+    }
+
+    public GameMove minimizeCrossingAngles(GameMove lastMove) {
+        // TODO
+        return minimizeCrossings(lastMove);
+    }
+
     @Override
     public String getName()
     {
