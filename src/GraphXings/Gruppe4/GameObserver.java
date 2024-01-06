@@ -108,14 +108,14 @@ public class GameObserver {
      */
     public long getSingleGameMoveTime() {
         // We divide our time limit by the amount of vertices we have to place
-        long gameMove = (timeLimit - timeLimitBuffer) / (totalVerticesCount / 2);
-        //long remainingVertices = (totalVerticesCount / 2 - ourMoves.size());
+        //long gameMove = (timeLimit - timeLimitBuffer) / (totalVerticesCount / 2);
+        long remainingVertices = (totalVerticesCount / 2 - ourMoves.size());
 
-        //// Prevent division by zero
-        //if (remainingVertices == 0) {
-        //    remainingVertices = 1;
-        //}
-        //long gameMove = (timeLimit - timeLimitBuffer - getTotalElapsedTime()) / remainingVertices;
+        // Prevent division by zero
+        if (remainingVertices == 0) {
+            remainingVertices = 1;
+        }
+        long gameMove = (timeLimit - timeLimitBuffer - getTotalElapsedTime()) / remainingVertices;
 
         // One game move should at least have 5ms time to compute
         // TODO: These are nano seconds...
@@ -123,6 +123,11 @@ public class GameObserver {
             return 500;
         }
         return gameMove;
+    }
+
+    public long getSingleGameMoveTimeThread() {
+
+        return (timeLimit - timeLimitBuffer) / (totalVerticesCount / 2);
     }
 
     /**
@@ -157,11 +162,11 @@ public class GameObserver {
         switch (sampleSize) {
             case Increment -> {
                 samples++;
-                perimeter++;
+                //perimeter++;
             }
             case Decrement -> {
                 samples--;
-                perimeter--;
+                //perimeter--;
             }
             case Keep -> {
                 // Do nothing
@@ -173,6 +178,7 @@ public class GameObserver {
         if (perimeter <= 0) {
             perimeter = 1;
         }
+        samples = 10;
         sampleParameters = new SampleParameters(sampleSize, samples, perimeter);
         return sampleParameters;
     }
