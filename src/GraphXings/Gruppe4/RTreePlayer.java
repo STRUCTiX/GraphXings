@@ -321,7 +321,7 @@ public class RTreePlayer implements NewPlayer {
         var sampleParameters = new SampleParameters(SampleSize.Keep, 10, 1);
         Strategy[] strategies = {
                 //new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters),
-                new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
+                //new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
                 //new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters),
                 //new MaximizePointReflection(g, gs, tree, width, height, sampleParameters),
                 //new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters),
@@ -335,7 +335,7 @@ public class RTreePlayer implements NewPlayer {
         // TODO
         var sampleParameters = new SampleParameters(SampleSize.Keep, 10, 1);
         Strategy[] strategies = {
-                new MinimizePlaceNextToOpponent(g, gs, tree, width, height, sampleParameters),
+                //new MinimizePlaceNextToOpponent(g, gs, tree, width, height, sampleParameters),
                 //new MinimizePlaceAtBorder(g, gs, tree, width, height, sampleParameters),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters),
         };
@@ -344,6 +344,14 @@ public class RTreePlayer implements NewPlayer {
         return calculateCrossingsSequential(lastMove, Role.MIN, strategies);
     }
 
+    /**
+     * This calculates the crossings based on the input role parallelized.
+     *
+     * @param lastMove Last GameMove
+     * @param role Minimize or Maximize
+     * @param strategies The strategies which should be calculated
+     * @return A calculated game move
+     */
     private GameMove calculateCrossings(GameMove lastMove, Role role, Strategy[] strategies) {
         gameObserver.startTimer();
         if (lastMove != null) {
@@ -439,6 +447,13 @@ public class RTreePlayer implements NewPlayer {
     }
 
 
+    /**
+     * Calculate the crossings based on the given role in a sequence.
+     * @param lastMove The last game move
+     * @param role Minimize/Maximize
+     * @param strategies Calculate the given strategies
+     * @return A game move
+     */
     private GameMove calculateCrossingsSequential(GameMove lastMove, Role role, Strategy[] strategies) {
         gameObserver.startTimer();
         if (lastMove != null) {

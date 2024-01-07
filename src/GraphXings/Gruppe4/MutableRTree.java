@@ -1,8 +1,7 @@
 package GraphXings.Gruppe4;
 
-import GraphXings.Data.Coordinate;
-import GraphXings.Data.Graph;
-import GraphXings.Data.Vertex;
+import GraphXings.Data.*;
+import GraphXings.Gruppe4.Common.FastSegment;
 import com.github.davidmoten.rtree2.Entry;
 import com.github.davidmoten.rtree2.Iterables;
 import com.github.davidmoten.rtree2.RTree;
@@ -79,6 +78,47 @@ public class MutableRTree<T, S extends Geometry> {
 
         // Count all elements
         return Iterables.size(potentialIntersections);
+    }
+
+    /**
+     * NOT GENERIC: THIS DOES ONLY WORK WITH EDGE TREES!
+     * Calculate the crossing angle of intersecting edges
+     * @param line The line which should be checked for intersections
+     * @return Angle
+     */
+    public double computeSumOfCrossingAngles(LineFloat line) {
+        // retrieve the minimal bounding box from the geometry
+        var rectBB = line.mbr();
+
+        // Get all potential intersections with the given bounding box
+        Iterable<Entry<T, S>> potentialIntersections = tree.search(rectBB);
+
+        // Use the crossing calculator on this reduced set of edges
+        double result = 0;
+        for (var entry1 : potentialIntersections) {
+            Edge e1 = (Edge) entry1.value();
+            LineFloat l1 = (LineFloat) entry1.geometry();
+            for (var entry2 : potentialIntersections) {
+                Edge e2 = (Edge) entry2.value();
+                LineFloat l2 = (LineFloat) entry2.geometry();
+                if (e1.equals(e2)) {
+                    continue;
+                }
+                if (e1.isAdjacent(e2)) {
+                    continue;
+                }
+
+                FastSegment s1 = new FastSegment(new Coordinate((int) l1.x1(), (int) l1.y1()), new Coordinate((int) l1.x2(), (int) l1.y2()));
+                FastSegment s2 = new FastSegment(new Coordinate((int) l2.x1(), (int) l2.y1()), new Coordinate((int) l2.x2(), (int) l2.y2()));
+                // TODO: Can we use l1.intersects(l2) instead?
+                if (FastSegment.intersect(s1,s2))
+                {
+                    result += FastSegment.squaredCosineOfAngle(s1,s2);
+                }
+            }
+        }
+
+        return result;
     }
 
     public Optional<Rectangle> findHighestDensity(int tiling) {
