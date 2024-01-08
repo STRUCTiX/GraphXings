@@ -58,7 +58,7 @@ public class RTreePlayer implements NewPlayer {
     private GameObserver gameObserver;
 
     // Set to true if you'd like to export data
-    private boolean enableExport = true;
+    private boolean enableExport = false;
 
     /**
      * Creates a random player with the assigned name.
@@ -103,7 +103,7 @@ public class RTreePlayer implements NewPlayer {
                 //new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters),
                 new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
                 //new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters),
-                //new MaximizePointReflection(g, gs, tree, width, height, sampleParameters),
+                new MaximizePointReflection(g, gs, tree, width, height, sampleParameters),
                 //new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters),
                 //new MaximizeGrid(g, gs, tree, width, height, sampleParameters),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters),
@@ -322,8 +322,8 @@ public class RTreePlayer implements NewPlayer {
         Strategy[] strategies = {
                 //new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters),
                 //new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
-                //new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters),
-                //new MaximizePointReflection(g, gs, tree, width, height, sampleParameters),
+                new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters),
+                new MaximizePointReflection(g, gs, tree, width, height, sampleParameters),
                 //new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters),
                 //new MaximizeGrid(g, gs, tree, width, height, sampleParameters),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters),

@@ -1,6 +1,8 @@
 package GraphXings;
 import GraphXings.Algorithms.NewPlayer;
 import GraphXings.Algorithms.NewRandomPlayer;
+import GraphXings.Data.Coordinate;
+import GraphXings.Data.Segment;
 import GraphXings.Game.GameInstance.GameInstanceFactory;
 import GraphXings.Game.GameInstance.PlanarGameInstanceFactory;
 import GraphXings.Game.League.NewLeague;
@@ -10,6 +12,7 @@ import GraphXings.Game.Match.NewMatchResult;
 import GraphXings.Gruppe4.RTreePlayer;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class GraphXings
