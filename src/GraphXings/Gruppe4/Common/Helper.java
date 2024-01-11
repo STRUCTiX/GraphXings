@@ -6,6 +6,7 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.Rectangle;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
@@ -248,15 +249,15 @@ public class Helper {
     public static int numIncidentVertices(Graph g, GameState gs, Vertex vertex, boolean onlyFreeNeighbours) {
         var incidentEdges = g.getIncidentEdges(vertex);
 
-        List<Edge> edgeList = new ArrayList<>();
-        incidentEdges.forEach(edgeList :: add);
+        // Use the underlying graph structure (HashSet) and avoid iteration over elements
+        HashSet<Edge> edgeSet = new HashSet<>((HashSet<Edge>) incidentEdges);
 
         if (onlyFreeNeighbours){
-            edgeList.removeIf(edge -> !edge.getS().equals(vertex) && gs.getPlacedVertices().contains(edge.getS()));
-            edgeList.removeIf(edge -> !edge.getT().equals(vertex) && gs.getPlacedVertices().contains(edge.getT()));
+            edgeSet.removeIf(edge -> !edge.getS().equals(vertex) && gs.getPlacedVertices().contains(edge.getS()));
+            edgeSet.removeIf(edge -> !edge.getT().equals(vertex) && gs.getPlacedVertices().contains(edge.getT()));
         }
 
-        return edgeList.size();
+        return edgeSet.size();
     }
 
 
@@ -317,34 +318,45 @@ public class Helper {
      * @param bottomBorder
      * @return List of free Coordinates
      */
-    public static Optional<List<Coordinate>> findFreeCoordinatesAtBorder(int[][] usedCoordinates, int rightBorder, int leftBorder, int topBorder, int bottomBorder){
+    public static Optional<List<Coordinate>> findFreeCoordinatesAtBorder(int[][] usedCoordinates, int rightBorder, int leftBorder, int topBorder, int bottomBorder, int amountSamples) {
         List<Coordinate> freeCoordinates = new ArrayList<>();
+        int counter = 0;
 
-        // search through top border
+        // search through top/bottom border
         for (int i = leftBorder; i <= rightBorder; i++){
-            if (isCoordinateFree(usedCoordinates, i, 0)){
-                freeCoordinates.add(new Coordinate(i,0));
+            // top
+            if (isCoordinateFree(usedCoordinates, i, topBorder)){
+                counter++;
+                freeCoordinates.add(new Coordinate(i, topBorder));
             }
-        }
-
-        //search through bottom border
-        for (int i = leftBorder; i <= rightBorder; i++){
+            // bottom
             if (isCoordinateFree(usedCoordinates, i, bottomBorder)){
-                freeCoordinates.add(new Coordinate(i,bottomBorder));
+                counter++;
+                freeCoordinates.add(new Coordinate(i, bottomBorder));
+            }
+
+            if (counter >= amountSamples) {
+                // Strip to the right amount of samples
+                return Optional.of(freeCoordinates.subList(0, amountSamples));
             }
         }
 
-        //search through left border
+        //search through left/right border
         for (int i = topBorder; i <= bottomBorder; i++){
-            if (isCoordinateFree(usedCoordinates, 0, i)){
-                freeCoordinates.add(new Coordinate(0, i));
+            // left
+            if (isCoordinateFree(usedCoordinates, leftBorder, i)){
+                counter++;
+                freeCoordinates.add(new Coordinate(leftBorder, i));
             }
-        }
-
-        //search through right border
-        for (int i = topBorder; i <= bottomBorder; i++){
+            // right
             if (isCoordinateFree(usedCoordinates, rightBorder, i)){
+                counter++;
                 freeCoordinates.add(new Coordinate(rightBorder, i));
+            }
+
+            if (counter >= amountSamples) {
+                // Strip to the right amount of samples
+                return Optional.of(freeCoordinates.subList(0, amountSamples));
             }
         }
 

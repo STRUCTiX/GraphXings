@@ -54,12 +54,15 @@ public class MaximizeGrid extends StrategyClass{
         var placedVertices = gs.getPlacedVertices();
 
         //search for a placed vertex at the border with free neighbours
-        Vertex placedVertex;
         Coordinate vertexCoordinate;
         for (Vertex v : placedVertices){
             vertexCoordinate = vertexCoordinates.get(v);
             if (Helper.isAtBorder(vertexCoordinate, width-1, 0, 0, height-1) && Helper.numIncidentVertices(g, gs, v, true) > 0){
-                Vertex neigbourVertex = Helper.pickIncidentVertex(g, vertexCoordinates, v).get(); //should be possible since the number of free neighbours is > 0
+                var neigbourVertexOption = Helper.pickIncidentVertex(g, vertexCoordinates, v); //should be possible since the number of free neighbours is > 0
+                if (neigbourVertexOption.isEmpty()) { // Better check and safe unnecessary calculations
+                    continue;
+                }
+                Vertex neigbourVertex = neigbourVertexOption.get();
                 var oppositeCoordinate = findOppositeCoordinate(vertexCoordinate);
                 if (oppositeCoordinate.isPresent()){
                     gameMove = Optional.of(new GameMove(neigbourVertex, oppositeCoordinate.get()));
@@ -70,14 +73,15 @@ public class MaximizeGrid extends StrategyClass{
         }
 
         //if no vertex at the border with free neighbours is found -> set a free vertex at the border
-        for (Vertex v : g.getVertices()){
-            if (!placedVertices.contains(v) && Helper.numIncidentVertices(g, gs, v, true) > 0){
-                var freeCoordinatesAtBorder = Helper.findFreeCoordinatesAtBorder(usedCoordinates, width-1, 0, 0, height-1);
+        for (Vertex v : g.getVertices()) {
+            if (!placedVertices.contains(v) && Helper.numIncidentVertices(g, gs, v, true) > 0) {
+                var freeCoordinatesAtBorder = Helper.findFreeCoordinatesAtBorder(usedCoordinates, width-1, 0, 0, height-1, sampleParameters.samples());
                 freeCoordinatesAtBorder.ifPresent(coordinateList -> gameMove = chooseHighestIntersection(List.of(v), coordinateList));
+
+                // Break out otherwise we try to do the same thing for every vertex
+                break;
             }
         }
-
-
 
         return gameMove.isPresent();
     }
@@ -88,7 +92,7 @@ public class MaximizeGrid extends StrategyClass{
      * @param coordinate coordinate at border
      * @return opposite coordinate
      */
-    private Optional<Coordinate> findOppositeCoordinate (Coordinate coordinate){
+    private Optional<Coordinate> findOppositeCoordinate(Coordinate coordinate) {
         //coordinate is left
         if (coordinate.getX() == 0){
             for (int i = width-1; i > width/2; i--){
