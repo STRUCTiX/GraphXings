@@ -7,6 +7,7 @@ import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
+import GraphXings.Gruppe4.Common.EdgeType;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
@@ -103,8 +104,8 @@ public class MaximizePlaceVertexOnEdge extends StrategyClass {
      */
     //TODO: how to find not only the next free coordinate, but the best free coordinate????
     private Optional<Coordinate> nextFreeCoordinateOnEdge(){
-        String edgeType = getLongestEdgeType();
-        int max_length = (edgeType.equals("diagonal")? Math.min(width, height) : Math.max(width, height));
+        EdgeType edgeType = getLongestEdgeType();
+        int max_length = (edgeType == EdgeType.diagonal) ? Math.min(width, height) : Math.max(width, height);
 
         for (int i = 1; i < max_length/2; i++){
             int x = 0;
@@ -112,19 +113,19 @@ public class MaximizePlaceVertexOnEdge extends StrategyClass {
             int x_end = 0;
             int y_end = 0;
             switch (edgeType) {
-                case "diagonal" -> {
+                case EdgeType.diagonal -> {
                     x = i;
                     y = i;
-                    x_end = width-i;
-                    y_end = height-i;
+                    x_end = width - i;
+                    y_end = height - i;
                 }
-                case "vertical" -> {
+                case EdgeType.vertical -> {
                     y = i;
-                    y_end = height-i;
+                    y_end = height - i;
                 }
-                case "horizontal" -> {
+                case EdgeType.horizontal -> {
                     x = i;
-                    x_end = width-i;
+                    x_end = width - i;
                 }
                 default ->
                     throw new IllegalArgumentException("edge type must be one of: diagonal, vertical, horizontal, but it was " + edgeType);
@@ -133,7 +134,7 @@ public class MaximizePlaceVertexOnEdge extends StrategyClass {
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), x, y)){
                 return Optional.of(new Coordinate(x, y));
             }
-            //test free coordinate at the end of the edge
+            // test free coordinate at the end of the edge
             if (Helper.isCoordinateFree(gs.getUsedCoordinates(), x_end, y_end)){
                 return Optional.of(new Coordinate(x_end, y_end));
             }
@@ -145,18 +146,17 @@ public class MaximizePlaceVertexOnEdge extends StrategyClass {
      * find the longest edge (either the diagonal or the vertical/horizontal line)
      * @return "diagonal"/"vertical"/"horizontal"
      */
-    private String getLongestEdgeType(){
+    private EdgeType getLongestEdgeType(){
         double diagonal_length = Math.sqrt(Math.pow(Math.min(width, height), 2) * 2);
         int max_straight_length = Math.max(width, height);
 
         if (diagonal_length > max_straight_length){
-            return "diagonal";
+            return EdgeType.diagonal;
         } else if (width > height){
-            return "horizontal";
+            return EdgeType.horizontal;
         } else {
-            return "vertical";
+            return EdgeType.vertical;
         }
-
     }
 
 
@@ -170,7 +170,7 @@ public class MaximizePlaceVertexOnEdge extends StrategyClass {
         var usedCoordinates = gs.getUsedCoordinates();
         var vertexCoordinates = gs.getVertexCoordinates();
 
-        String edge_type = getLongestEdgeType();
+        EdgeType edge_type = getLongestEdgeType();
 
         //the next vertex to place is the neighbour vertex to the firstVertex
         //(there has to be a free neighbour vertex, since the minimizer had only one game move at this point)
@@ -186,12 +186,12 @@ public class MaximizePlaceVertexOnEdge extends StrategyClass {
         int y = height-1;
 
         switch (edge_type) {
-            case "diagonal":
+            case EdgeType.diagonal:
                 break;
-            case "vertical":
+            case EdgeType.vertical:
                 x = 0;
                 break;
-            case "horizontal":
+            case EdgeType.horizontal:
                 y = 0;
                 break;
             default:
