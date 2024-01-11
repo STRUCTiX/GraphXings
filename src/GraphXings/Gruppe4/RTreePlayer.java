@@ -72,28 +72,6 @@ public class RTreePlayer implements NewPlayer {
     @Override
     public GameMove maximizeCrossings(GameMove lastMove)
     {
-        gameObserver.startTimer();
-
-        if (lastMove != null) {
-            gs.applyMove(lastMove);
-            gameObserver.addOpponentGameMove(lastMove);
-
-            // Last move must have been a minimize move.
-            // Therefore, export the move from opponent.
-            if (enableExport) {
-                try {
-                    guiExport.exportVertexPlacement(lastMove, Role.MIN);
-                } catch (IOException e) {
-                    enableExport = false;
-                }
-            }
-        }
-
-        // Add lines to tree by observing last game move if not empty.
-        TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove).ifPresent(lines -> tree.addAll(lines));
-
-        // Add point to the vertex tree by converting the last game move
-        TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
 
         // Get the estimated SampleParameters
         var sampleParameters = gameObserver.calculateSampleSizeParameters();
@@ -108,98 +86,12 @@ public class RTreePlayer implements NewPlayer {
                 //new MaximizeGrid(g, gs, tree, width, height, sampleParameters),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters),
         };
-
-        var threads = new ArrayList<Thread>(4);
-        for (var strat : maximizer) {
-
-            threads.add(Thread.ofVirtual().start(() -> {
-                // Check if we've got the first move and must execute the heuristic
-                if (gs.getPlacedVertices().isEmpty()) {
-                    strat.executeHeuristic(Optional.ofNullable(lastMove));
-                } else {
-                    strat.executeStrategy(lastMove);
-                }
-            }));
-        }
-
-        // This is our fallback. If our strategy fails, return a random move
-        var randomMove = new RandomMove(g, gs, tree, width, height, sampleParameters);
-        randomMove.executeHeuristic(Optional.ofNullable(lastMove));
-
-        // Calculate the game move.
-        Optional<GameMove> move = randomMove.getGameMove();
-        long moveQuality = randomMove.getGameMoveQuality();
-        StrategyName usedStrategy = randomMove.getStrategyName();
-
-        // Wait for the threads to finish
-        for (var t : threads) {
-            try {
-                t.join(gameObserver.getSingleGameMoveTimeThread());
-            } catch (InterruptedException e) {
-                // TODO Notify the game observer
-            }
-        }
-
-        for (var strat : maximizer) {
-            // Check the quality
-            var currentMove = strat.getGameMove();
-            var currentQuality = strat.getGameMoveQuality();
-
-            if (currentMove.isPresent() && currentQuality > moveQuality) {
-                moveQuality = currentQuality;
-                move = currentMove;
-                usedStrategy = strat.getStrategyName();
-            }
-        }
-
-
-        gs.applyMove(move.get());
-        gameObserver.addOwnGameMove(move.get(), usedStrategy);
-
-        if (enableExport) {
-            try {
-                guiExport.exportVertexPlacement(move.get(), Role.MAX);
-            } catch (IOException e) {
-                enableExport = false;
-            }
-        }
-
-        // Add our own move to the trees
-        // Add lines to tree by observing last game move if not empty.
-        TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove).ifPresent(lines -> tree.addAll(lines));
-
-        // Add point to the vertex tree by converting the last game move
-        TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
-
-        gameObserver.stopTimer();
-        return move.get();
+        return calculateCrossings(lastMove, Role.MAX, maximizer);
     }
 
     @Override
     public GameMove minimizeCrossings(GameMove lastMove)
     {
-        gameObserver.startTimer();
-        if (lastMove != null) {
-            gs.applyMove(lastMove);
-            gameObserver.addOpponentGameMove(lastMove);
-
-            // Last move must have been a maximize move.
-            // Therefore, export the move from opponent.
-            if (enableExport) {
-                try {
-                    guiExport.exportVertexPlacement(lastMove, Role.MAX);
-                } catch (IOException e) {
-                    enableExport = false;
-                }
-            }
-        }
-
-        // Add lines to tree by observing last game move if not empty.
-        TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove).ifPresent(lines -> tree.addAll(lines));
-
-        // Add point to the vertex tree by converting the last game move
-        TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
-
         // Get the estimated SampleParameters
         var sampleParameters = gameObserver.calculateSampleSizeParameters();
 
@@ -210,71 +102,7 @@ public class RTreePlayer implements NewPlayer {
                 new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters),
         };
 
-        var threads = new ArrayList<Thread>(4);
-        for (var strat : minimizer) {
-            threads.add(Thread.ofVirtual().start(() -> {
-                // Check if we've got the first move and must execute the heuristic
-                if (gs.getPlacedVertices().isEmpty()) {
-                    strat.executeHeuristic(Optional.ofNullable(lastMove));
-                } else {
-                    strat.executeStrategy(lastMove);
-                }
-            }));
-        }
-
-        // This is our fallback. If our strategy fails, return a random move
-        var randomMove = new RandomMove(g, gs, tree, width, height, sampleParameters);
-        randomMove.executeHeuristic(Optional.ofNullable(lastMove));
-
-        // Calculate the game move.
-        Optional<GameMove> move = randomMove.getGameMove();
-        long moveQuality = randomMove.getGameMoveQuality();
-        StrategyName usedStrategy = randomMove.getStrategyName();
-
-        // Join the threads
-        for (var t : threads) {
-            try {
-                t.join(gameObserver.getSingleGameMoveTimeThread());
-            } catch (InterruptedException e) {
-                // TODO Notify the game observer
-            }
-        }
-
-        // Calculate best move
-        for (var strat : minimizer) {
-            // Check the quality
-            var currentMove = strat.getGameMove();
-            var currentQuality = strat.getGameMoveQuality();
-
-            if (currentMove.isPresent() && currentQuality < moveQuality) {
-                moveQuality = currentQuality;
-                move = currentMove;
-                usedStrategy = strat.getStrategyName();
-            }
-
-        }
-
-        gs.applyMove(move.get());
-        gameObserver.addOwnGameMove(move.get(), usedStrategy);
-
-        if (enableExport) {
-            try {
-                guiExport.exportVertexPlacement(move.get(), Role.MIN);
-            } catch (IOException e) {
-                enableExport = false;
-            }
-        }
-
-        // Add our own move to the trees
-        // Add lines to tree by observing last game move if not empty.
-        TreeHelper.additionalLines(g, gs.getVertexCoordinates(), lastMove).ifPresent(lines -> tree.addAll(lines));
-
-        // Add point to the vertex tree by converting the last game move
-        TreeHelper.additionalPoint(lastMove).ifPresent(entry -> vertexTree.add(entry));
-
-        gameObserver.stopTimer();
-
-        return move.get();
+        return calculateCrossings(lastMove, Role.MIN, minimizer);
     }
 
     @Override
@@ -415,7 +243,13 @@ public class RTreePlayer implements NewPlayer {
             var currentMove = strat.getGameMove();
             var currentQuality = strat.getGameMoveQuality();
 
-            if (currentMove.isPresent() && currentQuality < moveQuality) {
+            if (role == Role.MAX && currentMove.isPresent() && currentQuality > moveQuality) {
+                // Maximize
+                moveQuality = currentQuality;
+                move = currentMove;
+                usedStrategy = strat.getStrategyName();
+            } else if (role == Role.MIN && currentMove.isPresent() && currentQuality < moveQuality) {
+                // Minimize
                 moveQuality = currentQuality;
                 move = currentMove;
                 usedStrategy = strat.getStrategyName();
@@ -543,30 +377,6 @@ public class RTreePlayer implements NewPlayer {
     public String getName()
     {
         return name;
-    }
-
-    public long computeMoveQuality (Vertex vertex, Coordinate coordinate){
-        var placedVertices = gs.getPlacedVertices();
-        var vertexCoordinates = gs.getVertexCoordinates();
-        var incidentEdges = g.getIncidentEdges(vertex);
-        long current_move_quality = 0;
-
-        //check for all edges that the vertex has, if they are already existing
-        for (Edge e : incidentEdges) {
-            if(placedVertices.contains(e.getS()) || placedVertices.contains(e.getT())){
-                LineFloat edge = null;
-                if (e.getT().equals(vertex)){
-                    edge = LineFloat.create(vertexCoordinates.get(e.getS()).getX(), vertexCoordinates.get(e.getS()).getY(), coordinate.getX(), coordinate.getY());
-                } else {
-                    edge = LineFloat.create(coordinate.getX(), coordinate.getY(), coordinate.getX(), coordinate.getY());
-
-                }
-                current_move_quality += tree.getIntersections(edge);
-            }
-        }
-
-        //additionally add all crossings that will be created by the free neighbour edges
-        return current_move_quality;
     }
 
     /**
