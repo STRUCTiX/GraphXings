@@ -9,6 +9,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.Rectangle;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
@@ -26,8 +27,8 @@ public class MinimizePlaceAtBorder extends StrategyClass {
 
     private int border = 0;
 
-    public MinimizePlaceAtBorder(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
-        super(g, gs, tree,  width, height, sampleParameters);
+    public MinimizePlaceAtBorder(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree,  width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MinimizePlaceAtBorder));
         moveQuality = Long.MAX_VALUE;
         topBorder = 0;
         bottomBorder = height-1;
@@ -51,6 +52,8 @@ public class MinimizePlaceAtBorder extends StrategyClass {
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
         var usedCoordinates = gs.getUsedCoordinates();
@@ -98,6 +101,7 @@ public class MinimizePlaceAtBorder extends StrategyClass {
             }
         }
 
+        super.stopExecuteStrategy();
 
         return gameMove.isPresent();
     }

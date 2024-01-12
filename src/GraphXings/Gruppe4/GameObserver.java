@@ -29,8 +29,7 @@ public class GameObserver {
     private long totalElapsedTime = 0;
     private long currentGameMoveTime = 0;
     private SampleParameters sampleParameters = new SampleParameters(SampleSize.Keep, 10, 1);
-    private HashMap<StrategyName, StopWatch> strategyStopWatches = new HashMap<>();
-
+    private StrategiesStopWatch strategiesStopWatch = new StrategiesStopWatch();
     private final long timeLimit = 300000000000L;
 
     // This is a safety measure, so we don't get a timeout
@@ -110,10 +109,10 @@ public class GameObserver {
     public long getSingleGameMoveTime() {
         // We divide our time limit by the amount of vertices we have to place
         //long gameMove = (timeLimit - timeLimitBuffer) / (totalVerticesCount / 2);
-        long remainingVertices = (totalVerticesCount / 2 - ourMoves.size());
+        long remainingVertices = ((totalVerticesCount / 2) - ourMoves.size());
 
         // Prevent division by zero
-        if (remainingVertices == 0) {
+        if (remainingVertices <= 0) {
             remainingVertices = 1;
         }
         long gameMove = (timeLimit - timeLimitBuffer - getTotalElapsedTime()) / remainingVertices;
@@ -192,11 +191,8 @@ public class GameObserver {
         return sampleParameters;
     }
 
-    public StopWatch getStrategyStopWatch(StrategyName strategyName) {
-        if (!strategyStopWatches.containsKey(strategyName)) {
-            strategyStopWatches.put(strategyName, new StopWatch());
-        }
-        return strategyStopWatches.get(strategyName);
+    public StrategiesStopWatch getStrategiesStopWatch() {
+        return strategiesStopWatch;
     }
 
     /**
@@ -225,9 +221,11 @@ public class GameObserver {
         System.out.println("Used strategies steps:");
         System.out.println(reportUsedStrategiesSteps());
 
-        System.out.println("Total elapsed time:" + totalElapsedTime);
-        System.out.println("Last game move time: " + currentGameMoveTime);
-        System.out.println("Optimal single game move time: " + getSingleGameMoveTime());
+        System.out.println("Total elapsed time:" + totalElapsedTime + "ns (" + totalElapsedTime / (double)1000000 + "ms)");
+        System.out.println("Last game move time: " + currentGameMoveTime + "ns (" + currentGameMoveTime / (double)1000000 + "ms)");
+        System.out.println("Optimal single game move time: " + getSingleGameMoveTime() + "ns (" + getSingleGameMoveTime() / (double)1000000 + "ms)");
+        System.out.println("Elapsed time per strategy:");
+        System.out.println(reportElapsedTimePerStrategy());
     }
 
     /**
@@ -253,6 +251,18 @@ public class GameObserver {
         for (var item : strategyNamesList) {
             output.append(num).append(",").append(item.name()).append("\n");
             num++;
+        }
+
+        return output.toString();
+    }
+
+    public String reportElapsedTimePerStrategy() {
+        StringBuilder output = new StringBuilder();
+        var strategyStopWatches = strategiesStopWatch.getStrategyStopWatches();
+
+        for (Map.Entry<StrategyName, StopWatch> entry : strategyStopWatches.entrySet()) {
+            var ms = entry.getValue().getTotalElapsedTime() / (double)1000000;
+            output.append(entry.getKey()).append(": ").append(entry.getValue().getTotalElapsedTime()).append("ns (").append(ms).append("ms)\n");
         }
 
         return output.toString();

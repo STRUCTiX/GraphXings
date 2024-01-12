@@ -8,6 +8,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.RectangleFloat;
 
@@ -17,8 +18,8 @@ import java.util.Optional;
 public class RandomSampleMove extends StrategyClass {
 
     private NewPlayer.Role role;
-    public RandomSampleMove(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, NewPlayer.Role role, SampleParameters sampleParameters) {
-        super(g, gs, tree, width, height, sampleParameters);
+    public RandomSampleMove(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, NewPlayer.Role role, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MaximizeRandomSampleMove));
         moveQuality = 0;
         this.role = role;
     }
@@ -47,6 +48,8 @@ public class RandomSampleMove extends StrategyClass {
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         var samples = Helper.randPickFreeCoordinatesPerimeter(gs.getUsedCoordinates(), RectangleFloat.create(0, 0, width, height), sampleParameters.samples());
         for (var v : g.getVertices()) {
             if (!gs.getPlacedVertices().contains(v)) {
@@ -58,6 +61,8 @@ public class RandomSampleMove extends StrategyClass {
                 break;
             }
         }
+
+        super.stopExecuteStrategy();
         return true;
     }
 

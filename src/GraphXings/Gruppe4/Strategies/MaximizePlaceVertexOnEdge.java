@@ -10,14 +10,15 @@ import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.EdgeType;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.Optional;
 
 public class MaximizePlaceVertexOnEdge extends StrategyClass {
 
-    public MaximizePlaceVertexOnEdge(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
-        super(g, gs, tree, width, height, sampleParameters);
+    public MaximizePlaceVertexOnEdge(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MaximizePlaceVertexOnEdge));
         moveQuality = 0;
     }
 
@@ -48,6 +49,8 @@ public class MaximizePlaceVertexOnEdge extends StrategyClass {
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         var placedVertices = gs.getPlacedVertices();
 
         //it is the third game move and the longest edge still has to be created
@@ -83,6 +86,9 @@ public class MaximizePlaceVertexOnEdge extends StrategyClass {
             moveQuality = computeMoveQuality(new_vertex, new_coordinate.get());
 
         }
+
+        super.stopExecuteStrategy();
+
         return gameMove.isEmpty();
     }
 

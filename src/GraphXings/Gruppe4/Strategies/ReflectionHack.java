@@ -9,6 +9,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.lang.reflect.Field;
@@ -17,8 +18,8 @@ import java.util.Optional;
 
 public class ReflectionHack extends StrategyClass {
 
-    public ReflectionHack(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
-        super(g, gs, tree, width, height, sampleParameters);
+    public ReflectionHack(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.Unknown));
         moveQuality = 0;
     }
 

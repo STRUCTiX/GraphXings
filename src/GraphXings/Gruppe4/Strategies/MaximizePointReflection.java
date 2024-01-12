@@ -11,6 +11,7 @@ import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 
@@ -20,8 +21,8 @@ import java.util.Optional;
 
 public class MaximizePointReflection extends StrategyClass{
 
-    public MaximizePointReflection(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
-        super(g, gs, tree, width, height, sampleParameters);
+    public MaximizePointReflection(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MaximizePointReflection));
         moveQuality = 0;
     }
 
@@ -51,6 +52,8 @@ public class MaximizePointReflection extends StrategyClass{
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         var usedCoordinates = gs.getUsedCoordinates();
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
@@ -101,7 +104,7 @@ public class MaximizePointReflection extends StrategyClass{
 
         gameMove = chooseHighestIntersection(neighbours, sampleList);
 
-
+        super.stopExecuteStrategy();
 
         return gameMove.isPresent();
     }

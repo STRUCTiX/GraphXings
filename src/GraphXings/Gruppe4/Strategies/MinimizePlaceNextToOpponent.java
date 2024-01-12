@@ -8,6 +8,7 @@ import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.Optional;
@@ -18,8 +19,8 @@ public class MinimizePlaceNextToOpponent extends StrategyClass {
 
 
 
-    public MinimizePlaceNextToOpponent(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
-        super(g, gs, tree, width, height, sampleParameters);
+    public MinimizePlaceNextToOpponent(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MinimizePlaceNextToOpponent));
         moveQuality = Long.MAX_VALUE;
     }
 
@@ -46,6 +47,8 @@ public class MinimizePlaceNextToOpponent extends StrategyClass {
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         var vertexCoordinates = gs.getVertexCoordinates();
         var usedCoordinates = gs.getUsedCoordinates();
         var placedVertices = gs.getPlacedVertices();
@@ -88,6 +91,9 @@ public class MinimizePlaceNextToOpponent extends StrategyClass {
                 return gameMove.isPresent();
             }
         }
+
+        super.stopExecuteStrategy();
+
         return gameMove.isPresent();
     }
 

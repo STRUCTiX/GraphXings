@@ -6,10 +6,9 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
+import GraphXings.Gruppe4.*;
 import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
-import GraphXings.Gruppe4.Heuristics;
-import GraphXings.Gruppe4.MutableRTree;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.List;
@@ -18,8 +17,8 @@ import java.util.Optional;
 public class MaximizeDiagonalCrossing extends StrategyClass {
 
 
-    public MaximizeDiagonalCrossing(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
-        super(g, gs, tree, width, height, sampleParameters);
+    public MaximizeDiagonalCrossing(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MaximizeDiagonalCrossing));
         moveQuality = 0;
     }
 
@@ -47,6 +46,8 @@ public class MaximizeDiagonalCrossing extends StrategyClass {
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         var usedCoordinates = gs.getUsedCoordinates();
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
@@ -96,6 +97,8 @@ public class MaximizeDiagonalCrossing extends StrategyClass {
         if (samples.isPresent() && unplacedVertex != null) {
             gameMove = chooseHighestIntersection(List.of(unplacedVertex), samples.get());
         }
+
+        super.stopExecuteStrategy();
 
         return gameMove.isPresent();
     }

@@ -9,6 +9,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.ArrayList;
@@ -17,8 +18,8 @@ import java.util.Optional;
 
 public class MaximizePointReflectionFromBorder extends StrategyClass{
 
-    public MaximizePointReflectionFromBorder(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
-        super(g, gs, tree, width, height, sampleParameters);
+    public MaximizePointReflectionFromBorder(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MaximizePointReflectionFromBorder));
         moveQuality = 0;
     }
 
@@ -48,6 +49,8 @@ public class MaximizePointReflectionFromBorder extends StrategyClass{
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         var usedCoordinates = gs.getUsedCoordinates();
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
@@ -104,6 +107,7 @@ public class MaximizePointReflectionFromBorder extends StrategyClass{
 
         }
 
+        super.stopExecuteStrategy();
 
         return gameMove.isPresent();
     }

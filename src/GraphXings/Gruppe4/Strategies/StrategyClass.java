@@ -9,6 +9,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.EdgeHelper;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.List;
@@ -22,18 +23,20 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
     protected final int width;
     protected final int height;
     protected final SampleParameters sampleParameters;
+    protected final StopWatch stopWatch;
 
     protected Optional<GameMove> gameMove =Optional.empty();
 
     protected long moveQuality;
 
-    public StrategyClass(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
+    public StrategyClass(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StopWatch stopWatch) {
         this.g = g;
         this.tree = tree;
         this.gs = gs;
         this.width = width;
         this.height = height;
         this.sampleParameters = sampleParameters;
+        this.stopWatch = stopWatch;
     }
 
     /**
@@ -93,6 +96,20 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
     @Override
     public StrategyName getStrategyName() {
         return StrategyName.Unknown;
+    }
+
+    /**
+     * Everything that should be executed at all starts of the strategies
+     */
+    protected void startExecuteStrategy() {
+        stopWatch.startTimer();
+    }
+
+    /**
+     * Everything that should be executed at all ends of the strategies
+     */
+    protected void stopExecuteStrategy() {
+        stopWatch.stopTimer();
     }
 
 

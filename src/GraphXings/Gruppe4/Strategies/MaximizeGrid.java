@@ -9,6 +9,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.sun.source.tree.IfTree;
 
@@ -18,8 +19,8 @@ import java.util.Optional;
 
 public class MaximizeGrid extends StrategyClass{
 
-    public MaximizeGrid(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
-        super(g, gs, tree, width, height, sampleParameters);
+    public MaximizeGrid(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MaximizeGrid));
         moveQuality = 0;
     }
 
@@ -49,6 +50,8 @@ public class MaximizeGrid extends StrategyClass{
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         var usedCoordinates = gs.getUsedCoordinates();
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
@@ -82,6 +85,8 @@ public class MaximizeGrid extends StrategyClass{
                 break;
             }
         }
+
+        super.stopExecuteStrategy();
 
         return gameMove.isPresent();
     }

@@ -10,6 +10,7 @@ import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.Optional;
 
 public class RandomMove extends StrategyClass {
 
-    public RandomMove(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters) {
-        super(g, gs, tree, width, height, sampleParameters);
+    public RandomMove(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.RandomMove));
         moveQuality = 0;
     }
 
@@ -47,8 +48,12 @@ public class RandomMove extends StrategyClass {
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         gameMove = Optional.of(Helper.randomMove(g, gs.getUsedCoordinates(), gs.getPlacedVertices(), width, height));
         moveQuality = computeMoveQuality(gameMove.get().getVertex(), gameMove.get().getCoordinate());
+
+        super.stopExecuteStrategy();
         return true;
     }
 

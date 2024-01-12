@@ -10,6 +10,7 @@ import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
+import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 
@@ -21,8 +22,8 @@ public class MaximizePlaceInDenseRegion extends StrategyClass {
 
     private MutableRTree<Vertex, PointFloat> vertexTree;
 
-    public MaximizePlaceInDenseRegion(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, MutableRTree<Vertex, PointFloat> vertexTree, int width, int height, SampleParameters sampleParameters) {
-       super(g, gs, tree, width, height, sampleParameters);
+    public MaximizePlaceInDenseRegion(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, MutableRTree<Vertex, PointFloat> vertexTree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+       super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MaximizePlaceInDenseRegion));
        this.vertexTree = vertexTree;
        moveQuality = 0;
     }
@@ -51,6 +52,8 @@ public class MaximizePlaceInDenseRegion extends StrategyClass {
      */
     @Override
     public boolean executeStrategy(GameMove lastMove) {
+        super.startExecuteStrategy();
+
         //var usedCoordinates = gs.getUsedCoordinates();
         var vertexCoordinates = gs.getVertexCoordinates();
         var placedVertices = gs.getPlacedVertices();
@@ -96,6 +99,8 @@ public class MaximizePlaceInDenseRegion extends StrategyClass {
                 samples.ifPresent(s -> gameMove = Optional.of(new GameMove(finalUnplacedVertex, s.getFirst())));
             }
         }
+
+        super.stopExecuteStrategy();
 
         return gameMove.isPresent();
     }
