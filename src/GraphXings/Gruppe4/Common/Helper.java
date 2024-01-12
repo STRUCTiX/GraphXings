@@ -322,6 +322,10 @@ public class Helper {
         List<Coordinate> freeCoordinates = new ArrayList<>();
         int counter = 0;
 
+        // TODO: Create a timeout counter to avoid long runtimes and return empty instead
+        // TODO: Reduce to one loop so we don't prefer top and bottom -> might be relevant in late game so we have more diversity
+        // Another strategy would be to use something like "random binary search" (go left/right randomly) to find free coordinates faster and more diverse in region
+
         // search through top/bottom border
         for (int i = leftBorder; i <= rightBorder; i++){
             // top
