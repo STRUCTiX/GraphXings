@@ -56,9 +56,9 @@ public class MinimizePlaceAtBorder extends StrategyClass {
         var usedCoordinates = gs.getUsedCoordinates();
 
         //find candidate coordinates (all coordinates at the border)
-        var freeCoordinatesAtBorder = Helper.findFreeCoordinatesAtBorder(usedCoordinates, rightBorder, leftBorder, topBorder, bottomBorder);
+        var freeCoordinatesAtBorder = Helper.findFreeCoordinatesAtBorder(usedCoordinates, rightBorder, leftBorder, topBorder, bottomBorder, sampleParameters.samples());
         while (freeCoordinatesAtBorder.isEmpty()){
-            freeCoordinatesAtBorder = Helper.findFreeCoordinatesAtBorder(usedCoordinates, --rightBorder, ++leftBorder, ++topBorder, --bottomBorder);
+            freeCoordinatesAtBorder = Helper.findFreeCoordinatesAtBorder(usedCoordinates, --rightBorder, ++leftBorder, ++topBorder, --bottomBorder, sampleParameters.samples());
         }
 
         for (var vertex : placedVertices){

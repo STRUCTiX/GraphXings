@@ -70,7 +70,7 @@ public class MaximizePointReflectionFromBorder extends StrategyClass{
             int i = 0;
             Optional<List<Coordinate>> freeCoordinatesAtBorder;
             do {
-                freeCoordinatesAtBorder = Helper.findFreeCoordinatesAtBorder(usedCoordinates, width-i-1, i, i, height-i-1);
+                freeCoordinatesAtBorder = Helper.findFreeCoordinatesAtBorder(usedCoordinates, width-i-1, i, i, height-i-1, sampleParameters.samples());
                 i++;
             } while (freeCoordinatesAtBorder.isEmpty());
 
