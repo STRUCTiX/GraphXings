@@ -29,6 +29,7 @@ public class GameObserver {
     private long totalElapsedTime = 0;
     private long currentGameMoveTime = 0;
     private SampleParameters sampleParameters = new SampleParameters(SampleSize.Keep, 10, 1);
+    private HashMap<StrategyName, StopWatch> strategyStopWatches = new HashMap<>();
 
     private final long timeLimit = 300000000000L;
 
@@ -189,6 +190,13 @@ public class GameObserver {
      */
     public SampleParameters getSampleParameters() {
         return sampleParameters;
+    }
+
+    public StopWatch getStrategyStopWatch(StrategyName strategyName) {
+        if (!strategyStopWatches.containsKey(strategyName)) {
+            strategyStopWatches.put(strategyName, new StopWatch());
+        }
+        return strategyStopWatches.get(strategyName);
     }
 
     /**
