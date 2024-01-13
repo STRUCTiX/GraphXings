@@ -78,12 +78,12 @@ public class RTreePlayer implements NewPlayer {
 
         // Instantiate the strategies
         Strategy[] maximizer = {
-                //new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters),
+                new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                //new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters),
+                new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizePointReflection(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                //new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters),
-                //new MaximizeGrid(g, gs, tree, width, height, sampleParameters),
+                //new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                //new MaximizeGrid(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters, gameObserver.getStrategiesStopWatch()),
         };
         return calculateCrossings(lastMove, Role.MAX, maximizer);
@@ -153,7 +153,7 @@ public class RTreePlayer implements NewPlayer {
                 new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizePointReflection(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                new MaximizeGrid(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                //new MaximizeGrid(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters, gameObserver.getStrategiesStopWatch()),
         };
         return calculateCrossingsSequential(lastMove, Role.MAX, strategies);
