@@ -167,4 +167,16 @@ public class MutableRTree<T, S extends Geometry> {
         return Optional.of(lowestDensity);
     }
 
+    /**
+     * Retrieve elements T (edges/vertices) from tree structure
+     * by querying for a geometry.
+     * @param geometry Geometry like a rectangle or line.
+     * @return Iterator with the resulting entries.
+     */
+    public Iterable<Entry<T, S>> getElementsFromGeometry(Geometry geometry) {
+        var rect = geometry.mbr();
+
+        return tree.search(rect);
+    }
+
 }

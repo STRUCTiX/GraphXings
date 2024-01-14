@@ -17,5 +17,6 @@ public enum StrategyName {
     MaximizePointReflection,
     MaximizePointReflectionFromBorder,
     MaximizeGrid,
+    MinimizeGridAngle,
     Unknown
 }

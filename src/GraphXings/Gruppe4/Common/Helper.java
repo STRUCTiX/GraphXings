@@ -215,6 +215,13 @@ public class Helper {
     }
 
 
+    /**
+     * Get all unplaced neighbour vertices of a given vertex which are connected by an edge.
+     * @param g
+     * @param gs
+     * @param vertex
+     * @return
+     */
     public static Optional<List<Vertex>> getAllNeighbourVertices (Graph g, GameState gs, Vertex vertex){
         List<Vertex> neighbourVertices = new ArrayList<>();
         var incidentEdges = g.getIncidentEdges(vertex);

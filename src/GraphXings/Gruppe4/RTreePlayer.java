@@ -165,6 +165,7 @@ public class RTreePlayer implements NewPlayer {
         Strategy[] strategies = {
                 //new MinimizePlaceNextToOpponent(g, gs, tree, width, height, sampleParameters),
                 //new MinimizePlaceAtBorder(g, gs, tree, width, height, sampleParameters),
+                new MinimizeGridAngle(g, gs, tree, vertexTree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters, gameObserver.getStrategiesStopWatch()),
         };
 
