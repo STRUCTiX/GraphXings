@@ -150,9 +150,10 @@ public class RTreePlayer implements NewPlayer {
         Strategy[] strategies = {
                 //new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters),
                 //new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
-                new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                //new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizePointReflection(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new MaximizeDiagonalCrossingAngle(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 //new MaximizeGrid(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters, gameObserver.getStrategiesStopWatch()),
         };
