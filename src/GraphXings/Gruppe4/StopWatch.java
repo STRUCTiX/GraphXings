@@ -9,7 +9,6 @@ public class StopWatch {
 
     /**
      * Construct a new stop watch with a name i.e. a name from the StrategyName enum
-     * @param watchName An element of type T
      */
     public StopWatch() {
     }
