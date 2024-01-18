@@ -117,4 +117,14 @@ public class MaximizePlaceInDenseRegion extends StrategyClass {
         return StrategyName.MaximizePlaceInDenseRegion;
     }
 
+    /**
+     * Determine if the strategy should be calculated.
+     *
+     * @param percentagePlacedMoves Value between 0-100. 100 means game is over.
+     * @return True if the strategy is effective and should be calculated.
+     */
+    @Override
+    public boolean activateFunction(double percentagePlacedMoves) {
+        return true;
+    }
 }
