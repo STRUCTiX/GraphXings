@@ -128,7 +128,7 @@ public class MaximizePlaceHighIncidentEdgesAngle extends StrategyClass {
      * @return True if the strategy is effective and should be calculated.
      */
     @Override
-    public boolean activateFunction(double percentagePlacedMoves) {
+    public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves) {
         return true;
     }
 }

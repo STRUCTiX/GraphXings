@@ -46,7 +46,9 @@ public interface Strategy {
     /**
      * Determine if the strategy should be calculated.
      * @param percentagePlacedMoves Value between 0-100. 100 means game is over.
+     * @param currentMove Current move count of the game.
+     * @param totalMoves The total amount of moves.
      * @return True if the strategy is effective and should be calculated.
      */
-    public boolean activateFunction(double percentagePlacedMoves);
+    public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves);
 }

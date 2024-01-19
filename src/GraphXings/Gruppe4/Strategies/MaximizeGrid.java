@@ -151,7 +151,7 @@ public class MaximizeGrid extends StrategyClass{
      * @return True if the strategy is effective and should be calculated.
      */
     @Override
-    public boolean activateFunction(double percentagePlacedMoves) {
+    public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves) {
         // TODO: Fix strategy and then activate again
         return false;
     }
