@@ -5,7 +5,7 @@ import GraphXings.Data.Edge;
 import GraphXings.Data.Graph;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
-import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
+import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.MutableRTree;
 import GraphXings.Gruppe4.StrategiesStopWatch;

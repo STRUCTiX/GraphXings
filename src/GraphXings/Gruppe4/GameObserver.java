@@ -5,7 +5,8 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
-import GraphXings.Gruppe4.CanvasObservations.*;
+import GraphXings.Gruppe4.GameObservations.CanvasObservation;
+import GraphXings.Gruppe4.GameObservations.CanvasObservations.*;
 import GraphXings.Gruppe4.Strategies.StrategyName;
 
 import java.util.ArrayList;

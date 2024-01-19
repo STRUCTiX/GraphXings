@@ -1,4 +1,4 @@
-package GraphXings.Gruppe4.CanvasObservations;
+package GraphXings.Gruppe4.GameObservations.CanvasObservations;
 
 public enum SampleSize {
     Increment,

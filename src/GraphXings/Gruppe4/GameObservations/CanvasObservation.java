@@ -1,4 +1,4 @@
-package GraphXings.Gruppe4;
+package GraphXings.Gruppe4.GameObservations;
 
 import GraphXings.Game.GameMove;
 import GraphXings.Gruppe4.Strategies.StrategyName;

@@ -7,7 +7,7 @@ import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.*;
-import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
+import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 

@@ -1,14 +1,12 @@
 package GraphXings.Gruppe4;
 
 import GraphXings.Algorithms.NewPlayer;
-import GraphXings.Data.Coordinate;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
-import GraphXings.Gruppe4.CanvasObservations.SampleParameters;
-import GraphXings.Gruppe4.CanvasObservations.SampleSize;
-import GraphXings.Gruppe4.Common.Helper;
+import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleParameters;
+import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleSize;
 import GraphXings.Gruppe4.Common.TreeHelper;
 import GraphXings.Gruppe4.Strategies.*;
 import GraphXings.Gruppe4.Gui.GuiExport;

@@ -1,9 +1,9 @@
-package GraphXings.Gruppe4.CanvasObservations;
+package GraphXings.Gruppe4.GameObservations.CanvasObservations;
 
 import GraphXings.Algorithms.NewPlayer;
 import GraphXings.Data.Graph;
 import GraphXings.Game.GameMove;
-import GraphXings.Gruppe4.CanvasObservation;
+import GraphXings.Gruppe4.GameObservations.CanvasObservation;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.Strategies.StrategyName;
 
