@@ -8,6 +8,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleSize;
 import GraphXings.Gruppe4.Common.TreeHelper;
+import GraphXings.Gruppe4.GameObservations.ValuableVertices;
 import GraphXings.Gruppe4.Strategies.*;
 import GraphXings.Gruppe4.Gui.GuiExport;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
@@ -54,6 +55,8 @@ public class RTreePlayer implements NewPlayer {
     private GuiExport guiExport;
 
     private GameObserver gameObserver;
+
+    private ValuableVertices valuableVertices;
 
     // Set to true if you'd like to export data
     private boolean enableExport = false;
@@ -125,6 +128,9 @@ public class RTreePlayer implements NewPlayer {
         gs = new GameState(g, width, height);
 
         this.gameObserver = new GameObserver(g, role, width, height);
+
+        valuableVertices = new ValuableVertices(g, gs);
+        valuableVertices.computeRank();
 
         if (enableExport) {
             try {
