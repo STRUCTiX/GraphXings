@@ -6,8 +6,9 @@ import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
-import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
+import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleParameters;
+import GraphXings.Gruppe4.GameObservations.ValuableVertices;
 import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
 import GraphXings.Gruppe4.StrategiesStopWatch;
@@ -16,10 +17,17 @@ import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 import java.util.List;
 import java.util.Optional;
 
-public class MaximizeDiagonalCrossingAngle extends StrategyClass {
+/**
+ * This maximizer places the vertices with the most incident edges first.
+ * These will be placed in the left upper and right lower corner.
+ */
+public class MaximizePlaceHighIncidentEdgesAngle extends StrategyClass {
 
-    public MaximizeDiagonalCrossingAngle(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
-        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MaximizeDiagonalCrossingAngle));
+    ValuableVertices valuableVertices;
+
+    public MaximizePlaceHighIncidentEdgesAngle(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch, ValuableVertices valuableVertices) {
+        super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MaximizePlaceHighIncidentEdgesAngle));
+        this.valuableVertices = valuableVertices;
         moveQuality = 0;
     }
 
@@ -34,8 +42,9 @@ public class MaximizeDiagonalCrossingAngle extends StrategyClass {
      */
     @Override
     public boolean executeHeuristic(Optional<GameMove> lastMove) {
-        gameMove = Heuristics.getFreeGameMoveOnCanvasCenter(g, gs.getUsedCoordinates(), gs.getVertexCoordinates(), null, gs.getPlacedVertices(), width, height);
-        return gameMove.isPresent();
+        var vertex = valuableVertices.getAndRemoveVertexWithMostEdges();
+        gameMove = Optional.of(new GameMove(vertex, new Coordinate(0, 0)));
+        return true;
     }
 
     /**
@@ -72,9 +81,9 @@ public class MaximizeDiagonalCrossingAngle extends StrategyClass {
         }
 
         // Select an unplaced vertex neighbour
-        var unplacedVertexOption = Helper.pickIncidentVertex(g, vertexCoordinates, lastMove);
+        var valuableUnplacedVertex = valuableVertices.getAndRemoveVertexWithMostEdges();
         Vertex unplacedVertex = null;
-        if (unplacedVertexOption.isEmpty()) {
+        if (valuableUnplacedVertex == null) {
             // In this case we have to select any free vertex
             for (var v : g.getVertices()) {
                 if (!placedVertices.contains(v)) {
@@ -83,7 +92,8 @@ public class MaximizeDiagonalCrossingAngle extends StrategyClass {
                 }
             }
         } else {
-            unplacedVertex = unplacedVertexOption.get();
+            //
+            unplacedVertex = valuableUnplacedVertex;
         }
 
         // Pick 10/more/less random coordinates out of a perimeter and test for the max. crossings
@@ -108,7 +118,7 @@ public class MaximizeDiagonalCrossingAngle extends StrategyClass {
      */
     @Override
     public StrategyName getStrategyName() {
-        return StrategyName.MaximizeDiagonalCrossingAngle;
+        return StrategyName.MaximizePlaceHighIncidentEdgesAngle;
     }
 
     /**

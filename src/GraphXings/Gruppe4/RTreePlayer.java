@@ -158,6 +158,7 @@ public class RTreePlayer implements NewPlayer {
                 new MaximizePointReflection(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizeDiagonalCrossingAngle(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new MaximizePlaceHighIncidentEdgesAngle(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch(), valuableVertices),
                 //new MaximizeGrid(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters, gameObserver.getStrategiesStopWatch()),
         };

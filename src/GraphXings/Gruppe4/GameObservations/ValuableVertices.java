@@ -20,6 +20,9 @@ public class ValuableVertices {
         vertexIncidentEdges = new ArrayList<>(((HashSet<Vertex>)g.getVertices()).size());
     }
 
+    /**
+     * This computation must be performed before usage
+     */
     public void computeRank() {
         for (var vertex : g.getVertices()) {
             var incidentCount = Iterables.size(g.getIncidentEdges(vertex));
@@ -29,6 +32,10 @@ public class ValuableVertices {
         vertexIncidentEdges.sort(Map.Entry.comparingByValue());
     }
 
+    /**
+     * Returns the Vertex with the most incident edges which is currently free to use.
+     * @return Vertex
+     */
     public Vertex getAndRemoveVertexWithMostEdges() {
         for (int i = vertexIncidentEdges.size() - 1; i >= 0; i--) {
             Vertex currentVertex = vertexIncidentEdges.get(i).getKey();
