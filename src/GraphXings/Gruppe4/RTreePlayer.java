@@ -131,6 +131,9 @@ public class RTreePlayer implements NewPlayer {
 
         valuableVertices = new ValuableVertices(g, gs);
         valuableVertices.computeRank();
+        if (role == Role.MIN_ANGLE) {
+            valuableVertices.computeEllipseCoordinates(width, height);
+        }
 
         if (enableExport) {
             try {
