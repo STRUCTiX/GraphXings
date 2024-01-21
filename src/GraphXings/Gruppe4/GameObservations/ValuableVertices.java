@@ -103,6 +103,7 @@ public class ValuableVertices {
 
     /**
      * Bresenham ellipse algorithm.
+     * Taken from here: https://de.wikipedia.org/wiki/Bresenham-Algorithmus#Ellipsen
      * @param xm Middle coordinate in x direction
      * @param ym Middle coordinate in x direction
      * @param a Radius
