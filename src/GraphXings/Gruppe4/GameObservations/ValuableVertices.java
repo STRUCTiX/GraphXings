@@ -1,5 +1,6 @@
 package GraphXings.Gruppe4.GameObservations;
 
+import GraphXings.Data.Coordinate;
 import GraphXings.Data.Graph;
 import GraphXings.Data.Vertex;
 import GraphXings.Game.GameState;
@@ -49,5 +50,44 @@ public class ValuableVertices {
         }
         // This shouldn't happen. In this case the game is already over.
         return null;
+    }
+
+    /**
+     * Bresenham circle algorithm.
+     * @param xm Middle coordinate in x direction
+     * @param ym Middle coordinate in x direction
+     * @param a
+     * @param b
+     * @return
+     */
+    private ArrayList<Coordinate> ellipse(int xm, int ym, int a, int b) {
+        int dx = 0, dy = b; /* im I. Quadranten von links oben nach rechts unten */
+        long a2 = a * (long)a, b2 = b * (long)b;
+        long err = b2 - (2 * (long)b - 1) * a2, e2; /* Fehler im 1. Schritt */
+
+        ArrayList<Coordinate> coordinates = new ArrayList<>();
+
+        do {
+            coordinates.add(new Coordinate(xm + dx, ym + dy)); /* I. Quadrant */
+            coordinates.add(new Coordinate(xm - dx, ym + dy)); /* II. Quadrant */
+            coordinates.add(new Coordinate(xm - dx, ym - dy)); /* III. Quadrant */
+            coordinates.add(new Coordinate(xm + dx, ym - dy)); /* IV. Quadrant */
+            e2 = 2 * err;
+
+            if (e2 <  (2 * (long)dx + 1) * b2) {
+                ++dx; err += (2 * (long)dx + 1) * b2;
+            }
+            if (e2 > -(2 * (long)dy - 1) * a2) {
+                --dy; err -= (2 * (long)dy - 1) * a2;
+            }
+        } while (dy >= 0);
+
+        while (dx++ < a) {
+            /* fehlerhafter Abbruch bei flachen Ellipsen (b=1) */
+            coordinates.add(new Coordinate(xm+dx, ym)); /* -> Spitze der Ellipse vollenden */
+            coordinates.add(new Coordinate(xm-dx, ym));
+        }
+
+        return coordinates;
     }
 }
