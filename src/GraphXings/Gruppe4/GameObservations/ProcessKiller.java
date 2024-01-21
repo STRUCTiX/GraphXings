@@ -18,18 +18,17 @@ public class ProcessKiller {
     }
 
     public boolean killPythonProcess() {
-        ProcessBuilder pb = new ProcessBuilder();
-        if (isWindows) {
-            // Windows strategy
-            pb.command("Taskkill /IM python.exe /F; Taskkill /IM python3.exe /F");
-        } else {
-            // Linux/MacOS strategy
-            pb.command("killall python; killall python3");
-        }
-
         // Start killing
         try {
-            pb.start();
+            if (isWindows) {
+                // Windows strategy
+                Process p = Runtime.getRuntime().exec(new String[]{"Taskkill", "/IM", "python.exe", "/F"});
+                Process p3 = Runtime.getRuntime().exec(new String[]{"Taskkill", "/IM", "python3.exe", "/F"});
+            } else {
+                // Linux/MacOS strategy
+                Process p = Runtime.getRuntime().exec(new String[]{"pkill", "-9", "python"});
+                Process p3 = Runtime.getRuntime().exec(new String[]{"pkill", "-9", "python3"});
+            }
         } catch (IOException e) {
             // Didn't work or no Python process exists.
             return false;
