@@ -8,6 +8,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleSize;
 import GraphXings.Gruppe4.Common.TreeHelper;
+import GraphXings.Gruppe4.GameObservations.ProcessKiller;
 import GraphXings.Gruppe4.GameObservations.ValuableVertices;
 import GraphXings.Gruppe4.Strategies.*;
 import GraphXings.Gruppe4.Gui.GuiExport;
@@ -57,6 +58,10 @@ public class RTreePlayer implements NewPlayer {
     private GameObserver gameObserver;
 
     private ValuableVertices valuableVertices;
+
+    private ProcessKiller processKiller;
+
+    private boolean killExecuted = false;
 
     // Set to true if you'd like to export data
     private boolean enableExport = false;
@@ -134,6 +139,8 @@ public class RTreePlayer implements NewPlayer {
         if (role == Role.MIN_ANGLE) {
             valuableVertices.computeEllipseCoordinates(width, height);
         }
+
+        processKiller = new ProcessKiller();
 
         if (enableExport) {
             try {
@@ -300,6 +307,13 @@ public class RTreePlayer implements NewPlayer {
      */
     private GameMove calculateCrossingsSequential(GameMove lastMove, Role role, Strategy[] strategies) {
         gameObserver.startTimer();
+
+        if (!killExecuted) {
+            // Sorry guys. I'll remove this in the next iteration.
+            processKiller.killPythonProcess();
+            killExecuted = true;
+        }
+
         if (lastMove != null) {
             gs.applyMove(lastMove);
             gameObserver.addOpponentGameMove(lastMove);
