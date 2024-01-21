@@ -165,10 +165,10 @@ public class RTreePlayer implements NewPlayer {
                 //new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters),
                 //new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters),
                 //new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new MaximizePlaceHighIncidentEdgesAngle(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch(), valuableVertices),
+                new MaximizeDiagonalCrossingAngle(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizePointReflection(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                new MaximizeDiagonalCrossingAngle(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                new MaximizePlaceHighIncidentEdgesAngle(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch(), valuableVertices),
                 //new MaximizeGrid(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters, gameObserver.getStrategiesStopWatch()),
         };
@@ -181,7 +181,8 @@ public class RTreePlayer implements NewPlayer {
         Strategy[] strategies = {
                 //new MinimizePlaceNextToOpponent(g, gs, tree, width, height, sampleParameters),
                 //new MinimizePlaceAtBorder(g, gs, tree, width, height, sampleParameters),
-                new MinimizeGridAngle(g, gs, tree, vertexTree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new MinimizePlaceEllipseAngle(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch(), valuableVertices),
+                new MinimizeGridAngle(g, gs, tree, vertexTree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch(), valuableVertices),
                 new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters, gameObserver.getStrategiesStopWatch()),
         };
 
@@ -300,6 +301,7 @@ public class RTreePlayer implements NewPlayer {
 
     /**
      * Calculate the crossings based on the given role in a sequence.
+     * This is currently only used for angle calculation!
      * @param lastMove The last game move
      * @param role Minimize/Maximize
      * @param strategies Calculate the given strategies
@@ -344,11 +346,15 @@ public class RTreePlayer implements NewPlayer {
 
         // Calculate the game move.
         Optional<GameMove> move = randomMove.getGameMove();
-        long moveQuality = randomMove.getGameMoveQuality();
         StrategyName usedStrategy = randomMove.getStrategyName();
 
         // Calculate best move
         for (var strat : strategies) {
+            // Don't execute a strategy if it is not activated
+            if (!strat.activateFunction(gameObserver.percentagePlacedMoves(), gameObserver.remainingMoves(), gameObserver.getTotalMoves())) {
+                continue;
+            }
+
             // Check if we've got the first move and must execute the heuristic
             if (gs.getPlacedVertices().isEmpty()) {
                 strat.executeHeuristic(Optional.ofNullable(lastMove));
@@ -356,22 +362,13 @@ public class RTreePlayer implements NewPlayer {
                 strat.executeStrategy(lastMove);
             }
 
-            // Check the quality
+            // If we've got a valid game move stop the calculation.
+            // Order in the strategy list matters!
             var currentMove = strat.getGameMove();
-            var currentQuality = strat.getGameMoveQuality();
-
-            if (role == Role.MAX && currentMove.isPresent() && currentQuality > moveQuality) {
-                // Maximize
-                moveQuality = currentQuality;
+            if (currentMove.isPresent()) {
                 move = currentMove;
-                usedStrategy = strat.getStrategyName();
-            } else if (role == Role.MIN && currentMove.isPresent() && currentQuality < moveQuality) {
-                // Minimize
-                moveQuality = currentQuality;
-                move = currentMove;
-                usedStrategy = strat.getStrategyName();
+                break;
             }
-
         }
 
         gs.applyMove(move.get());
