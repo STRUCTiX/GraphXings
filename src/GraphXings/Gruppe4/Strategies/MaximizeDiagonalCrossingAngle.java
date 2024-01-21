@@ -119,6 +119,6 @@ public class MaximizeDiagonalCrossingAngle extends StrategyClass {
      */
     @Override
     public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves) {
-        return true;
+        return currentMove > 20;
     }
 }
