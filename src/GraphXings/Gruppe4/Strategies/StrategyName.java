@@ -20,5 +20,6 @@ public enum StrategyName {
     MinimizeGridAngle,
     MaximizeDiagonalCrossingAngle,
     MaximizePlaceHighIncidentEdgesAngle,
+    MinimizePlaceEllipseAngle,
     Unknown
 }

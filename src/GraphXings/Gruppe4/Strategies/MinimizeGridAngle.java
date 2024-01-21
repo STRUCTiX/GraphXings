@@ -9,6 +9,7 @@ import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.Helper;
 import GraphXings.Gruppe4.Common.TreeHelper;
+import GraphXings.Gruppe4.GameObservations.ValuableVertices;
 import GraphXings.Gruppe4.MutableRTree;
 import GraphXings.Gruppe4.StrategiesStopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
@@ -25,8 +26,10 @@ import java.util.Optional;
 public class MinimizeGridAngle extends StrategyClass {
 
     private final MutableRTree<Vertex, PointFloat> vtree;
-    public MinimizeGridAngle(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, MutableRTree<Vertex, PointFloat> vtree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch) {
+    private final ValuableVertices valuableVertices;
+    public MinimizeGridAngle(Graph g, GameState gs, MutableRTree<Edge, LineFloat> tree, MutableRTree<Vertex, PointFloat> vtree, int width, int height, SampleParameters sampleParameters, StrategiesStopWatch strategiesStopWatch, ValuableVertices valuableVertices) {
         super(g, gs, tree, width, height, sampleParameters, strategiesStopWatch.getWatch(StrategyName.MinimizeGridAngle));
+        this.valuableVertices = valuableVertices;
         this.vtree = vtree;
         moveQuality = 0;
     }
@@ -171,6 +174,6 @@ public class MinimizeGridAngle extends StrategyClass {
      */
     @Override
     public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves) {
-        return true;
+        return valuableVertices.getCoordinateSize() <= 0;
     }
 }

@@ -94,6 +94,14 @@ public class ValuableVertices {
     }
 
     /**
+     * Retrieve the size of the remaining coordinates
+     * @return Integer with the size
+     */
+    public int getCoordinateSize() {
+        return ellipseCoordinates.size();
+    }
+
+    /**
      * Bresenham ellipse algorithm.
      * @param xm Middle coordinate in x direction
      * @param ym Middle coordinate in x direction
