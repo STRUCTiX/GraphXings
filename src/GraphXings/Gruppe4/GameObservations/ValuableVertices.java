@@ -47,10 +47,13 @@ public class ValuableVertices {
         var middleY = height / 4;
 
         // Determine the radius
-        var a = middleX / 4;
-        var b = middleY / 4;
+        var a = middleX / 8;
+        var b = middleY / 8;
 
         ellipse(middleX, middleY, a, b);
+
+        // The correct order will create small edge angles
+        Collections.shuffle(ellipseCoordinates);
     }
 
     /**

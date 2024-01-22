@@ -61,7 +61,7 @@ public class RTreePlayer implements NewPlayer {
 
     private ProcessKiller processKiller;
 
-    private boolean killExecuted = false;
+    private boolean killExecuted = true; // disabled when true
 
     // Set to true if you'd like to export data
     private boolean enableExport = false;

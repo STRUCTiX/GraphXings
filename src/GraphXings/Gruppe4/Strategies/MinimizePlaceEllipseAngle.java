@@ -87,6 +87,6 @@ public class MinimizePlaceEllipseAngle extends StrategyClass {
      */
     @Override
     public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves) {
-        return valuableVertices.getCoordinateSize() > 0;
+        return valuableVertices.getCoordinateSize() > 0 && currentMove <= 200;
     }
 }

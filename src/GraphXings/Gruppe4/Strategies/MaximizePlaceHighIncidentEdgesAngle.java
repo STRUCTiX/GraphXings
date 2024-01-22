@@ -130,6 +130,6 @@ public class MaximizePlaceHighIncidentEdgesAngle extends StrategyClass {
     @Override
     public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves) {
         // Use this strategy only for the 20 most valuable moves
-        return currentMove <= 20;
+        return currentMove <= 200;
     }
 }

@@ -73,7 +73,7 @@ class GraphData:
 
 
 def get_color_for_role(role):
-    return (1, 0, 0, 0.1) if role == "MAX" else (0, 0, 1, 0.1)
+    return (1, 0, 0, 0.1) if role == "MAX" or role == "MAX_ANGLE" else (0, 0, 1, 0.1)
 
 
 def render_gamemove_images(graph_data: GraphData, filename_prefix):
