@@ -351,7 +351,7 @@ public class RTreePlayer implements NewPlayer {
         // Calculate best move
         for (var strat : strategies) {
             // Don't execute a strategy if it is not activated
-            if (!strat.activateFunction(gameObserver.percentagePlacedMoves(), gameObserver.remainingMoves(), gameObserver.getTotalMoves())) {
+            if (!strat.activateFunction(gameObserver.percentagePlacedMoves(), gameObserver.getCurrentMoves(), gameObserver.getTotalMoves())) {
                 continue;
             }
 

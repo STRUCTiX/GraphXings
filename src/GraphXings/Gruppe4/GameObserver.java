@@ -83,6 +83,10 @@ public class GameObserver {
         return totalVerticesCount;
     }
 
+    public int getCurrentMoves() {
+        return currentVerticesCount;
+    }
+
     /**
      * Returns a double between 0-100% of already placed moves
      * @return A double
