@@ -7,9 +7,9 @@ read answer
 
 if [ "$answer" == "y" ]; then
     for d in "${LOG_DIR}/"1*M*/ ; do
-        pushd "${d}"
+        pushd "${d}" 1>/dev/null
         rm 1*M*.png 2>/dev/null && ( f="$(basename ${d})" && echo "Deleted files in directory \"${f}.\"" )
-        popd
+        popd 1>/dev/null
     done
 else
     echo "Deletion canceled."
