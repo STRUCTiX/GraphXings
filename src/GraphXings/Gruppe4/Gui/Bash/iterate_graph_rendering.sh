@@ -5,6 +5,7 @@ LOG_DIR="../../../../../logs"
 NO_OF_THREADS=6
 SECONDS_OF_SLEEP=60
 
+mkdir -p ${LOG_DIR}/{MIN,MAX}{,_ANGLE}
 while true; do
     # Check if there are less than NO_OF_THREADS background processes
     if [ "$(jobs | wc -l)" -lt ${NO_OF_THREADS} ]; then
@@ -17,7 +18,7 @@ while true; do
             mkdir -p "${d}"
             mv "${LOG_DIR}/${f}" "${d}/"
             # Launch a new command in the background
-            python Python/graph.py "${d}/${f}" &
+            python "${GRAPH_BIN}" "${d}/${f}" &
         else
             # No matching files found, break out of the loop
             break
