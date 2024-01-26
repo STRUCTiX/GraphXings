@@ -2,9 +2,10 @@
 
 PYTHON_BIN="python3"
 GRAPH_SCRIPT="../Python/graph.py"
-LOG_DIR="../../../../../logs"
 NO_OF_THREADS=6
 SECONDS_OF_SLEEP=60
+
+source vars.sh
 
 mkdir -p ${LOG_DIR}/{MIN,MAX}{,_ANGLE}
 while true; do

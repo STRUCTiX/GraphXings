@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-LOG_DIR="../../../../../logs"
+source vars.sh
 
 # https://stackoverflow.com/questions/24961127/how-to-create-a-video-from-images-with-ffmpeg
 for d in "${LOG_DIR}/"1*M*/ ; do
