@@ -32,7 +32,7 @@ public class GuiExport {
     private BufferedWriter buffer;
 
 
-    public GuiExport() throws IOException {
+    public GuiExport(NewPlayer.Role role) throws IOException {
         final String directoryPath = "./logs/";
         // Get the current time after the Unix epoch.
         // This ensures that filenames are unique
@@ -41,7 +41,7 @@ public class GuiExport {
         File directory = new File(directoryPath);
         directory.mkdirs();
 
-        file = new FileWriter(directoryPath + currentTime + ".txt");
+        file = new FileWriter(directoryPath + currentTime + role.name() + ".txt");
         buffer = new BufferedWriter(file);
     }
 

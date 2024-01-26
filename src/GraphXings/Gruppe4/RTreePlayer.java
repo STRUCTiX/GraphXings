@@ -64,7 +64,7 @@ public class RTreePlayer implements NewPlayer {
     private boolean killExecuted = true; // disabled when true
 
     // Set to true if you'd like to export data
-    private boolean enableExport = false;
+    private boolean enableExport = true;
 
     /**
      * Creates a random player with the assigned name.
@@ -147,7 +147,7 @@ public class RTreePlayer implements NewPlayer {
                 if (guiExport != null) {
                     guiExport.close();
                 }
-                guiExport = new GuiExport();
+                guiExport = new GuiExport(role);
 
                 // Export the initial graph
                 guiExport.exportGraphStructure(g, role, name);
