@@ -21,5 +21,6 @@ public enum StrategyName {
     MaximizeDiagonalCrossingAngle,
     MaximizePlaceHighIncidentEdgesAngle,
     MinimizePlaceEllipseAngle,
+    Bruteforce,
     Unknown
 }

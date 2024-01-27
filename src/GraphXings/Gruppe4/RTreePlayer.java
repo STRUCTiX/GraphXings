@@ -64,7 +64,7 @@ public class RTreePlayer implements NewPlayer {
     private boolean killExecuted = true; // disabled when true
 
     // Set to true if you'd like to export data
-    private boolean enableExport = true;
+    private boolean enableExport = false;
 
     /**
      * Creates a random player with the assigned name.
@@ -84,13 +84,14 @@ public class RTreePlayer implements NewPlayer {
 
         // Instantiate the strategies
         Strategy[] maximizer = {
-                new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                new MaximizePointReflection(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                //new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                //new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                //new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                //new MaximizePointReflection(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 //new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 //new MaximizeGrid(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                //new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new BruteforceCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch(), Role.MAX),
         };
         return calculateCrossings(lastMove, Role.MAX, maximizer);
     }
@@ -105,7 +106,8 @@ public class RTreePlayer implements NewPlayer {
         Strategy[] minimizer = {
                 //new MinimizePlaceNextToOpponent(g, gs, tree, width, height, sampleParameters),
                 //new MinimizePlaceAtBorder(g, gs, tree, width, height, sampleParameters),
-                new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                //new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new BruteforceCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch(), Role.MIN),
         };
 
         return calculateCrossings(lastMove, Role.MIN, minimizer);
