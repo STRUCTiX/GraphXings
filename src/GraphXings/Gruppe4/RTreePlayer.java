@@ -85,12 +85,12 @@ public class RTreePlayer implements NewPlayer {
         // Instantiate the strategies
         Strategy[] maximizer = {
                 //new MaximizePlaceVertexOnEdge(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                //new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                //new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                //new MaximizePointReflection(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new MaximizePlaceInDenseRegion(g, gs, tree, vertexTree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new MaximizeDiagonalCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new MaximizePointReflection(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 //new MaximizePointReflectionFromBorder(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 //new MaximizeGrid(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
-                //new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new RandomSampleMove(g, gs, tree, width, height, Role.MAX, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new BruteforceCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch(), Role.MAX),
         };
         return calculateCrossings(lastMove, Role.MAX, maximizer);
@@ -104,9 +104,9 @@ public class RTreePlayer implements NewPlayer {
 
         // Instantiate the strategies
         Strategy[] minimizer = {
-                //new MinimizePlaceNextToOpponent(g, gs, tree, width, height, sampleParameters),
+                new MinimizePlaceNextToOpponent(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 //new MinimizePlaceAtBorder(g, gs, tree, width, height, sampleParameters),
-                //new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters, gameObserver.getStrategiesStopWatch()),
+                new RandomSampleMove(g, gs, tree, width, height, Role.MIN, sampleParameters, gameObserver.getStrategiesStopWatch()),
                 new BruteforceCrossing(g, gs, tree, width, height, sampleParameters, gameObserver.getStrategiesStopWatch(), Role.MIN),
         };
 
@@ -229,6 +229,10 @@ public class RTreePlayer implements NewPlayer {
 
         var threads = new ArrayList<Thread>(4);
         for (var strat : strategies) {
+            if (!strat.activateFunction(gameObserver.percentagePlacedMoves(), gameObserver.getCurrentMoves(), gameObserver.getTotalMoves())) {
+                // Skip the strategy if it shouldn't be active.
+                continue;
+            }
             threads.add(Thread.ofVirtual().start(() -> {
                 // Check if we've got the first move and must execute the heuristic
                 if (gs.getPlacedVertices().isEmpty()) {
