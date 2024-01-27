@@ -128,7 +128,9 @@ public class BruteforceCrossing extends StrategyClass {
      */
     @Override
     public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves) {
-        return true;
+        // Use Bruteforce strategy only if we have a small field (< 100x100)
+        // and in late game -> we can skip most of the fields so the strategy computes faster.
+        return width * height < 10000 && percentagePlacedMoves > 70.0;
     }
 
 }
