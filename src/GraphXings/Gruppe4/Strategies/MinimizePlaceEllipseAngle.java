@@ -89,4 +89,16 @@ public class MinimizePlaceEllipseAngle extends StrategyClass {
     public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves) {
         return valuableVertices.getCoordinateSize() > 0 && currentMove <= 200;
     }
+
+    /**
+     * Retrieve the weight of the current strategy move.
+     * The execute strategy must be called first.
+     *
+     * @return Weight as double
+     */
+    @Override
+    public double getWeight() {
+        // We currently don't need weights for angle strategies
+        return 0;
+    }
 }

@@ -121,4 +121,16 @@ public class MaximizeDiagonalCrossingAngle extends StrategyClass {
     public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves) {
         return currentMove > 20;
     }
+
+    /**
+     * Retrieve the weight of the current strategy move.
+     * The execute strategy must be called first.
+     *
+     * @return Weight as double
+     */
+    @Override
+    public double getWeight() {
+        // We currently don't need weights for angle strategies
+        return 0;
+    }
 }
