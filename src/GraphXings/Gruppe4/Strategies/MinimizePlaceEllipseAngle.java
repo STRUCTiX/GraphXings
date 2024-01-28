@@ -99,6 +99,6 @@ public class MinimizePlaceEllipseAngle extends StrategyClass {
     @Override
     public double getWeight() {
         // We currently don't need weights for angle strategies
-        return 0;
+        return 1;
     }
 }

@@ -248,7 +248,7 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
      */
     protected double calculateVertexWeight() {
         if (gameMove.isEmpty()) {
-            return 0;
+            return 1;
         }
 
         var vertex = gameMove.get().getVertex();

@@ -249,7 +249,9 @@ public class RTreePlayer implements NewPlayer {
 
         // Calculate the game move.
         Optional<GameMove> move = randomMove.getGameMove();
+        double moveWeight = randomMove.getWeight();
         long moveQuality = randomMove.getGameMoveQuality();
+        double weightedQuality = moveQuality * moveWeight;
         StrategyName usedStrategy = randomMove.getStrategyName();
 
         // Join the threads
@@ -266,15 +268,16 @@ public class RTreePlayer implements NewPlayer {
             // Check the quality
             var currentMove = strat.getGameMove();
             var currentQuality = strat.getGameMoveQuality();
+            var currentWeight = strat.getWeight();
 
-            if (role == Role.MAX && currentMove.isPresent() && currentQuality > moveQuality) {
+            if (role == Role.MAX && currentMove.isPresent() && currentQuality * currentWeight > weightedQuality) {
                 // Maximize
-                moveQuality = currentQuality;
+                weightedQuality = currentQuality * currentWeight;
                 move = currentMove;
                 usedStrategy = strat.getStrategyName();
-            } else if (role == Role.MIN && currentMove.isPresent() && currentQuality < moveQuality) {
+            } else if (role == Role.MIN && currentMove.isPresent() && currentQuality * currentWeight < weightedQuality) {
                 // Minimize
-                moveQuality = currentQuality;
+                weightedQuality = currentQuality * currentWeight;
                 move = currentMove;
                 usedStrategy = strat.getStrategyName();
             }
