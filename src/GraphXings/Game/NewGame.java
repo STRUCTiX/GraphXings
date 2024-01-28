@@ -275,7 +275,7 @@ public class NewGame
 		if (false) {
 			if (player1 instanceof RTreePlayer) {
 				((RTreePlayer) player1).getGameObserver().report();
-			} else {
+			} else if (player2 instanceof RTreePlayer) {
 				((RTreePlayer) player2).getGameObserver().report();
 			}
 		}
