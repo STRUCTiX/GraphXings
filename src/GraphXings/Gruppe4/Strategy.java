@@ -51,4 +51,12 @@ public interface Strategy {
      * @return True if the strategy is effective and should be calculated.
      */
     public boolean activateFunction(double percentagePlacedMoves, int currentMove, int totalMoves);
+
+    /**
+     * Retrieve the weight of the current strategy move.
+     * The execute strategy must be called first.
+     * @return Weight as double
+     */
+    public double getWeight();
+
 }

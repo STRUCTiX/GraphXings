@@ -241,6 +241,11 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
         }
     }
 
+    /**
+     * Calculate the average edge length of a vertex.
+     * This value is used as a weight.
+     * @return Average edge length as double
+     */
     protected double calculateVertexWeight() {
         if (gameMove.isEmpty()) {
             return 0;
