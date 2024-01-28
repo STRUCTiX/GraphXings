@@ -155,4 +155,16 @@ public class MaximizeGrid extends StrategyClass{
         // TODO: Fix strategy and then activate again
         return false;
     }
+
+    /**
+     * Retrieve the weight of the current strategy move.
+     * The execute strategy must be called first.
+     *
+     * @return Weight as double
+     */
+    @Override
+    public double getWeight() {
+        // We could add some custom weighting here
+        return calculateVertexWeight();
+    }
 }
