@@ -8,10 +8,12 @@ import GraphXings.Game.GameMove;
 import GraphXings.Game.GameState;
 import GraphXings.Gruppe4.GameObservations.CanvasObservations.SampleParameters;
 import GraphXings.Gruppe4.Common.EdgeHelper;
+import GraphXings.Gruppe4.Heuristics;
 import GraphXings.Gruppe4.MutableRTree;
 import GraphXings.Gruppe4.StopWatch;
 import com.github.davidmoten.rtree2.geometry.internal.LineFloat;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -237,6 +239,41 @@ public abstract class StrategyClass implements GraphXings.Gruppe4.Strategy {
         } else {
             return Optional.of(new GameMove(bestVertex, bestCoordinate));
         }
+    }
+
+    protected double calculateVertexWeight() {
+        if (gameMove.isEmpty()) {
+            return 0;
+        }
+
+        var vertex = gameMove.get().getVertex();
+        var coordinate = gameMove.get().getCoordinate();
+
+        int distanceSum = 0;
+        int edgeCount = ((HashSet<Edge>) g.getIncidentEdges(vertex)).size();
+
+        // Get the incident edges of the vertex
+        for (var inc : g.getIncidentEdges(vertex)) {
+            if (inc.getS().equals(vertex)) {
+                // Check for T coordinates
+                var tCoord = gs.getVertexCoordinates().get(inc.getT());
+                if (tCoord != null) {
+                    distanceSum += Heuristics.euclideanDistance(coordinate, tCoord);
+                }
+            } else if (inc.getT().equals(vertex)) {
+                // Check for S coordinates
+                var sCoord = gs.getVertexCoordinates().get(inc.getS());
+                if (sCoord != null) {
+                    distanceSum += Heuristics.euclideanDistance(coordinate, sCoord);
+                }
+            }
+        }
+
+        // Calculate the average edge length.
+        // Even if not all edges are placed yet.
+        // This should compensate vertices with higher edge counts -> these are more valuable but tend to have a higher edge length score.
+
+        return distanceSum / (double) edgeCount;
     }
 
 
