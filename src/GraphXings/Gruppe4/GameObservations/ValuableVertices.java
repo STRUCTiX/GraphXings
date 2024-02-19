@@ -42,8 +42,9 @@ public class ValuableVertices {
      * @param height
      */
     public void computeEllipseCoordinates(int width, int height) {
-        // Use the upper right quadrant as center-point
-        var middleX = width * 3/4;
+        // Use the north side (between quadrant 1 and 2) as center-point
+        // to avoid getting crossed by diagonal maximizers.
+        var middleX = width / 2;
         var middleY = height / 4;
 
         // Determine the radius
