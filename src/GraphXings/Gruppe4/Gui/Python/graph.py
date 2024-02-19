@@ -113,6 +113,8 @@ def render_gamemove_images(graph_data: GraphData, filename_prefix):
         plt.figure()
 
         plt.grid(True)
+        plt.xlim(graph_data.width * -0.05, graph_data.width + graph_data.width * 0.05)  # x-Achsenlimit festlegen
+        plt.ylim(graph_data.height * -0.05, graph_data.height + graph_data.height * 0.05)  # y-Achsenlimit festlegen
 
         # Draw the graph with assigned colors
         # nx.draw_networkx(G, nodelist=nodes, edgelist=edges, pos=node_positions_todo, with_labels=True,
