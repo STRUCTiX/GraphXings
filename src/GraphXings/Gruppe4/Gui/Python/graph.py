@@ -112,7 +112,7 @@ def render_gamemove_images(graph_data: GraphData, filename_prefix):
         # Open new plot
         plt.figure()
 
-        plt.grid(True)
+        # plt.grid(True)
         plt.xlim(graph_data.width * -0.05, graph_data.width + graph_data.width * 0.05)  # x-Achsenlimit festlegen
         plt.ylim(graph_data.height * -0.05, graph_data.height + graph_data.height * 0.05)  # y-Achsenlimit festlegen
 
