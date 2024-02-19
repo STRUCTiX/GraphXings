@@ -152,7 +152,7 @@ public class RTreePlayer implements NewPlayer {
                 guiExport = new GuiExport(role);
 
                 // Export the initial graph
-                guiExport.exportGraphStructure(g, role, name);
+                guiExport.exportGraphStructure(g, role, name, width, height);
             } catch (IOException e) {
                 enableExport = false;
             }
@@ -289,7 +289,7 @@ public class RTreePlayer implements NewPlayer {
 
         if (enableExport) {
             try {
-                guiExport.exportVertexPlacement(move.get(), Role.MIN);
+                guiExport.exportVertexPlacement(move.get(), Role.MIN, usedStrategy.name());
             } catch (IOException e) {
                 enableExport = false;
             }
@@ -385,7 +385,7 @@ public class RTreePlayer implements NewPlayer {
 
         if (enableExport) {
             try {
-                guiExport.exportVertexPlacement(move.get(), Role.MIN);
+                guiExport.exportVertexPlacement(move.get(), Role.MIN, usedStrategy.name());
             } catch (IOException e) {
                 enableExport = false;
             }
