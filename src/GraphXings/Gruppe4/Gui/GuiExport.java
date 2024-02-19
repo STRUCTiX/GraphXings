@@ -50,12 +50,16 @@ public class GuiExport {
      * @param g
      * @throws IOException Can't write to file
      */
-    public void exportGraphStructure(Graph g, NewPlayer.Role role, String playerName) throws IOException {
+    public void exportGraphStructure(Graph g, NewPlayer.Role role, String playerName, int width, int height) throws IOException {
 
         // Write metadata
         buffer.write(playerName + "\n");
         buffer.write("\\\n");
         buffer.write(role.name() + "\n");
+        buffer.write("\\\n");
+        buffer.write(width + "\n");
+        buffer.write("\\\n");
+        buffer.write(height + "\n");
         // Write a delimiter
         buffer.write("\\\n");
 

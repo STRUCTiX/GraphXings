@@ -8,6 +8,8 @@ import os
 class GraphData:
     player_name = ""
     player_role = ""
+    width = 0
+    height = 0
     vertices = []
     edges = []
     game_moves = []
@@ -25,11 +27,15 @@ class GraphData:
             elif parse_mode == 1:
                 self.player_role = clean_line
             elif parse_mode == 2:
-                self.vertices.append(clean_line)
+                self.width = int(clean_line)
             elif parse_mode == 3:
+                self.height = int(clean_line)
+            elif parse_mode == 4:
+                self.vertices.append(clean_line)
+            elif parse_mode == 5:
                 v1, v2 = clean_line.split(",")
                 self.edges.append((v1, v2))
-            elif parse_mode == 4:
+            elif parse_mode == 6:
                 # We have the following format for game moves:
                 # role, vertex, x, y, player strategy
                 role, vertex, x, y, player_strategy = clean_line.split(",")
