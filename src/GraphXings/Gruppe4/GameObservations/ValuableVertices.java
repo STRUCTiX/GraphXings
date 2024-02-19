@@ -47,9 +47,11 @@ public class ValuableVertices {
         var middleX = width / 2;
         var middleY = height / 4;
 
+        var min = Math.min(width, height);
+
         // Determine the radius
-        var a = middleX / 8;
-        var b = middleY / 8;
+        var a = min / 8;
+        var b = min / 8;
 
         ellipse(middleX, middleY, a, b);
 
