@@ -179,4 +179,8 @@ public class MutableRTree<T, S extends Geometry> {
         return tree.search(rect);
     }
 
+    public void exportPicture(String variant, int width, int height) {
+        tree.visualize(width, height).save("./logs/" + System.nanoTime() + "_" + variant + ".png");
+    }
+
 }

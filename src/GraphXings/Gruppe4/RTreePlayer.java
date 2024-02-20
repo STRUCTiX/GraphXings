@@ -307,6 +307,10 @@ public class RTreePlayer implements NewPlayer {
         return move.get();
     }
 
+    public void saveImages() {
+        tree.exportPicture("edges", width, height);
+        vertexTree.exportPicture("vertex", width, height);
+    }
 
     /**
      * Calculate the crossings based on the given role in a sequence.
